@@ -103,7 +103,7 @@ public class JoinConditionVisitor implements SelectVisitor, ExpressionVisitor, F
 		joinConditions = new ArrayList<Expression>();
 		select.getSelectBody().accept(this);
 	
-		if(notSupported) // used to throw exception for the currently unsupported methods
+		if(notSupported && unquote) // used to throw exception for the currently unsupported methods
 			throw new JSQLParserException("Query not yet supported");
 		
 		return joinConditions;

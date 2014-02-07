@@ -141,7 +141,6 @@ public class MetaMappingExpander {
 //				try {
 //					selectQuery = (Select) CCJSqlParserUtil.parse(sourceQuery.toString());
 //				} catch (JSQLParserException e3) {
-//					// TODO Auto-generated catch block
 //					e3.printStackTrace();
 //				}
 				

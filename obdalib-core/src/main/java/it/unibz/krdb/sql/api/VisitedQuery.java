@@ -88,7 +88,7 @@ public class VisitedQuery implements Serializable{
 				
 				
 				//getting the values we also eliminate or handle the quotes if unquote is set to true
-				if(unquote){	
+				if(unquote){
 				tableSet = getTableSet();
 				selection = getSelection();
 				projection = getProjection();
@@ -108,7 +108,7 @@ public class VisitedQuery implements Serializable{
 	/**
 	 * The query is not parsed again
 	 * @param statement we pass already a parsed statement
-	 * @param unquote emove quotes if present
+	 * @param unquote remove quotes if present and throw exception when query is not supported
 	 * @throws JSQLParserException
 	 */
 	public VisitedQuery(Statement statement, boolean unquote) throws JSQLParserException{
@@ -126,9 +126,13 @@ public class VisitedQuery implements Serializable{
 				select = (Select)stm;
 				
 				
-				//getting the values we also eliminate or handle the quotes if unquote is set to true
-				if(unquote){	
-				tableSet = getTableSet();
+				/**
+				 * Getting the values we also eliminate or handle the quotes if unquote is set to true
+				 * and we throw errors for unsupported values
+				 */
+	
+				if(unquote){
+				tableSet = getTableSet();				
 				selection = getSelection();
 				projection = getProjection();
 				joins = getJoinCondition();
@@ -144,6 +148,21 @@ public class VisitedQuery implements Serializable{
 
 	}
 	
+	/**
+	 * Unquote the query and throw errors for unsupported values
+	 * @throws JSQLParserException
+	 */
+	public void unquote() throws JSQLParserException{
+		this.unquote=true;
+		  
+		tableSet = getTableSet();				
+		selection = getSelection();
+		projection = getProjection();
+		joins = getJoinCondition();
+		aliasMap = getAliasMap();
+		groupByClause =getGroupByClause();
+			
+	}
 	
 	
 
@@ -159,7 +178,7 @@ public class VisitedQuery implements Serializable{
 		
 		if(tableSet== null){
 			TablesNameVisitor tnp = new TablesNameVisitor();
-			tableSet =tnp.getTableList(select);
+			tableSet =tnp.getTableList(select, unquote);
 		}
 		return tableSet;
 	}
@@ -171,7 +190,7 @@ public class VisitedQuery implements Serializable{
 		
 		if(selectsSet== null){
 			SubSelectVisitor tnp = new SubSelectVisitor();
-			selectsSet =tnp.getSubSelectList(select);
+			selectsSet =tnp.getSubSelectList(select,unquote);
 		}
 		return selectsSet;
 	}

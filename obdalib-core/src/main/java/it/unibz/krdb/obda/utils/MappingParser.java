@@ -47,11 +47,11 @@ public class MappingParser {
 	private ArrayList<OBDAMappingAxiom> mappingList;
 	private SQLQueryTranslator translator;
 	private ArrayList<ParsedMapping> parsedMappings;
-	private ArrayList<RelationJSQL> realTables; // Tables that are not view definitions
+//	private ArrayList<RelationJSQL> realTables; // Tables that are not view definitions
 	
-	public MappingParser(Connection conn, ArrayList<OBDAMappingAxiom> mappingList) throws SQLException{
+	public MappingParser(ArrayList<OBDAMappingAxiom> mappingList) throws SQLException{
 		this.mappingList = mappingList;
-		this.translator = new SQLQueryTranslator(conn);
+		this.translator = new SQLQueryTranslator();
 		this.parsedMappings = this.parseMappings();
 	}
 	
@@ -62,23 +62,23 @@ public class MappingParser {
 	 * @return The tables (same as getTables) but without those that are created by the sqltranslator as view definitions
 	 * @throws JSQLParserException 
 	 */
-	public ArrayList<RelationJSQL> getRealTables() throws JSQLParserException{
-		if(this.realTables == null){
-			ArrayList<RelationJSQL> _realTables = this.getTables();
-			ArrayList<RelationJSQL> removeThese = new ArrayList<RelationJSQL>();
-			for(ViewDefinition vd : translator.getViewDefinitions()){
-				for(RelationJSQL rel : _realTables){
-					if(rel.getName().equals(vd.getName()))
-						removeThese.add(rel);
-				}
-			}
-			for(RelationJSQL remRel : removeThese){
-				_realTables.remove(remRel);
-			}
-			this.realTables = _realTables;
-		}
-		return this.realTables;
-	}
+//	public ArrayList<RelationJSQL> getRealTables() throws JSQLParserException{
+//		if(this.realTables == null){
+//			ArrayList<RelationJSQL> _realTables = this.getTables();
+//			ArrayList<RelationJSQL> removeThese = new ArrayList<RelationJSQL>();
+//			for(ViewDefinition vd : translator.getViewDefinitions()){
+//				for(RelationJSQL rel : _realTables){
+//					if(rel.getName().equals(vd.getName()))
+//						removeThese.add(rel);
+//				}
+//			}
+//			for(RelationJSQL remRel : removeThese){
+//				_realTables.remove(remRel);
+//			}
+//			this.realTables = _realTables;
+//		}
+//		return this.realTables;
+//	}
 	
 	/**
 	 * Returns the list of parsed mapping objects.
@@ -89,6 +89,10 @@ public class MappingParser {
 	 */
 	public ArrayList<ParsedMapping> getParsedMappings(){
 		return parsedMappings;
+	}
+	
+	public ArrayList<OBDAMappingAxiom> getMappingList(){
+		return mappingList;
 	}
 	
 	public ArrayList<RelationJSQL> getTables() throws JSQLParserException{
@@ -113,11 +117,11 @@ public class MappingParser {
 	 * 
 	 * This must be separated out, since the parsing must be done before metadata extraction
 	 */
-	public void addViewDefs(DBMetadata metadata){
-		for (ViewDefinition vd : translator.getViewDefinitions()){
-			metadata.add(vd);
-		}
-	}
+//	public void addViewDefs(DBMetadata metadata){
+//		for (ViewDefinition vd : translator.getViewDefinitions()){
+//			metadata.add(vd);
+//		}
+//	}
 	
 	/**
 	 * 	Parses the mappingList (Actually, only the source sql is parsed.)

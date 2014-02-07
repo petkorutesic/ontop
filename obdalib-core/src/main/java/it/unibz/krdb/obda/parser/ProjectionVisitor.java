@@ -108,7 +108,7 @@ public class ProjectionVisitor implements SelectVisitor, SelectItemVisitor, Expr
 		}
 		select.getSelectBody().accept(this);
 		
-		if(notSupported) // used to throw exception for the currently unsupported methods
+		if(notSupported && unquote) // used to throw exception for the currently unsupported methods
 				throw new JSQLParserException("Query not yet supported");
 		
 		return projection;	

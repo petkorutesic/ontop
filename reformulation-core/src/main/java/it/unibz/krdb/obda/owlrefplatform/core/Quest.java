@@ -24,6 +24,7 @@ import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.model.Constant;
 import it.unibz.krdb.obda.model.DatalogProgram;
 import it.unibz.krdb.obda.model.Function;
+import it.unibz.krdb.obda.model.OBDAQuery;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDADataSource;
@@ -73,8 +74,10 @@ import it.unibz.krdb.obda.utils.MappingAnalyzer;
 import it.unibz.krdb.obda.utils.MappingParser;
 import it.unibz.krdb.obda.utils.MappingSplitter;
 import it.unibz.krdb.obda.utils.MetaMappingExpander;
+import it.unibz.krdb.obda.utils.ParsedMapping;
 import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.JDBCConnectionManager;
+import it.unibz.krdb.sql.api.VisitedQuery;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -685,7 +688,10 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			URI sourceId = datasource.getSourceID();
 
 
-			
+			/***
+			 * Parse all the mappings and retrieve the metadata
+			 */
+			MappingParser mParser = new MappingParser(unfoldingOBDAModel.getMappings(sourceId));
 			//if the metadata was not already set
 			if (metadata == null) {
 				// if we have to parse the full metadata or just the table list in the mappings
@@ -693,12 +699,9 @@ public class Quest implements Serializable, RepositoryChangedListener {
 					metadata = JDBCConnectionManager.getMetaData(localConnection);
 				} else {
 					// This is the NEW way of obtaining part of the metadata
-					// (the schema.table names) by parsing the mappings
-					MappingParser mParser = new MappingParser(localConnection, unfoldingOBDAModel.getMappings(sourceId));
-					metadata = JDBCConnectionManager.getMetaData(localConnection, mParser.getRealTables());
-					// This call should be used if the ParsedMappings 
-					// are reused for the parsing below
-					mParser.addViewDefs(metadata);
+					// (the schema.table names) by parsing the mappings			
+					metadata = JDBCConnectionManager.getMetaData(localConnection, mParser.getTables());
+			
 				}
 			}
 			
@@ -716,14 +719,13 @@ public class Quest implements Serializable, RepositoryChangedListener {
 				datasourceQueryGenerator.setUriIds(uriRefIds);
 			}
 
-			preprocessProjection(localConnection, unfoldingOBDAModel.getMappings(sourceId), fac, sqladapter);
-
-			
 			/***
 			 * Starting mapping processing
 			 */
-			
-			
+			//use the parsed mapping and the metadata to add columns where select * is present
+			preprocessProjection(mParser, fac);
+
+		
 			/**
 			 * Split the mapping
 			 */
@@ -747,6 +749,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
  			unfoldingProgram = analyzer.constructDatalogProgram();
 
+ 			//set the unfoldingobdamodel with the last parsed mapping
 			/***
 			 * T-Mappings and Fact mappings
 			 */
@@ -1062,15 +1065,18 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 	/***
 	 * Expands a SELECT * into a SELECT with all columns implicit in the *
+	 * It works only for subqueries of the form 
+	 * Select * from (select....) as CHILD,(select....) as PARENT, WHERE ...
 	 * 
-	 * @param mappings
+	 * @param mappings 
 	 * @param factory
-	 * @param adapter
 	 * @throws SQLException
 	 */
-	private void preprocessProjection(Connection localConnection, ArrayList<OBDAMappingAxiom> mappings, OBDADataFactory factory,
-			SQLDialectAdapter adapter) throws SQLException {
+	private void preprocessProjection(MappingParser mapParser, OBDADataFactory factory) throws SQLException {
 
+		//use metadata to fetch column name
+		ArrayList<ParsedMapping> mappings = mapParser.getParsedMappings();
+		
 		// TODO this code seems buggy, it will probably break easily (check the
 		// part with
 		// parenthesis in the beggining of the for loop.
@@ -1078,21 +1084,21 @@ public class Quest implements Serializable, RepositoryChangedListener {
 		Statement st = null;
 		try {
 			st = localConnection.createStatement();
-			for (OBDAMappingAxiom axiom : mappings) {
-				String sourceString = axiom.getSourceQuery().toString();
+			for (ParsedMapping axiom : mappings) {
+				VisitedQuery source = axiom.getSourceQueryParsed();
 
 				/*
 				 * Check if the projection contains select all keyword, i.e.,
 				 * 'SELECT * [...]'.
 				 */
-				if (containSelectAll(sourceString)) {
+				if (source.getProjection().getColumnList().isEmpty()) {
 					StringBuilder sb = new StringBuilder();
-
+			
 					 // If the SQL string has sub-queries in its statement
-					if (containChildParentSubQueries(sourceString)) {
-						int childquery1 = sourceString.indexOf("(");
-						int childquery2 = sourceString.indexOf(") as CHILD");
-						String childquery = sourceString.substring(childquery1 + 1, childquery2);
+					if (containChildParentSubQueries(source)) {
+						int childquery1 = source.indexOf("(");
+						int childquery2 = source.indexOf(") as CHILD");
+						String childquery = source.substring(childquery1 + 1, childquery2);
 
 						String copySourceQuery = createDummyQueryToFetchColumns(childquery, adapter);
 						if (st.execute(copySourceQuery)) {
@@ -1110,9 +1116,9 @@ public class Quest implements Serializable, RepositoryChangedListener {
 						}
 						sb.append(", ");
 
-						int parentquery1 = sourceString.indexOf(", (", childquery2);
-						int parentquery2 = sourceString.indexOf(") as PARENT");
-						String parentquery = sourceString.substring(parentquery1 + 3, parentquery2);
+						int parentquery1 = source.indexOf(", (", childquery2);
+						int parentquery2 = source.indexOf(") as PARENT");
+						String parentquery = source.substring(parentquery1 + 3, parentquery2);
 
 						copySourceQuery = createDummyQueryToFetchColumns(parentquery, adapter);
 						if (st.execute(copySourceQuery)) {
@@ -1133,7 +1139,8 @@ public class Quest implements Serializable, RepositoryChangedListener {
 					} else 
 					
 					{
-						String copySourceQuery = createDummyQueryToFetchColumns(sourceString, adapter);
+						source.getTableSet()
+						String copySourceQuery = createDummyQueryToFetchColumns(source, adapter);
 						if (st.execute(copySourceQuery)) {
 							ResultSetMetaData rsm = st.getResultSet().getMetaData();
 							boolean needComma = false;
@@ -1155,7 +1162,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 					int fromPosition = tmp.toLowerCase().indexOf("from");
 					int asteriskPosition = tmp.indexOf('*');
 					if (asteriskPosition != -1 && asteriskPosition < fromPosition) {
-						String str = sourceString.replaceFirst("\\*", columnProjection);
+						String str = source.replaceFirst("\\*", columnProjection);
 						axiom.setSourceQuery(factory.getSQLQuery(str));
 					}
 				}
@@ -1170,26 +1177,26 @@ public class Quest implements Serializable, RepositoryChangedListener {
 	final String selectAllPattern = "(S|s)(E|e)(L|l)(E|e)(C|c)(T|t)\\s+\\*";
 	final String subQueriesPattern = "\\(.*\\)\\s+(A|a)(S|s)\\s+(C|c)(H|h)(I|i)(L|l)(D|d),\\s+\\(.*\\)\\s+(A|a)(S|s)\\s+(P|p)(A|a)(R|r)(E|e)(N|n)(T|t)";
 
-	private boolean containSelectAll(String sql) {
-		final Pattern pattern = Pattern.compile(selectAllPattern);
-		return pattern.matcher(sql).find();
-	}
+//	private boolean containSelectAll(String sql) {
+//		final Pattern pattern = Pattern.compile(selectAllPattern);
+//		return pattern.matcher(sql).find();
+//	}
 
-	private boolean containChildParentSubQueries(String sql) {
-		final Pattern pattern = Pattern.compile(subQueriesPattern);
-		return pattern.matcher(sql).find();
-	}
+//	private boolean containChildParentSubQueries(String sql) {
+//		final Pattern pattern = Pattern.compile(subQueriesPattern);
+//		return pattern.matcher(sql).find();
+//	}
 
-	private String createDummyQueryToFetchColumns(String originalQuery, SQLDialectAdapter adapter) {
-		String toReturn = String.format("select * from (%s) view20130219 ", originalQuery);
-		if (adapter instanceof SQLServerSQLDialectAdapter) {
-			SQLServerSQLDialectAdapter sqlServerAdapter = (SQLServerSQLDialectAdapter) adapter;
-			toReturn = sqlServerAdapter.sqlLimit(toReturn, 1);
-		} else {
-			toReturn += adapter.sqlSlice(0, Long.MIN_VALUE);
-		}
-		return toReturn;
-	}
+//	private String createDummyQueryToFetchColumns(String originalQuery, SQLDialectAdapter adapter) {
+//		String toReturn = String.format("select * from (%s) view20130219 ", originalQuery);
+//		if (adapter instanceof SQLServerSQLDialectAdapter) {
+//			SQLServerSQLDialectAdapter sqlServerAdapter = (SQLServerSQLDialectAdapter) adapter;
+//			toReturn = sqlServerAdapter.sqlLimit(toReturn, 1);
+//		} else {
+//			toReturn += adapter.sqlSlice(0, Long.MIN_VALUE);
+//		}
+//		return toReturn;
+//	}
 
 	private List<CQIE> createSigmaRules(Ontology ontology) {
 		List<CQIE> rules = new ArrayList<CQIE>();

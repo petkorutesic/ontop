@@ -9,7 +9,6 @@
 package it.unibz.krdb.sql.api;
 
 import java.io.Serializable;
-import java.util.regex.Pattern;
 
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.schema.Table;
@@ -25,7 +24,6 @@ public class TableJSQL implements Serializable{
 	
 	private String schema;
 	private String tableName;
-	private String name;
 	private String aliasName;
 	private Alias alias;
 	
@@ -44,7 +42,7 @@ public class TableJSQL implements Serializable{
 	
 
 	public TableJSQL(String name) {
-		this("", name);
+		this(null, name);
 	}
 	
 	public TableJSQL(String schema, String name) {
@@ -60,7 +58,7 @@ public class TableJSQL implements Serializable{
 			setGivenSchema(schema);
 			setTableName(tableName);
 			setGivenName(givenName);
-			setName(givenName);
+			
 			
 		}
 	
@@ -69,7 +67,6 @@ public class TableJSQL implements Serializable{
 		setGivenSchema(table.getSchemaName());
 		setTableName(table.getName());
 		setGivenName(table.getWholeTableName());
-		setName(table.getName());
 		setAlias(table.getAlias());
 	}
 
@@ -129,15 +126,13 @@ public class TableJSQL implements Serializable{
 	public String getTableName() {
 		return tableName;
 	}
-	
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+		
 
 	public String getName() {
-		return name;
+		if(schema!=null)
+			return schema+"."+tableName;
+		else
+			return tableName;
 	}
 	
 

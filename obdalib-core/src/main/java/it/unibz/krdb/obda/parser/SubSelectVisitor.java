@@ -93,9 +93,10 @@ public class SubSelectVisitor implements SelectVisitor, FromItemVisitor, Express
 	 * Main entry for this Tool class. A list of found tables is returned.
 	 *
 	 * @param select
+	 * @param unquote 
 	 * @return
 	 */
-	public ArrayList<SelectJSQL> getSubSelectList(Select select) {
+	public ArrayList<SelectJSQL> getSubSelectList(Select select, boolean unquote) {
 		init();
  		if (select.getWithItemsList() != null) {
 			for (WithItem withItem : select.getWithItemsList()) {

@@ -113,7 +113,7 @@ public class SQLQueryTranslator {
 	 * @param query The sql query to be parsed
 	 * @return A ParsedQuery (or a SELECT * FROM table with the generated view)
 	 */
-	public VisitedQuery constructParser(String query) {
+	public VisitedQuery constructParser(VisitedQuery query) {
 		return constructParser(query, true);
 	}
 	
@@ -137,6 +137,28 @@ public class SQLQueryTranslator {
 		{
 			log.warn("The following query couldn't be parsed. This means Quest will need to use nested subqueries (views) to use this mappings. This is not good for SQL performance, specially in MySQL. Try to simplify your query to allow Quest to parse it. If you think this query is already simple and should be parsed by Quest, please contact the authors. \nQuery: '{}'", query);
 			queryParser = createView(query);
+		}
+		return queryParser;
+		
+		
+	}
+	private VisitedQuery constructParser (VisitedQuery query, boolean generateViews){
+		boolean errors=false;
+		VisitedQuery queryParser = query;
+		
+		try {
+			queryParser.unquote();
+			
+		} catch (JSQLParserException e) 
+		{
+			errors=true;
+			
+		}
+		
+		if (queryParser == null || (errors && generateViews) )
+		{
+			log.warn("The following query couldn't be parsed. This means Quest will need to use nested subqueries (views) to use this mappings. This is not good for SQL performance, specially in MySQL. Try to simplify your query to allow Quest to parse it. If you think this query is already simple and should be parsed by Quest, please contact the authors. \nQuery: '{}'", query);
+			queryParser = createView(query.toString());
 		}
 		return queryParser;
 		

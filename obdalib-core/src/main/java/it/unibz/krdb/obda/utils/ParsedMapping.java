@@ -46,7 +46,7 @@ public class ParsedMapping {
 		OBDASQLQuery sourceQuery = (OBDASQLQuery) axiom.getSourceQuery();
 
 		// Construct the SQL parsed query from the source query
-		VisitedQuery queryParsed = translator.constructParser(sourceQuery.toString());
+		VisitedQuery queryParsed = translator.constructParserNoView(sourceQuery.toString());
 		this.sourceQueryParsed = queryParsed;
 	}
 	

@@ -110,7 +110,7 @@ public class SelectionVisitor implements SelectVisitor, ExpressionVisitor, FromI
 			}
 		}
 		select.getSelectBody().accept(this);
-		if(notSupported)
+		if(notSupported && unquote)
 				throw new JSQLParserException("Query not yet supported");
 		return selection;
 		

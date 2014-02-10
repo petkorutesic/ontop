@@ -77,6 +77,7 @@ import it.unibz.krdb.obda.utils.MetaMappingExpander;
 import it.unibz.krdb.obda.utils.ParsedMapping;
 import it.unibz.krdb.sql.DBMetadata;
 import it.unibz.krdb.sql.JDBCConnectionManager;
+import it.unibz.krdb.sql.api.ProjectionJSQL;
 import it.unibz.krdb.sql.api.VisitedQuery;
 
 import java.io.Serializable;
@@ -99,6 +100,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
@@ -1076,6 +1079,17 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 		//use metadata to fetch column name
 		ArrayList<ParsedMapping> mappings = mapParser.getParsedMappings();
+		for (ParsedMapping axiom : mappings) {
+			VisitedQuery source = axiom.getSourceQueryParsed();
+			//if it has subqueries
+			
+			//if no subqueries
+			List<SelectExpressionItem> columns= getColumnsFromStar(source);
+			ProjectionJSQL projection= new ProjectionJSQL();
+			projection.addAll(columns);
+			source.setProjection(projection);
+			
+		}
 		
 		// TODO this code seems buggy, it will probably break easily (check the
 		// part with
@@ -1139,7 +1153,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 					} else 
 					
 					{
-						source.getTableSet()
+						
 						String copySourceQuery = createDummyQueryToFetchColumns(source, adapter);
 						if (st.execute(copySourceQuery)) {
 							ResultSetMetaData rsm = st.getResultSet().getMetaData();

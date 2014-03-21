@@ -84,10 +84,10 @@ public class ConfigPanel extends javax.swing.JPanel {
             radSemanticIndex.setSelected(true);
         }
 
-        bChecked = preference.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_FROM_ONTOLOGY);
+        bChecked = preference.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY);
         chkObtainFromOntology.setSelected(bChecked);
 
-        bChecked = preference.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_FROM_MAPPINGS);
+        bChecked = preference.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_MAPPINGS);
         chkObtainFromMappings.setSelected(bChecked);
     }
 
@@ -450,17 +450,17 @@ public class ConfigPanel extends javax.swing.JPanel {
 
     private void chkObtainFromMappingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkObtainFromMappingsActionPerformed
         if (chkObtainFromMappings.isSelected()) {
-            preference.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_MAPPINGS, "true");
+            preference.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_MAPPINGS, "true");
         } else {
-            preference.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_MAPPINGS, "false");
+            preference.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_MAPPINGS, "false");
         }
     }//GEN-LAST:event_chkObtainFromMappingsActionPerformed
 
     private void chkObtainFromOntologyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkObtainFromOntologyActionPerformed
         if (chkObtainFromOntology.isSelected()) {
-            preference.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_ONTOLOGY, "true");
+            preference.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY, "true");
         } else {
-            preference.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_ONTOLOGY, "false");
+            preference.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY, "false");
         }
     }//GEN-LAST:event_chkObtainFromOntologyActionPerformed
 

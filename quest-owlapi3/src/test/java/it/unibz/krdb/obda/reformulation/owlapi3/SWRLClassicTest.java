@@ -22,7 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class SWRLVClassicTest {
+public class SWRLClassicTest {
 
 	private String owlfile = "src/test/resources/test/swrl/exampleSWRL.owl";
 	//private String obdafile = "src/test/resources/example/exampleBooks.obda";
@@ -42,7 +42,7 @@ public class SWRLVClassicTest {
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.CLASSIC);
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_EQUIVALENCES, QuestConstants.TRUE);
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_TBOX_SIGMA, QuestConstants.TRUE);
-		p.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_ONTOLOGY, QuestConstants.TRUE);
+		p.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY, QuestConstants.TRUE);
 		
 		manager = OWLManager.createOWLOntologyManager();
 		try {

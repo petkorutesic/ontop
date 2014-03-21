@@ -149,8 +149,8 @@ public class QuestDBClassicStore extends QuestDBAbstractStore {
 
 		questInstance.setupRepository();
 		
-		final boolean bObtainFromOntology = config.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_FROM_ONTOLOGY);
-		final boolean bObtainFromMappings = config.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_FROM_MAPPINGS);
+		final boolean bObtainFromOntology = config.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY);
+		final boolean bObtainFromMappings = config.getCurrentBooleanValueFor(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_MAPPINGS);
 		QuestConnection conn = questInstance.getNonPoolConnection();
 		QuestStatement st = conn.createStatement();
 		if (bObtainFromOntology) {

@@ -73,7 +73,7 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 	private OBDAModel obdaModel;
 	private OWLOntology ontology;
 
-	final String owlfile = "src/test/resources/test/simplemapping.owl";
+	final String owlfile = "src/test/resources/test/simplemapping-swrl.owl";
 	final String obdafile = "src/test/resources/test/simplemapping.obda";
 
 	@Override
@@ -213,7 +213,7 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.CLASSIC);
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_EQUIVALENCES, "true");
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_TBOX_SIGMA, "true");
-		p.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_MAPPINGS, "true");
+		p.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_MAPPINGS, "true");
 
 		runTests(p);
 	}

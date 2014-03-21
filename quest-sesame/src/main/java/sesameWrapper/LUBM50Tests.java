@@ -184,7 +184,7 @@ public class LUBM50Tests {
 		pref.setCurrentValueOf(QuestPreferences.DBTYPE, QuestConstants.SEMANTIC_INDEX);
 		pref.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.CLASSIC);
 		pref.setCurrentValueOf(QuestPreferences.STORAGE_LOCATION, QuestConstants.JDBC);
-		pref.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_ONTOLOGY, "false");
+		pref.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY, "false");
 		pref.setCurrentValueOf(QuestPreferences.JDBC_DRIVER, driver);
 		pref.setCurrentValueOf(QuestPreferences.JDBC_URL, url);
 		pref.setCurrentValueOf(QuestPreferences.DBUSER, username);

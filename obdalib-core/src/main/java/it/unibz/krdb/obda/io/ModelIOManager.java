@@ -163,16 +163,15 @@ public class ModelIOManager {
     /**
      * The load/read operation.
      * 
-     * @param fileLocation
+     * @param file
      *          The target file object from which the model is loaded.
      * @throws IOException
-     * @throws InvalidPredicateDeclarationException
      * @throws InvalidMappingException 
      */
     public void load(File file) throws IOException, InvalidMappingException {
         if (!file.exists()) {
-            log.warn("WARNING: Cannot locate OBDA file at: " + file.getPath());
-            return;
+            throw new IOException(String.format("Cannot locate OBDA file at: %s.\n" +
+                    "Make sure the file exists at the location specified.", file.getPath()));
         }
         if (!file.canRead()) {
             throw new IOException(String.format("Error while reading the file located at %s.\n" +

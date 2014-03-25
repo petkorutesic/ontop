@@ -720,7 +720,10 @@ public class QuestStatement implements OBDAStatement {
 				/*
 				 * Query optimization w.r.t Sigma rules
 				 */
-				optimizeQueryWithSigmaRules(program, rulesIndex);
+				
+				//FIXME
+				//TODO option
+				//optimizeQueryWithSigmaRules(program, rulesIndex);
 
 			} catch (Exception e1) {
 				log.debug(e1.getMessage(), e1);
@@ -749,8 +752,18 @@ public class QuestStatement implements OBDAStatement {
 	
 			try {
 				final long startTime = System.currentTimeMillis();
+			
+				/**
+				 * append the SWRL rules
+				 */
+				programAfterRewriting.appendRule(questInstance.getRules());
+				
 				//Here we do include the mappings, and get the final SQL-ready program
 				programAfterUnfolding = getUnfolding(programAfterRewriting);
+				
+			
+				
+				
 				final long endTime = System.currentTimeMillis();
 				unfoldingTime = endTime - startTime;
 

@@ -60,8 +60,8 @@ public class SNOMEDTest {
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.CLASSIC);
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_EQUIVALENCES, "true");
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_TBOX_SIGMA, "true");
-		p.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_MAPPINGS, "true");
-		p.setCurrentValueOf(QuestPreferences.OBTAIN_FROM_ONTOLOGY, "false");
+		p.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_MAPPINGS, "true");
+		p.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY, "false");
 
 		p.setCurrentValueOf(QuestPreferences.DBTYPE, QuestConstants.SEMANTIC_INDEX);
 

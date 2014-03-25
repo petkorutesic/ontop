@@ -20,6 +20,8 @@ package it.unibz.krdb.obda.owlrefplatform.core;
  * #L%
  */
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.model.Constant;
 import it.unibz.krdb.obda.model.DatalogProgram;
@@ -328,7 +330,14 @@ public class Quest implements Serializable, RepositoryChangedListener {
 	public void setRules(Collection<CQIE> rules){
 		this.rules = rules;
 	}
-	
+
+    public void appendRules(Collection<CQIE> rules) {
+        if(this.rules == null){
+            this.rules = Lists.newArrayList();
+        }
+        this.rules.addAll(rules);
+        log.debug("appending rules \n{}", Joiner.on("\n").join(rules));
+    }
 
 	protected Map<String, String> getSQLCache() {
 		return querycache;
@@ -1454,5 +1463,9 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 	public boolean isSemIdx() {
 		return isSemanticIdx;
+	}
+
+	public Collection<CQIE> getRules() {
+		return rules;
 	}
 }

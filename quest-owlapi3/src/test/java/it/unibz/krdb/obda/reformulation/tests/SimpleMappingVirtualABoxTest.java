@@ -73,7 +73,7 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 	private OBDAModel obdaModel;
 	private OWLOntology ontology;
 
-	final String owlfile = "src/test/resources/test/simplemapping-swrl.owl";
+	final String owlfile = "src/test/resources/test/simplemapping.owl";
 	final String obdafile = "src/test/resources/test/simplemapping.obda";
 
 	@Override

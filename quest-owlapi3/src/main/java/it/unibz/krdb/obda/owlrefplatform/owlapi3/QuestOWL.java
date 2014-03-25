@@ -208,8 +208,8 @@ public class QuestOWL extends OWLReasonerBase {
 	 * extract version from {@link it.unibz.krdb.obda.utils.VersionInfo}, which is from the file {@code version.properties}
 	 */
 	private void extractVersion() {
-		VersionInfo versonInfo = VersionInfo.getVersionInfo();
-		String versionString = versonInfo.getVersion();
+		VersionInfo versionInfo = VersionInfo.getVersionInfo();
+		String versionString = versionInfo.getVersion();
 		String[] splits = versionString.split("\\.");
 		int major = 0;
 		int minor = 0;
@@ -269,20 +269,16 @@ public class QuestOWL extends OWLReasonerBase {
 
 		questInstance = new Quest(translatedOntologyMerge, obdaModel, preferences);
 
-		
-		/* SWRL */
-		
-		// TODO: handle imports closure
-		SWRLToDatalogTranslator swrlToDatalogTranslator = new SWRLToDatalogTranslator(getRootOntology());
-		Collection<CQIE> rules = swrlToDatalogTranslator.getRules();
-		questInstance.setRules(rules);
-		
-		
-		
 		Set<OWLOntology> importsClosure = man.getImportsClosure(getRootOntology());
-		
 
-		try {
+        /* SWRL */
+        for(OWLOntology ont : importsClosure){
+            SWRLToDatalogTranslator swrlToDatalogTranslator = new SWRLToDatalogTranslator(ont);
+            Collection<CQIE> rules = swrlToDatalogTranslator.getRules();
+            questInstance.appendRules(rules);
+        }
+
+        try {
 			// pm.reasonerTaskProgressChanged(1, 4);
 
 			// Setup repository

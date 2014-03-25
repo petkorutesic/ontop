@@ -22,7 +22,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 
-public class SWRLClassicTest {
+public class SWRLClassicABoxTest {
 
 	private String owlfile = "src/test/resources/test/swrl/exampleSWRL.owl";
 	//private String obdafile = "src/test/resources/example/exampleBooks.obda";

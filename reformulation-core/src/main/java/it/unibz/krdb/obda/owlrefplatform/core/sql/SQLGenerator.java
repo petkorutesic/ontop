@@ -1838,27 +1838,32 @@ public class SQLGenerator implements SQLQueryGenerator {
 			String viewname = viewNames.get(atom);
 			viewname = sqladapter.sqlQuote(viewname);
 
-			if (def instanceof TableDefinition) {
-				return sqladapter.sqlTableName(tableNames.get(atom), viewname);
-			} else if (def instanceof ViewDefinition) {
-				String viewdef = ((ViewDefinition) def).getStatement();
-				String formatView = String.format("(%s) %s", viewdef, viewname);
-				return formatView;
+			if (def != null){
+				if (def instanceof TableDefinition) {
+					return sqladapter.sqlTableName(tableNames.get(atom), viewname);
+				} else if (def instanceof ViewDefinition) {
+					String viewdef = ((ViewDefinition) def).getStatement();
+					String formatView = String.format("(%s) %s", viewdef, viewname);
+					return formatView;
+				} else {
+					throw new IllegalStateException("unkown type of def: " + def);
+				}
+			} else {
+
+				// Should be an ans atom.
+				Predicate pred = atom.getFunctionSymbol();
+				String view = sqlAnsViewMap.get(pred);
+
+				if (view == null) {
+					throw new SQLGenerationException("Impossible to get data definition for: " + atom + ", type: " + def);
+				} else {
+					viewname = "Q" + pred + "View";
+					viewname = sqladapter.sqlQuote(viewname);
+					String formatView = String.format("(%s) %s", view, viewname);
+					return formatView;
+				}
+
 			}
-
-			// Should be an ans atom.
-			Predicate pred = atom.getFunctionSymbol();
-			String view = sqlAnsViewMap.get(pred);
-			viewname = "Q" + pred + "View";
-			viewname = sqladapter.sqlQuote(viewname);
-
-			if (view != null) {
-				String formatView = String.format("(%s) %s", view, viewname);
-				return formatView;
-
-			}
-
-			throw new RuntimeException("Impossible to get data definition for: " + atom + ", type: " + def);
 		}
 
 		public String getView(Function atom) {

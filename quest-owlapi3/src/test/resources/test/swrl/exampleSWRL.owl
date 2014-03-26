@@ -55,6 +55,9 @@
         <DataProperty IRI="#hasCar"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#name"/>
+    </Declaration>
+    <Declaration>
         <NamedIndividual IRI="#Ivan"/>
     </Declaration>
     <Declaration>

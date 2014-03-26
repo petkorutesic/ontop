@@ -10,7 +10,7 @@ quest:		http://obda.org/quest#
 sourceUri	person
 connectionUrl	jdbc:h2:mem:questjunitdb
 username	sa
-password
+password    
 driverClass	org.h2.Driver
 
 [MappingDeclaration] @collection [[
@@ -29,7 +29,7 @@ source		select ID from PERSON WHERE GENDER='M'
 
 mappingId	spouse-map
 target		:person/{ID1}/ :hasSibling :person/{ID2}/ .
-source		select CHILD_ID, PARENT_ID from PARENT
+source		select CHILD_ID, PARENT_ID from SPOUSE
 
 
 mappingId	parent-map

@@ -841,14 +841,16 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			 * sparql translator)
 			 */
 
-			unfoldingProgram.appendRule(generateTripleMappings(fac, unfoldingProgram));
-			
+			unfoldingProgram.appendRule(generateTripleMappings(fac,	unfoldingProgram));
+
 			/*
-			 * Adding SWRL rules 
+			 * Adding SWRL rules
 			 */
-			if(!rules.isEmpty()){
-				unfoldingProgram.appendRule(rules);
-				log.debug("append SWRL rules: \n{}", rules);
+			if (swrlEntailment) {
+				if (!rules.isEmpty()) {
+					unfoldingProgram.appendRule(rules);
+					log.debug("append SWRL rules: \n{}", rules);
+				}
 			}
 
 			log.debug("Final set of mappings: \n{}", unfoldingProgram);
@@ -865,14 +867,6 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			unfolder = new DatalogUnfolder(unfoldingProgram, pkeys, multiplePredIdx);
 			
 			multiplePredIdx = unfolder.processMultipleTemplatePredicates(unfoldingProgram);
-			
-			
-			
-			
-			
-			
-			
-			
 			
 
 			/***
@@ -943,7 +937,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 		unfoldingProgram = analyzer.constructDatalogProgram();
 
 		unfoldingProgram = applyTMappings(metadata, true, unfoldingProgram, sigma, false);
-		;
+		
 
 		/*
 		 * Adding "triple(x,y,z)" mappings for support of unbounded predicates

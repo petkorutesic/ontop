@@ -69,6 +69,7 @@ public class SWRLVirtualABoxTest {
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_EQUIVALENCES, QuestConstants.TRUE);
 		p.setCurrentValueOf(QuestPreferences.OPTIMIZE_TBOX_SIGMA, QuestConstants.TRUE);
 		p.setCurrentValueOf(QuestPreferences.OBTAIN_ABOX_ASSERTIONS_FROM_ONTOLOGY, QuestConstants.FALSE);
+		p.setCurrentValueOf(QuestPreferences.SWRL_ENTAILMENT, QuestConstants.TRUE);
 		
 		manager = OWLManager.createOWLOntologyManager();
 		try {

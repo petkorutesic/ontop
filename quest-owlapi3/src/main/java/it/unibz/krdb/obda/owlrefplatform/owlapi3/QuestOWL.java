@@ -272,11 +272,13 @@ public class QuestOWL extends OWLReasonerBase {
 		Set<OWLOntology> importsClosure = man.getImportsClosure(getRootOntology());
 
         /* SWRL */
-        for(OWLOntology ont : importsClosure){
-            SWRLToDatalogTranslator swrlToDatalogTranslator = new SWRLToDatalogTranslator(ont);
-            Collection<CQIE> rules = swrlToDatalogTranslator.getRules();
-            questInstance.appendRules(rules);
-        }
+		if(preferences.getCurrentBooleanValueFor(QuestPreferences.SWRL_ENTAILMENT)) {
+	        for(OWLOntology ont : importsClosure){
+	            SWRLToDatalogTranslator swrlToDatalogTranslator = new SWRLToDatalogTranslator(ont);
+	            Collection<CQIE> rules = swrlToDatalogTranslator.getRules();
+	            questInstance.appendRules(rules);
+	        }
+		}
 
         try {
 			// pm.reasonerTaskProgressChanged(1, 4);

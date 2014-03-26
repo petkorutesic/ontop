@@ -105,6 +105,9 @@ import org.openrdf.query.parser.ParsedQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
 //import com.hp.hpl.jena.query.Query;
 
 public class Quest implements Serializable, RepositoryChangedListener {
@@ -188,6 +191,11 @@ public class Quest implements Serializable, RepositoryChangedListener {
 	 * queries into Functions, used by the SPARQL translator.
 	 */
 	private UriTemplateMatcher uriTemplateMatcher = new UriTemplateMatcher();
+	
+	/*
+	 * The list of predicates that are defined in multiple mappings
+	 */
+	protected Multimap<Predicate,Integer> multiplePredIdx = ArrayListMultimap.create();
 
 	final HashSet<String> templateStrings = new HashSet<String>();
 
@@ -776,6 +784,9 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
  			unfoldingProgram = analyzer.constructDatalogProgram();
 
+
+ 			
+ 			
 			/***
 			 * T-Mappings and Fact mappings
 			 */
@@ -850,7 +861,19 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 			pkeys = DBMetadata.extractPKs(metadata, unfoldingProgram);
 
-			unfolder = new DatalogUnfolder(unfoldingProgram, pkeys);
+
+			unfolder = new DatalogUnfolder(unfoldingProgram, pkeys, multiplePredIdx);
+			
+			multiplePredIdx = unfolder.processMultipleTemplatePredicates(unfoldingProgram);
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
 			/***
 			 * Setting up the TBox we will use for the reformulation
@@ -939,7 +962,7 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 		pkeys = DBMetadata.extractPKs(metadata, unfoldingProgram);
 
-		unfolder = new DatalogUnfolder(unfoldingProgram, pkeys);
+		unfolder = new DatalogUnfolder(unfoldingProgram, pkeys, multiplePredIdx);
 
 		log.debug("Mappings and unfolder have been updated after inserts to the semantic index DB");
 

@@ -28,6 +28,7 @@ import it.unibz.krdb.obda.model.DatalogProgram;
 import it.unibz.krdb.obda.model.Function;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAException;
+import it.unibz.krdb.obda.model.OBDAMappingAxiom;
 import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.Variable;
@@ -58,6 +59,7 @@ import java.util.Stack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -86,6 +88,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	//private final List<CQIE> emptyList = Collections.unmodifiableList(new LinkedList<CQIE>());
 	private final List<CQIE> emptyList = ImmutableList.of();
 	
+	
 	private enum UnfoldingMode {
 		UCQ, DATALOG
 	};
@@ -96,6 +99,9 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 	private Multimap<Predicate, CQIE> ruleIndex;
 	private Multimap<Predicate, CQIE> ruleIndexByBody;
+	private static Multimap<Predicate, Integer> emptyMulti= ArrayListMultimap.create();
+	private Multimap<Predicate, Integer> multPredList;
+
 	
 	private DatalogDependencyGraphGenerator depGraph;
 
@@ -121,13 +127,24 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	private HashSet<Predicate> allPredicates = new HashSet<Predicate>();
 
 	public DatalogUnfolder(DatalogProgram unfoldingProgram) {
-		this(unfoldingProgram, new HashMap<Predicate, List<Integer>>());
+		this(unfoldingProgram, new HashMap<Predicate, List<Integer>>(), emptyMulti);
 	}
 
 	public DatalogUnfolder(DatalogProgram unfoldingProgram, Map<Predicate, List<Integer>> primaryKeys) {
+		this(unfoldingProgram, primaryKeys, emptyMulti);
+	}
+		
+	public DatalogUnfolder(DatalogProgram unfoldingProgram, Map<Predicate, List<Integer>> primaryKeys, Multimap<Predicate, Integer> multPredList) {
 		this.primaryKeys = primaryKeys;
 		this.unfoldingProgram = unfoldingProgram;
-
+		
+		//TODO:remove this hack!!
+		if (multPredList.isEmpty()){
+			Multimap<Predicate, Integer> newemptyMulti= ArrayListMultimap.create();
+			this.multPredList = newemptyMulti;
+		}else{
+			this.multPredList = multPredList;
+		}
 		/*
 		 * Creating a local index for the rules according to their predicate
 		 */
@@ -876,6 +893,37 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				Predicate preFather, List<CQIE> result, CQIE fatherRule, List<CQIE> workingList) {
 			//boolean hasPred = false;
 			
+			//Update MultipleTemplateList
+			if (multPredList.containsKey(pred))
+			{
+				Function head = fatherRule.getHead();
+				List<Function> ruleBody = fatherRule.getBody(); 
+				Function oldFun = getAtomFromBody(pred, ruleBody);
+				
+				int oldIdx = multPredList.get(pred).iterator().next();
+				Term t = oldFun.getTerm(oldIdx);
+				
+				//here I find the new index in the head
+				int newIdx = -1;
+				int count = 0;
+				for (Term nt: head.getTerms()){
+					if (t.equals(nt)){
+						newIdx = count;
+					}
+					count++;
+				}
+
+				multPredList.removeAll(pred);
+				//if the problematic term was in the head
+				if (newIdx>-1){
+					multPredList.put(preFather,newIdx);
+				}
+	
+			}			
+			
+			
+			
+			
 			for (CQIE newquery : result) {
 				//Update the ruleIndex
 				depGraph.removeRuleFromRuleIndex(preFather,fatherRule);
@@ -888,30 +936,14 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 
 
-				//List<Term> bodyTerms = getBodyTerms(newquery);
-
 				//Update the bodyIndex
-				
 				depGraph.removeOldRuleIndexByBodyPredicate(fatherRule);
 				depGraph.updateRuleIndexByBodyPredicate(newquery);
 
 				
 				
-/*				for (Term termPredicate: bodyTerms){
-					if (termPredicate instanceof Function){
-						Predicate mypred = ((Function) termPredicate).getFunctionSymbol(); 
-						if (extensionalPredicates.contains(mypred)){
-							depGraph.removeRuleFromBodyIndex(mypred, fatherRule);
-							depGraph.addRuleToBodyIndex(mypred, newquery);
+				
 
-						}
-						
-						if (mypred.equals(pred)){
-							hasPred=true;
-						}
-					}
-				} //end for terms in rule
-			*/
 			} // end for queries in result
 			
 			
@@ -1914,8 +1946,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
  * 
  * @param unfolding
  */
-	public  List<CQIE> pushTypes(DatalogProgram unfolding) {
-
+	public  List<CQIE> pushTypes(DatalogProgram unfolding, Multimap<Predicate,Integer> multPredList) {
+		
 		List<CQIE> workingList = new LinkedList<CQIE>();
 		
 		cloneRules(workingList, unfolding.getRules());
@@ -1930,16 +1962,13 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		List<Predicate> extensionalPredicates = depGraph.getExtensionalPredicates();
 		List<Predicate> predicatesInBottomUp = depGraph.getPredicatesInBottomUp();		
 
-		ruleIndex = depGraph.getRuleIndex();
-		ruleIndexByBody = depGraph.getRuleIndexByBodyPredicate();
-
 
 		for (int predIdx = 0; predIdx < predicatesInBottomUp.size() -1; predIdx++) {
 
 			Predicate buPredicate = predicatesInBottomUp.get(predIdx);
 			//get the father predicate
 
-			if (!extensionalPredicates.contains(buPredicate)) {// it is a defined  predicate, like ans2,3.. etc
+			if (!extensionalPredicates.contains(buPredicate) ) {// it is a defined  predicate, like ans2,3.. etc
 
 				//get all the indexes we need
 				ruleIndex = depGraph.getRuleIndex();
@@ -2008,6 +2037,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 							
 							//Update the indexes for the t query
 							Predicate fathead = fatherRule.getHead().getFunctionSymbol();
+							
+							//TODO!
 							updateIndexesinTypes(workingList,fatherIdx,result, fathead,fatherRule);
 							
 							continue;
@@ -2047,7 +2078,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	 * @param sourceRule
 	 * @return
 	 */
-	private static CQIE computeSourceRuleNoTypes(CQIE sourceRule){
+	private  CQIE computeSourceRuleNoTypes(CQIE sourceRule){
 
 		Function sourceHead=sourceRule.getHead();
 
@@ -2058,9 +2089,13 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		List<Term> typedArguments= sourceHead.getTerms();
 		List<Term> untypedArguments= new LinkedList<Term>();
 
+		boolean isProblemTemplate = false;
+		
+		if (multPredList.containsKey(sourceHead.getFunctionSymbol())){
+			isProblemTemplate = true;
+		}
 		for (Term t: typedArguments){
-			getUntypedArgumentFromTerm(untypedArguments, t);
-
+			getUntypedArgumentFromTerm(untypedArguments, t,isProblemTemplate);
 		}
 
 		//updating the rule!!
@@ -2080,10 +2115,11 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	 * Takes a Term of the form Type(x) and returns the list [x]
 	 * @param untypedArguments
 	 * @param t
+	 * @param isProblemTemplate 
 	 */
-	private static void getUntypedArgumentFromTerm(List<Term> untypedArguments,
-			Term t) {
-		if (t instanceof Function){
+	private  void getUntypedArgumentFromTerm(List<Term> untypedArguments,
+			Term t, boolean isProblemTemplate) {
+		if (t instanceof Function && !isProblemTemplate){
 			//if it is a function, we add the inner variables and values
 			List<Term>  functionArguments = ((Function) t).getTerms();
 			Predicate functionSymbol = ((Function) t).getFunctionSymbol();
@@ -2093,6 +2129,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				functionArguments.remove(0);
 			}
 			untypedArguments.addAll(functionArguments);
+		}else if (t instanceof Function && isProblemTemplate){ // if it is a problematic term we leave it as it is
+			untypedArguments.add(t);
 		}else if(t instanceof Variable){
 			untypedArguments.add(t);
 		}else if (t instanceof Constant){
@@ -2113,7 +2151,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	 */
 	
 	
-	private static List<CQIE> computeRuleExtendedTypes(List currentTerms,
+	private  List<CQIE> computeRuleExtendedTypes(List currentTerms,
 			CQIE sourceRule, CQIE fatherRule) {
 
 
@@ -2134,7 +2172,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				} else if (focus.isDataFunction()) {
 					//add type 
 					if (focus.getFunctionSymbol().equals(sourceHead.getFunctionSymbol())){
-						result.add(addTypes(sourceHead,sourceRule,focus,fatherRule));
+						CQIE addTypes = addTypes(sourceHead,sourceRule,focus,fatherRule);
+						result.add(addTypes);
 						break;
 					} else{
 						continue;
@@ -2167,12 +2206,13 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	 * @param fatherRule
 	 * @return
 	 */
-	private static CQIE addTypes(Function sourceHead, CQIE sourceRule, Function targetAtom, CQIE fatherRule) {
+	private  CQIE addTypes(Function sourceHead, CQIE sourceRule, Function targetAtom, CQIE fatherRule) {
 
 		//TODO: Check this variable!!!
 		Map<Variable, Term> mgu = new HashMap<Variable,Term>();
 		boolean oneWayMGU = true;
-		mgu = Unifier.getMGU(sourceHead, targetAtom, oneWayMGU);
+		mgu = Unifier.getMGU(sourceHead, targetAtom, oneWayMGU, multPredList);
+		
 		
 		
 		if (mgu == null) {
@@ -2186,7 +2226,6 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				Term value = pairs.getValue();
 
 				if (value instanceof Function){
-					//TODO: this HAS TO CHANGE!!! Since here we assume there is only 1 variable!!!
 
 					Set<Variable> varset =  value.getReferencedVariables();
 					Variable mvar;
@@ -2228,19 +2267,6 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 			}
 
-			//Generate the MGU for the body
-			/*Map<Variable, Term> bodymgu = new HashMap<Variable,Term>();
-			generateMGUforBody(mgu, bodymgu);
-*/
-
-			//applying unifers in head and body*/
-
-			//updating the rule head
-			/*			List<Function> newbody =  fatherRule.getBody();
-
-			 * 			Unifier.applyUnifier(newbody, bodymgu);
-			 **/
-
 			//updating the rule body
 			Function newHead = (Function) fatherRule.getHead();
 			Unifier.applySelectiveUnifier(newHead, mgu);
@@ -2253,29 +2279,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		}
 	}
 
-	/**
-	 * Takes the MGU used for the head, and removes the types, leaves the variables
-	 * @param mgu
-	 * @param bodymgu
-	 */
-	private static void generateMGUforBody(Map<Variable, Term> mgu,
-			Map<Variable, Term> bodymgu) {
-		Iterator<Map.Entry<Variable, Term>> vars = mgu.entrySet().iterator();
-		  while (vars.hasNext()) {
-		        Map.Entry<Variable, Term> pairs = vars.next();
-		        
-		        Variable key = pairs.getKey();
-		        Term value = pairs.getValue();
 
-		        List<Term> untypedArguments=new LinkedList<Term>();
-				getUntypedArgumentFromTerm(untypedArguments, value);
-				
-				//TODO: this HAS TO CHANGE!!! Since here we assume there is only 1 variable!!!
-				Term untypedValue = untypedArguments.get(0);
-				bodymgu.put(key, untypedValue);
-		        
-		  }
-	}
 	
 	
 	
@@ -2321,14 +2325,164 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			} //end if
 		}// end for result
 	}
-	
 
-	
-	
-	
+	public Multimap<Predicate,Integer> getMultiplePredList() {
+		
+		return multPredList;
+	}
+
 
 	
 				
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * This method returns the predicates that define two different templates
+	 */
+	public Multimap<Predicate,Integer>  processMultipleTemplatePredicates(DatalogProgram mappings) {
+		
+		
+		
+		 Multimap<Predicate, CQIE> ruleIndex;
+		 DatalogDependencyGraphGenerator depGraph;
+		 depGraph = new DatalogDependencyGraphGenerator(mappings);
+		 ruleIndex = depGraph.getRuleIndex();
+		 
+		
+		
+		Predicate triple = termFactory.getPredicate("triple", 3);
+		
+		Set<Predicate> keySet = ruleIndex.keySet();
+		//Not interested in triple predicates
+		keySet.remove(triple);
+
+		for(Predicate focusPred: keySet){
+			
+			List<CQIE> rules = (List<CQIE>) ruleIndex.get(focusPred);
+			
+			//if there is only one rule there cannot be two templates
+			if (rules.size()==1){
+				continue;
+			}
+			
+			//There is more than 1 rule, we need to see if it uses different templates
+			
+			// I pick the pred atom in the body of the first rule
+			CQIE firstRule = (CQIE) rules.get(0);
+			Function focusAtom= firstRule.getHead();
+			
+			
+			for (int i=1; i<rules.size(); i++){
+				Function pickedAtom = null;
+				CQIE tgt = (CQIE) rules.get(i);
+				pickedAtom=  tgt.getHead();
+				
+				//TODO: is this if needed??
+				boolean found = false;
+					for (int p=0;p<focusAtom.getArity();p++){
+						
+						Function t1 = (Function)focusAtom.getTerm(p);
+						Function t2 = (Function) pickedAtom.getTerm(p);
+						
+						boolean templateProblem = false;
+						
+						//it has different types
+						if (!t1.getFunctionSymbol().equals(t2.getFunctionSymbol())){
+							templateProblem = true;
+						}
+						
+						//it has different templates regarding the variable
+						if (t1.getArity() !=  t2.getArity()){
+							templateProblem = true;
+						}
+						
+						//it has different templates regarding the uri
+						if (t1.getFunctionSymbol().getName().equals(OBDAVocabulary.QUEST_URI)){
+							Term string1 = t1.getTerm(0);
+							Term string2 = t1.getTerm(0);
+							if (!string1.equals(string2)){
+								templateProblem = true;
+							}
+						}
+
+						if (templateProblem){
+								if (!multPredList.containsEntry(focusPred,p)) {
+									multPredList.put(focusPred,p);
+									found = true;
+									break;
+								}
+						}
+					}//end for terms	
+				
+			
+				
+				if (found ==true){
+					continue;
+				}
+			}//end for rules
+			
+		} //end for predicates
+		
+		return multPredList;
+
+	}
+
+	/**
+	 * This is a helper method for processMultiplePredicates. 
+	 * It returns the atom of a given predicate in a body of a rule
+	 * @param bodyPred
+	 * @param ruleBody
+	 */
+	private Function getAtomFromBody(Predicate bodyPred, List<Function> ruleBody) {
+		Function focusAtom = null;
+		for (Function atom: ruleBody ){
+			if (atom.getFunctionSymbol().equals(bodyPred))
+			{
+				focusAtom = atom;
+			}
+		}
+		return focusAtom;
+	}
 	
 	
 	

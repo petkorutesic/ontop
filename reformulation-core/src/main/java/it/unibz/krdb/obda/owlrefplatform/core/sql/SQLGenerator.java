@@ -116,8 +116,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 	private final DBMetadata metadata;
 	private final JDBCUtility jdbcutil;
 	private final SQLDialectAdapter sqladapter;
+    private final String QUEST_TYPE = "QuestType";
 
-	private boolean isDistinct = false;
+    private boolean isDistinct = false;
 	private boolean isOrderBy = false;
 	private boolean isSI = false;
 
@@ -129,7 +130,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 	private static final org.slf4j.Logger log = LoggerFactory.getLogger(SQLGenerator.class);
 
-	/**
+    /**
 	 * This method is in charge of generating the SQL query from a Datalog
 	 * program
 	 * 
@@ -162,7 +163,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * {@link #generateQuery(DatalogProgram, List, String, Map, List, Set)}
 	 * 
 	 * @param queryProgram
-	 *            This is a arbitrary Datalog Program. In this program ans
+	 *            This is an arbitrary Datalog Program. In this program ans
 	 *            predicates will be translated to Views.
 	 * @param signature
 	 *            The Select variables in the SPARQL query
@@ -214,7 +215,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		}
 	}
 
-		private boolean hasSelectDistinctStatement(DatalogProgram query) {
+	private boolean hasSelectDistinctStatement(DatalogProgram query) {
 		boolean toReturn = false;
 		if (query.getQueryModifiers().hasModifiers()) {
 			toReturn = query.getQueryModifiers().isDistinct();
@@ -494,7 +495,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		// Hard coded variable names
 		for (int i = 0; i < headArity; i++) {
-			columns.add("v" + i + "QuestType");
+			columns.add("v" + i + QUEST_TYPE);
 			columns.add("v" + i + "lang");
 			columns.add("v" + i);
 		}
@@ -1025,7 +1026,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 				varName = "v" + hpos;
 			}
 	
-			String typeColumn = getTypeColumnForSELECT(ht, varName);
+			String typeColumn = getTypeColumnForSELECT(ht, varName, index);
 			String mainColumn = getMainColumnForSELECT(ht, varName, index);
 			String langColumn = getLangColumnForSELECT(ht, varName, index);
 
@@ -1164,7 +1165,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 	}
 
-	private String getTypeColumnForSELECT(Term ht, String varName) {
+	private String getTypeColumnForSELECT(Term ht, String varName, QueryAliasIndex index) {
 
 		String typeStr = "%s AS \"%sQuestType\"";
 
@@ -1202,11 +1203,57 @@ public class SQLGenerator implements SQLQueryGenerator {
 		} else if (ht == OBDAVocabulary.NULL) {
 			return (String.format(typeStr, 0, varName));
 		} else if (ht instanceof Variable) {
-			// TODO Here we do not have a proper type. Check if is there problem with "-1"
-			return (String.format(typeStr, -1, varName));
+			/*
+			 * var itself does not have the info of type. We try to find the type from the index. 
+			 */
+			
+			Variable var = (Variable) ht;
+            Collection<String> columnRefs = index.getColumnReferences(var);
+            
+            if (columnRefs == null || columnRefs.size() == 0) {
+                throw new RuntimeException("Unbound variable found in WHERE clause: " + var);
+            }
+            
+            
+            for(String columnRef : columnRefs) {
+                // for instance, columnRef is `Qans4View`.`v1`                
+                String columnType, tableColumnType;
+
+                String[] splits = columnRef.split("\\.");
+                
+                String quotedTable = splits[0];
+                String column = unquote(splits[1]);
+                
+                DataDefinition definition = metadata.getDefinition(quotedTable);
+				/*
+				 * If the var is defined in a ViewDefinition, then there is a
+				 * column for the type and we just need to refer to that column
+				 */
+                if (definition instanceof ViewDefinition){
+                	// for instance, tableColumnType becomes `Qans4View`.`v1QuestType`
+				    columnType = column + QUEST_TYPE;
+				    tableColumnType = sqladapter.sqlQualifiedColumn(quotedTable, columnType);
+				    return (String.format(typeStr, tableColumnType, varName));
+				}
+                
+            }
+            
+            /*
+             * Here we cannot find the type from the index. Assume it is a URI 
+             */
+            return String.format(typeStr, 1, varName);
+            
+         
 		}
 		throw new RuntimeException("Cannot generate SELECT for term: " + ht.toString());
 
+	}
+
+	private static String unquote(String string) {
+		if (string.charAt(0) == '\'' || string.charAt(0) == '\"' || string.charAt(0) == '`'){
+			return string.substring(1, string.length() - 1);
+		}
+		return string;
 	}
 
 	public String getSQLStringForTemplateFunction(Function ov, QueryAliasIndex index) {

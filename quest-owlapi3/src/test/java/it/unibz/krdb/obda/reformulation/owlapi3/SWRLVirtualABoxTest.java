@@ -101,13 +101,14 @@ public class SWRLVirtualABoxTest {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
-		String query = "SELECT ?subject  WHERE { ?subject a <http://www.example.org/swrl/1#Driver> }";
+		String query = "PREFIX : <http://www.example.org/swrl/1#> " +
+				"SELECT ?subject ?name WHERE { ?subject a :Driver ; :name ?name}";
 		QuestOWLResultSet rs = stmt.executeTuple(query);
 		while(rs.nextRow()){
-			int columCount = rs.getColumCount();
-			for(int i = 0; i < columCount; i++){
-				System.out.print(rs.getOWLIndividual(i) + ", ");
-			}
+			
+			System.out.print(rs.getOWLIndividual(0) + ", ");
+			System.out.print(rs.getOWLIndividual(1));
+		
 			System.out.println();
 		}
 

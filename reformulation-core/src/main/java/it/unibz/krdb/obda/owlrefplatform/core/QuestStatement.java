@@ -479,7 +479,7 @@ public class QuestStatement implements OBDAStatement {
 		DatalogUnfolder unfolder = (DatalogUnfolder) questInstance.unfolder;
 		
 		//This instnce of the unfolder is carried from Quest, and contains the mappings.
-		DatalogProgram unfolding = unfolder.unfold((DatalogProgram) query, "ans1",QuestConstants.BUP, true);
+		DatalogProgram unfolding = unfolder.unfold((DatalogProgram) query, "ans1", QuestConstants.BUP, true);
 		log.debug("Partial evaluation: \n{}", unfolding);
 
 		//removeNonAnswerQueries(unfolding);
@@ -504,7 +504,6 @@ public class QuestStatement implements OBDAStatement {
 			newTypedRules = unfolding.getRules();
 		}
 
-		
 		
 		for (CQIE rule: newTypedRules){
 			System.out.println(rule);

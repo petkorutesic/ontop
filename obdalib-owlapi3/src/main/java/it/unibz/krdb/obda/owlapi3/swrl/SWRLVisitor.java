@@ -6,6 +6,7 @@ import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Term;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
+import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -267,6 +268,7 @@ public class SWRLVisitor implements SWRLObjectVisitor {
 		terms.add(fac.getConstantLiteral(node.getIndividual().toStringID(), Predicate.COL_TYPE.STRING));
 	}
 
+	// TODO: add types
 	@Override
 	public void visit(SWRLLiteralArgument node) {
 
@@ -274,9 +276,9 @@ public class SWRLVisitor implements SWRLObjectVisitor {
 
 		if (literal.isBoolean()) {
 			if (literal.parseBoolean()) {
-				terms.add(fac.getConstantTrue());
+				terms.add(fac.getFunction(OBDAVocabulary.XSD_BOOLEAN, fac.getConstantTrue()));
 			} else {
-				terms.add(fac.getConstantFalse());
+				terms.add(fac.getFunction(OBDAVocabulary.XSD_BOOLEAN, fac.getConstantFalse()));
 			}
 		} else if (literal.hasLang()) {
 			terms.add(fac.getConstantLiteral(literal.getLiteral(), literal.getLang()));

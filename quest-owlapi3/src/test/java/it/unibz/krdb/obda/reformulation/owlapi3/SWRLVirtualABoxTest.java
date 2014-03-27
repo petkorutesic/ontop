@@ -25,7 +25,7 @@ import java.sql.Statement;
 
 public class SWRLVirtualABoxTest {
 
-	private String owlfile = "src/test/resources/test/swrl/exampleSWRL.owl";
+	private String owlfile = "src/test/resources/test/swrl/exampleSWRL-noABox.owl";
 	private String obdafile = "src/test/resources/test/swrl/exampleSWRL.obda";
 	private QuestOWL reasoner;
 	private OWLOntology ontology;
@@ -101,7 +101,7 @@ public class SWRLVirtualABoxTest {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
-		String query = "SELECT ?subject  WHERE { ?subject a <http://www.examaple.org/swrl/1#Driver> }";
+		String query = "SELECT ?subject  WHERE { ?subject a <http://www.example.org/swrl/1#Driver> }";
 		QuestOWLResultSet rs = stmt.executeTuple(query);
 		while(rs.nextRow()){
 			int columCount = rs.getColumCount();

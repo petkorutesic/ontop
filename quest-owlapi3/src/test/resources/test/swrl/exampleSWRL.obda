@@ -1,5 +1,5 @@
 [PrefixDeclaration]
-:		http://www.examaple.org/swrl/1#
+:		http://www.example.org/swrl/1#
 owl:		http://www.w3.org/2002/07/owl#
 rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
 xsd:		http://www.w3.org/2001/XMLSchema#
@@ -14,23 +14,21 @@ password
 driverClass	org.h2.Driver
 
 [MappingDeclaration] @collection [[
-
 mappingId	person-map
-target		:person/{ID}/ a :Person ; :name {NAME} .
+target		:person/{ID}/ a :Person ; :name {NAME}; :hasCar {HAS_CAR} .
 source		select ID, NAME, HAS_CAR from PERSON
 
-mappingId	person-man
+mappingId	woman-map
 target		:person/{ID}/ a :Woman .
 source		select ID from PERSON WHERE GENDER='F'
 
-mappingId	person-man
+mappingId	man-map
 target		:person/{ID}/ a :Man .
 source		select ID from PERSON WHERE GENDER='M'
 
 mappingId	spouse-map
-target		:person/{ID1}/ :hasSibling :person/{ID2}/ .
-source		select CHILD_ID, PARENT_ID from SPOUSE
-
+target		:person/{ID1}/ :hasSpouse :person/{ID2}/ .
+source		select ID1, ID2 from SPOUSE
 
 mappingId	parent-map
 target		:person/{CHILD_ID}/ :hasParent :person/{CHILD_ID}/ .

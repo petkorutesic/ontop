@@ -481,18 +481,19 @@ public class QuestStatement implements OBDAStatement {
 
 		//log.debug("After target rules removed: \n{}", unfolding);
 
-		ExpressionEvaluator evaluator = new ExpressionEvaluator();
-		evaluator.setUriTemplateMatcher(questInstance.getUriTemplateMatcher());
-		evaluator.evaluateExpressions(unfolding);
-
-		log.debug("Boolean expression evaluated: \n{}", unfolding);
+		if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.TRUE) ){
+			ExpressionEvaluator evaluator = new ExpressionEvaluator();
+			evaluator.setUriTemplateMatcher(questInstance.getUriTemplateMatcher());
+			evaluator.evaluateExpressions(unfolding);
+			log.debug("Boolean expression evaluated: \n{}", unfolding);
+		}
 		
-		// PUSH TYPE HERE
-		log.debug("Pushing types...");
 
 		// FIXME: get it back later (SWRL)
 		List<CQIE> newTypedRules;		
 		if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.FALSE) ){
+			// PUSH TYPE HERE
+			log.debug("Pushing types...");
 			newTypedRules = questInstance.unfolder.pushTypes(unfolding, unfolder.getMultiplePredList());
 		} else {
 			newTypedRules = unfolding.getRules();
@@ -508,7 +509,7 @@ public class QuestStatement implements OBDAStatement {
 		//TODO: can we avoid using this intermediate variable???
 		// FIXME: get it back later (SWRL)
 		if(questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT)
-				.equals(QuestConstants.TRUE)){
+				.equals(QuestConstants.FALSE)){
 			unfolding.removeAllRules();
 			unfolding.appendRule(newTypedRules);
 		}
@@ -734,9 +735,10 @@ public class QuestStatement implements OBDAStatement {
 				 * Query optimization w.r.t Sigma rules
 				 */
 				
-				//FIXME
 				//TODO option
-				//optimizeQueryWithSigmaRules(program, rulesIndex);
+				if(questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.FALSE) ){
+					optimizeQueryWithSigmaRules(program, rulesIndex);
+				}
 
 			} catch (Exception e1) {
 				log.debug(e1.getMessage(), e1);
@@ -769,7 +771,9 @@ public class QuestStatement implements OBDAStatement {
 				/**
 				 * append the SWRL rules
 				 */
-				programAfterRewriting.appendRule(questInstance.getRules());
+				if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.TRUE) ){
+					programAfterRewriting.appendRule(questInstance.getRules());
+				}
 				
 				//Here we do include the mappings, and get the final SQL-ready program
 				programAfterUnfolding = getUnfolding(programAfterRewriting);

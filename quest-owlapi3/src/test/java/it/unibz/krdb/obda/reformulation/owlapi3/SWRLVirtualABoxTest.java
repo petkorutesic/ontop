@@ -43,7 +43,7 @@ public class SWRLVirtualABoxTest {
 	public void setUp() throws Exception {
 
 
-        String url = "jdbc:h2:mem:questjunitdb";
+        String url = "jdbc:hsqldb:mem:questjunitdb";
         String username = "sa";
         String password = "";
 

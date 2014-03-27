@@ -8,10 +8,10 @@ quest:		http://obda.org/quest#
 
 [SourceDeclaration]
 sourceUri	person
-connectionUrl	jdbc:h2:mem:questjunitdb
+connectionUrl	jdbc:hsqldb:mem:questjunitdb
 username	sa
 password    
-driverClass	org.h2.Driver
+driverClass	org.hsqldb.jdbc.JDBCDriver
 
 [MappingDeclaration] @collection [[
 mappingId	person-map

@@ -866,8 +866,9 @@ public class Quest implements Serializable, RepositoryChangedListener {
 
 			unfolder = new DatalogUnfolder(unfoldingProgram, pkeys, multiplePredIdx);
 			
-			multiplePredIdx = unfolder.processMultipleTemplatePredicates(unfoldingProgram);
-			
+			if ((aboxMode.equals(QuestConstants.VIRTUAL))) {
+				multiplePredIdx = unfolder.processMultipleTemplatePredicates(unfoldingProgram);
+			}			
 
 			/***
 			 * Setting up the TBox we will use for the reformulation

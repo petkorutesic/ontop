@@ -120,15 +120,13 @@ public class SWRLVirtualABoxTest {
 				+ " WHERE { ?subject a :Driver ; :name ?name ; :age ?age}";
 		QuestOWLResultSet rs = stmt.executeTuple(query);
 		while(rs.nextRow()){
-			
 			System.out.print(rs.getOWLIndividual(1));
-			System.out.println(", ");
+			System.out.print(", ");
 			System.out.print(rs.getOWLLiteral(2));
-			System.out.println(", ");
+			System.out.print(", ");
 			System.out.print(rs.getOWLLiteral(3));
 			System.out.println();
 		}
-
 	} 
 	
 	

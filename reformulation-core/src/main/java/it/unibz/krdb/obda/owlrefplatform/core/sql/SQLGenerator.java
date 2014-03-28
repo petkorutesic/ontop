@@ -172,8 +172,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 *            The Select variables in the SPARQL query
 	 */
 	@Override
-	public String generateSourceQuery(DatalogProgram queryProgram,
-			List<String> signature) throws OBDAException {
+	public String generateSourceQuery(DatalogProgram queryProgram, List<String> signature) throws OBDAException {
 
 		normalizeProgram(queryProgram);
 
@@ -184,14 +183,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		ruleIndex = depGraph.getRuleIndex();
 
-		Multimap<Predicate, CQIE> ruleIndexByBodyPredicate = depGraph
-				.getRuleIndexByBodyPredicate();
+		Multimap<Predicate, CQIE> ruleIndexByBodyPredicate = depGraph.getRuleIndexByBodyPredicate();
 
-		List<Predicate> predicatesInBottomUp = depGraph
-				.getPredicatesInBottomUp();
+		List<Predicate> predicatesInBottomUp = depGraph.getPredicatesInBottomUp();
 
-		List<Predicate> extensionalPredicates = depGraph
-				.getExtensionalPredicates();
+		List<Predicate> extensionalPredicates = depGraph.getExtensionalPredicates();
 
 		isDistinct = hasSelectDistinctStatement(queryProgram);
 		isOrderBy = hasOrderByClause(queryProgram);
@@ -382,8 +378,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		String FROM = getFROM(cq.getBody(), index);
 		String WHERE = getWHERE(cq.getBody(), index);
-		String SELECT = getSelectClause(signature, cq, index, innerdistincts,
-				isAns1);
+		String SELECT = getSelectClause(signature, cq, index, innerdistincts, isAns1);
 
 		String querystr = SELECT + FROM + WHERE;
 		return querystr;

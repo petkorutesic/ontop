@@ -8,6 +8,7 @@ import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.*;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -18,9 +19,12 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SWRLVirtualABoxTest {
@@ -50,19 +54,11 @@ public class SWRLVirtualABoxTest {
         fac = OBDADataFactoryImpl.getInstance();
 
         conn = DriverManager.getConnection(url, username, password);
-        Statement st = conn.createStatement();
+        String sqlFile_create = "src/test/resources/test/swrl/exampleSWRL_create.sql";
+        String sqlFile_insert = "src/test/resources/test/swrl/exampleSWRL_insert.sql";
 
-        FileReader reader = new FileReader("src/test/resources/test/swrl/exampleSWRL.sql");
-        BufferedReader in = new BufferedReader(reader);
-        StringBuilder bf = new StringBuilder();
-        String line = in.readLine();
-        while (line != null) {
-            bf.append(line);
-            line = in.readLine();
-        }
-
-        st.executeUpdate(bf.toString());
-        conn.commit();
+        executeSQLFile(sqlFile_create);
+        executeSQLFile(sqlFile_insert);
 
 		p = new QuestPreferences();
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL);
@@ -78,6 +74,23 @@ public class SWRLVirtualABoxTest {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+
+	private void executeSQLFile(String sqlFile) throws SQLException,
+			FileNotFoundException, IOException {
+		Statement st = conn.createStatement();
+		FileReader reader = new FileReader(sqlFile);
+        BufferedReader in = new BufferedReader(reader);
+        StringBuilder bf = new StringBuilder();
+        String line = in.readLine();
+        while (line != null) {
+            bf.append(line);
+            line = in.readLine();
+        }
+
+        st.executeUpdate(bf.toString());
+        conn.commit();
 	}
 	
 	
@@ -102,13 +115,17 @@ public class SWRLVirtualABoxTest {
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
 		String query = "PREFIX : <http://www.example.org/swrl/1#> " +
-				"SELECT ?subject ?name WHERE { ?subject a :Driver ; :name ?name}";
+				//"SELECT ?subject ?name ?age"
+				"SELECT ?subject ?name ?age"
+				+ " WHERE { ?subject a :Driver ; :name ?name ; :age ?age}";
 		QuestOWLResultSet rs = stmt.executeTuple(query);
 		while(rs.nextRow()){
 			
-			System.out.print(rs.getOWLIndividual(0) + ", ");
 			System.out.print(rs.getOWLIndividual(1));
-		
+			System.out.println(", ");
+			System.out.print(rs.getOWLLiteral(2));
+			System.out.println(", ");
+			System.out.print(rs.getOWLLiteral(3));
 			System.out.println();
 		}
 

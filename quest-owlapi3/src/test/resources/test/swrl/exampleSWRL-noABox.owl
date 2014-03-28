@@ -58,6 +58,9 @@
         <DataProperty IRI="#name"/>
     </Declaration>
     <Declaration>
+        <DataProperty IRI="#age"/>
+    </Declaration>
+    <Declaration>
         <NamedIndividual IRI="#Ivan"/>
     </Declaration>
     <Declaration>
@@ -169,6 +172,26 @@
             </ClassAtom>
         </Head>
     </DLSafeRule>
+    <DLSafeRule>
+        <Body>
+            <ClassAtom>
+                <Class IRI="#Person"/>
+                <Variable IRI="urn:swrl#x"/>
+            </ClassAtom>
+            <DataPropertyAtom>
+                <DataProperty IRI="#hasCar"/>
+                <Variable IRI="urn:swrl#x"/>
+                <Literal datatypeIRI="&xsd;boolean">true</Literal>
+            </DataPropertyAtom>
+        </Body>
+        <Head>
+            <ClassAtom>
+                <Class IRI="#Driver"/>
+                <Variable IRI="urn:swrl#x"/>
+            </ClassAtom>
+        </Head>
+    </DLSafeRule>
+    
     <!-- 
     <DLSafeRule>
         <Body>

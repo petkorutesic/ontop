@@ -15,8 +15,8 @@ driverClass	org.hsqldb.jdbc.JDBCDriver
 
 [MappingDeclaration] @collection [[
 mappingId	person-map
-target		:person/{ID}/ a :Person ; :name {NAME}; :hasCar {HAS_CAR} .
-source		select ID, NAME, HAS_CAR from PERSON
+target		:person/{ID}/ a :Person ; :name {NAME} ; :hasCar {HAS_CAR} ; :age {AGE} .
+source		select ID, NAME, HAS_CAR, AGE from PERSON
 
 mappingId	woman-map
 target		:person/{ID}/ a :Woman .

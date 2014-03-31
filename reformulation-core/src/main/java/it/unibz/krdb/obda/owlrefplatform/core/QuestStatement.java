@@ -507,30 +507,15 @@ public class QuestStatement implements OBDAStatement {
 		}
 		
 
-		// FIXME: get it back later (SWRL)
 		List<CQIE> newTypedRules;		
-		//if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.FALSE) ){
-			// PUSH TYPE HERE
-			log.debug("Pushing types...");
-			newTypedRules = questInstance.unfolder.pushTypes(unfolding, unfolder.getMultiplePredList());
-			for (CQIE rule: newTypedRules){
-				System.out.println(rule);
-			}
-//		} else {
-//			newTypedRules = unfolding.getRules();
-//		}
+		log.debug("Pushing types...");
+		newTypedRules = questInstance.unfolder.pushTypes(unfolding, unfolder.getMultiplePredList());
+		for (CQIE rule: newTypedRules){
+			System.out.println(rule);
+		}
 
-		
-		
-		
-		
-		//TODO: can we avoid using this intermediate variable???
-		// FIXME: get it back later (SWRL)
-//		if(questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT)
-//				.equals(QuestConstants.FALSE)){
-			unfolding.removeAllRules();
-			unfolding.appendRule(newTypedRules);
-		//}
+		unfolding.removeAllRules();
+		unfolding.appendRule(newTypedRules);
 		
 		log.debug("Pulling out equalities...");
 				
@@ -538,10 +523,6 @@ public class QuestStatement implements OBDAStatement {
 			DatalogNormalizer.pullOutEqualities(rule);
 			System.out.println(rule);
 		}
-
-		
-
-		
 		
 		log.debug("\n Partial evaluation ended.");
 

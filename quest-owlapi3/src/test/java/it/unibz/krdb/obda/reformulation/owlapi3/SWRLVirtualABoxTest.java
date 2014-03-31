@@ -117,7 +117,7 @@ public class SWRLVirtualABoxTest {
 		String query = "PREFIX : <http://www.example.org/swrl/1#> " +
 				//"SELECT ?subject ?name ?age"
 				"SELECT ?subject ?name ?age"
-				+ " WHERE { ?subject a :Driver ; :name ?name ; :age ?age}";
+				+ " WHERE { ?subject a :MaleDriver ; :name ?name ; :age ?age}";
 		QuestOWLResultSet rs = stmt.executeTuple(query);
 		while(rs.nextRow()){
 			System.out.print(rs.getOWLIndividual(1));

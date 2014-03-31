@@ -175,18 +175,17 @@
     <DLSafeRule>
         <Body>
             <ClassAtom>
-                <Class IRI="#Person"/>
+                <Class IRI="#Driver"/>
                 <Variable IRI="urn:swrl#x"/>
             </ClassAtom>
-            <DataPropertyAtom>
-                <DataProperty IRI="#hasCar"/>
+            <ClassAtom>
+                <Class IRI="#Man"/>
                 <Variable IRI="urn:swrl#x"/>
-                <Literal datatypeIRI="&xsd;boolean">true</Literal>
-            </DataPropertyAtom>
+            </ClassAtom>
         </Body>
         <Head>
             <ClassAtom>
-                <Class IRI="#Driver"/>
+                <Class IRI="#MaleDriver"/>
                 <Variable IRI="urn:swrl#x"/>
             </ClassAtom>
         </Head>

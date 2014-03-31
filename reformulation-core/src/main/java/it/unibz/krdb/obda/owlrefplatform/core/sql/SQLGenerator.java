@@ -650,8 +650,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 				String column = getSQLString(p1, index, false);
 				String pattern = getSQLString(p2, index, false);
-				return sqladapter.sqlRegex(column, pattern, caseinSensitive,
+				String sqlRegex = sqladapter.sqlRegex(column, pattern, caseinSensitive,
 						multiLine, dotAllMode);
+				return sqlRegex;
 			} else {
 				throw new RuntimeException("The builtin function "
 						+ functionSymbol.toString() + " is not supported yet!");
@@ -1290,9 +1291,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 				String[] splits = columnRef.split("\\.");
 
 				String quotedTable = splits[0];
+				String table = unquote(splits[0]);
 				String column = unquote(splits[1]);
 
-				DataDefinition definition = metadata.getDefinition(quotedTable);
+				DataDefinition definition = metadata.getDefinition(table);
 				/*
 				 * If the var is defined in a ViewDefinition, then there is a
 				 * column for the type and we just need to refer to that column
@@ -1573,7 +1575,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 						|| ct.getType() == COL_TYPE.LITERAL) {
 					int id = getUriid(ct.getValue());
 					if (id >= 0)
-						return jdbcutil.getSQLLexicalForm(String.valueOf(id));
+						//return jdbcutil.getSQLLexicalForm(String.valueOf(id));
+						return String.valueOf(id);
 				}
 			}
 			return jdbcutil.getSQLLexicalForm(ct);
@@ -1737,13 +1740,29 @@ public class SQLGenerator implements SQLQueryGenerator {
 		} else if (functionSymbol.equals(OBDAVocabulary.NEQ)) {
 			operator = NEQ_OPERATOR;
 		} else if (functionSymbol.equals(OBDAVocabulary.GT)) {
-			operator = GT_OPERATOR;
+			if (sqladapter instanceof HSQLSQLDialectAdapter){
+				operator = "(cast (ltrim(%s) as INTEGER)) > %s";
+			}else{
+				operator = GT_OPERATOR;
+			}
 		} else if (functionSymbol.equals(OBDAVocabulary.GTE)) {
-			operator = GTE_OPERATOR;
+			if (sqladapter instanceof HSQLSQLDialectAdapter){
+				operator = "(cast (ltrim(%s) as INTEGER)) >= %s";
+			}else{
+				operator = GTE_OPERATOR;
+			}
 		} else if (functionSymbol.equals(OBDAVocabulary.LT)) {
-			operator = LT_OPERATOR;
+			if (sqladapter instanceof HSQLSQLDialectAdapter){
+				operator = "(cast (ltrim(%s) as INTEGER)) < %s";
+			}else{
+				operator = LT_OPERATOR;
+			}
 		} else if (functionSymbol.equals(OBDAVocabulary.LTE)) {
-			operator = LTE_OPERATOR;
+			if (sqladapter instanceof HSQLSQLDialectAdapter){
+				operator = "(cast (ltrim(%s) as INTEGER)) <= %s";
+			}else{
+				operator = LTE_OPERATOR;
+			}
 		} else if (functionSymbol.equals(OBDAVocabulary.AND)) {
 			operator = AND_OPERATOR;
 		} else if (functionSymbol.equals(OBDAVocabulary.OR)) {

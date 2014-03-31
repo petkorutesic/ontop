@@ -541,7 +541,9 @@ public class DatalogNormalizer {
 				} else if (subTerm instanceof Function) {
 					Predicate head = ((Function) subTerm).getFunctionSymbol();
 
-					if (head.isDataTypePredicate()) {
+					//if (head.isDataTypePredicate() ) {
+					// TODO: needs to check more cases
+					if (head.isDataTypePredicate() || head.getName().equals(OBDAVocabulary.QUEST_URI)) {
 
 						// This case is for the ans atoms that might have
 						// functions in the head. Check if it is needed.
@@ -554,14 +556,10 @@ public class DatalogNormalizer {
 									atom, subterms, j, (Function) subTerm, var);
 						}
 					}
-				}
+				} 
+				
+				
 			} // end for subterms
-			
-			
-			
-			
-			
-			
 			
 			
 			//TODO: WHat about the JOIN????

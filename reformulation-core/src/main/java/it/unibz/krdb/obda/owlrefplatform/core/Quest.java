@@ -860,12 +860,14 @@ public class Quest implements Serializable, RepositoryChangedListener {
 			/*
 			 * Adding SWRL rules
 			 */
+			/*
 			if (swrlEntailment) {
 				if (!rules.isEmpty()) {
 					unfoldingProgram.appendRule(rules);
 					log.debug("append SWRL rules: \n{}", rules);
 				}
 			}
+			*/
 
 			log.debug("Final set of mappings: \n{}", unfoldingProgram);
 

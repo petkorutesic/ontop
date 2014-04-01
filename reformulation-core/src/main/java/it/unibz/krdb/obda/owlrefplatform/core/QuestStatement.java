@@ -80,6 +80,7 @@ import org.openrdf.query.parser.QueryParserUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -735,9 +736,9 @@ public class QuestStatement implements OBDAStatement {
 				 */
 				
 				//TODO option
-				if(questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.FALSE) ){
+				//if(questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.FALSE) ){
 					optimizeQueryWithSigmaRules(program, rulesIndex);
-				}
+				//}
 
 			} catch (Exception e1) {
 				log.debug(e1.getMessage(), e1);
@@ -771,6 +772,7 @@ public class QuestStatement implements OBDAStatement {
 				 * append the SWRL rules
 				 */
 				if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.TRUE) ){
+					log.debug("appending the SWRL rules to the query rewriting result \n{}", Joiner.on("\n").join(questInstance.getRules()));
 					programAfterRewriting.appendRule(questInstance.getRules());
 				}
 				

@@ -150,6 +150,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 * Creating a local index for the rules according to their predicate
 		 */
 
+		System.err.println("REMOVE THIS!!!!!!!!!!");
+		//TODO: REMOVE THIS!!
 		//TODO: this should not be mappings when working with the query!!
 		for (CQIE mappingrule : unfoldingProgram.getRules()) {
 			Function head = mappingrule.getHead();
@@ -498,6 +500,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 							
 								
 								//Delete the rules from workingList that have been touched
+								queryIdx = Math.min(queryIdx, workingList.size());
 								workingList.add(queryIdx, newquery);
 
 							
@@ -571,7 +574,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 			boolean includeMappings=true;
 			boolean keepLooping=true;
-			extensionalPredicates =  depGraph.getExtensionalPredicates();
+			//extensionalPredicates =  depGraph.getExtensionalPredicates();
 			ruleIndex = depGraph.getRuleIndex();
 			ruleIndexByBody = depGraph.getRuleIndexByBodyPredicate();
 

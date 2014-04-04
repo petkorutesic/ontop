@@ -446,6 +446,8 @@ public class QuestStatement implements OBDAStatement {
 				translator.setSI();
 				translator.setUriRef(questInstance.getUriRefIds());
 			}
+			
+			
 			program = translator.translate(pq, signature);
 
 			log.debug("Translated query: \n{}", program);
@@ -453,6 +455,13 @@ public class QuestStatement implements OBDAStatement {
 			//TODO: cant we use here QuestInstance???
 			
 	
+			/**
+			 * append the SWRL rules
+			 */
+			if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.TRUE) ){
+				log.debug("appending the SWRL rules to the query rewriting result \n{}", Joiner.on("\n").join(questInstance.getRules()));
+				program.appendRule(questInstance.getRules());
+			}
 			
 			DatalogUnfolder unfolder = new DatalogUnfolder(program.clone(), new HashMap<Predicate, List<Integer>>(), questInstance.multiplePredIdx);
 			
@@ -779,13 +788,7 @@ public class QuestStatement implements OBDAStatement {
 			try {
 				final long startTime = System.currentTimeMillis();
 			
-				/**
-				 * append the SWRL rules
-				 */
-				if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.TRUE) ){
-					log.debug("appending the SWRL rules to the query rewriting result \n{}", Joiner.on("\n").join(questInstance.getRules()));
-					programAfterRewriting.appendRule(questInstance.getRules());
-				}
+				
 				
 				//Here we do include the mappings, and get the final SQL-ready program
 				programAfterUnfolding = getUnfolding(programAfterRewriting);

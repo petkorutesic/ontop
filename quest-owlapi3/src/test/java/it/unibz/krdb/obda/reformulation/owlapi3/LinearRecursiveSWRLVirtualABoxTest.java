@@ -113,7 +113,7 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
-		String query = "PREFIX : <http://www.example.org/linear-recuresive-swrl.owl#> " +
+		String query = "PREFIX : <http://www.example.org/linear-recursive-swrl.owl#> " +
 				//"SELECT ?subject ?name ?age"
 				"SELECT ?x ?xname ?y ?yname"
 				+ " WHERE { ?x :reach ?y. "

@@ -27,6 +27,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap; 
 
 
+
 /***
  * 
  * This class generates two dependency graphs for the datalog program
@@ -503,6 +504,21 @@ public class DatalogDependencyGraphGenerator {
 		}else {
 			System.err.println("No Such Key as"+pred);
 		}
+	}
+
+	public Collection<Predicate> getLinearRecursivePredicates() {
+		
+		Collection<Predicate> results = Lists.newArrayList();
+		
+		for(DefaultEdge edge:  predicateDependencyGraph.edgeSet()){
+			Predicate source = predicateDependencyGraph.getEdgeSource(edge);
+			Predicate target = predicateDependencyGraph.getEdgeTarget(edge);
+			if(source.equals(target)){
+				results.add(source);
+			}
+		}
+		
+		return results;
 	}
 	
 

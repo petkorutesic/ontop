@@ -638,6 +638,64 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				predicatesMightGotEmpty=updateRulesWithEmptyAnsPredicates(workingList, predicatesMightGotEmpty, touchedPredicates);
 			}
 
+			//TODO: I deserve an eternity in hell for this code... please... FIX after deadline!!!
+			List<Predicate> recVertexSet =  depGraph.getLinearRecursivePredicatesList();
+			
+			for (Predicate v: recVertexSet){
+				List<CQIE> ruleSet = (List<CQIE>) ruleIndex.get(v);
+				CQIE rule1 = ruleSet.get(0);
+				CQIE rule2 = ruleSet.get(1);
+				Function baseHead = null;
+				Function recursiveHead =  null;
+				CQIE recursiverule = null;
+				CQIE oldrule = null;
+				
+				int terms1 = rule1.getBody().size();
+				int terms2 = rule2.getBody().size();
+				Map<Variable, Term> mgu =null;
+				
+				if (terms1>terms2){
+					//rule2 is the base case
+					baseHead = rule2.getHead();
+					workingList.add(rule2);
+
+					recursiverule = rule1;
+					oldrule = rule1.clone();
+					recursiveHead = rule1.getHead();
+
+				
+				}else{
+					//rule1 is the base case
+					baseHead = rule1.getHead();
+					workingList.add(rule1);
+
+					recursiveHead = rule2.getHead();
+					recursiverule = rule2;
+					oldrule = rule2.clone();
+					
+				}
+				mgu = Unifier.getMGU(baseHead, recursiveHead);
+				recursiverule = Unifier.applyUnifier(recursiverule ,mgu,true);
+				
+				depGraph.removeRuleFromRuleIndex(v,oldrule);
+				depGraph.addRuleToRuleIndex(v, recursiverule);
+
+				if (workingList.contains(oldrule)){
+					workingList.remove(oldrule);
+				}
+				workingList.add(recursiverule);
+
+
+
+				//Update the bodyIndex
+				depGraph.removeOldRuleIndexByBodyPredicate(oldrule);
+				depGraph.updateRuleIndexByBodyPredicate(recursiverule);
+
+				
+				
+
+			}
+			
 			// I add to the working list all the rules touched by the unfolder!
 			addNewRules2WorkingListFromBodyAtoms(workingList, extensionalPredicates);
 			addNewRules2WorkingListFromHeadAtoms(workingList, touchedPredicates);
@@ -787,7 +845,11 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			for (int predIdx = 0; predIdx < predicatesToAdd.size() ; predIdx++) {
 				Predicate pred = predicatesToAdd.get(predIdx);
 				Predicate preFather =  depGraph.getFatherPredicate(pred);
-
+				
+				if (depGraph.getLinearRecursivePredicates().contains(preFather)){
+					continue;
+				}
+				
 				Collection<CQIE> rulesToAdd= ruleIndex.get(preFather);
 
 				for (CQIE resultingRule: rulesToAdd){

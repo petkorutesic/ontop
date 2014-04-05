@@ -147,8 +147,12 @@ public class DatalogDependencyGraphGenerator {
 		 * extensionalPredicates = vertices(predicateDependencyGraph) - ruleIndex.keys()
 		 * </pre>
 		 */
-		extensionalPredicates.addAll(predicateDependencyGraph.vertexSet());
-		extensionalPredicates.removeAll(ruleIndex.keySet());
+		Set<Predicate> vertexSet = predicateDependencyGraph.vertexSet();
+		Set<Predicate> vSet = new HashSet<Predicate>();
+		vSet.addAll(vertexSet);
+		Set<Predicate> keySet = ruleIndex.keySet();
+		vSet.removeAll(keySet);
+		extensionalPredicates.addAll(vSet);
 
 	}
 	
@@ -506,6 +510,9 @@ public class DatalogDependencyGraphGenerator {
 		}
 	}
 
+	/*
+	 * returns the recursive predicates in the program. Used for SWRL
+	 */
 	public Collection<Predicate> getLinearRecursivePredicates() {
 		
 		Collection<Predicate> results = Lists.newArrayList();
@@ -522,6 +529,22 @@ public class DatalogDependencyGraphGenerator {
 	}
 	
 
-
+	/*
+	 * returns the recursive predicates in the program. Used for SWRL
+	 */
+	public List<Predicate> getLinearRecursivePredicatesList() {
+		
+		List<Predicate> results = new LinkedList<Predicate>();
+		
+		for(DefaultEdge edge:  predicateDependencyGraph.edgeSet()){
+			Predicate source = predicateDependencyGraph.getEdgeSource(edge);
+			Predicate target = predicateDependencyGraph.getEdgeTarget(edge);
+			if(source.equals(target)){
+				results.add(source);
+			}
+		}
+		
+		return results;
+	}
 
 }

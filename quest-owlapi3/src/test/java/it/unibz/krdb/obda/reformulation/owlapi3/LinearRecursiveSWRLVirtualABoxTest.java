@@ -27,35 +27,37 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class SWRLVirtualABoxTest {
+public class LinearRecursiveSWRLVirtualABoxTest {
 
-	private String owlfile = "src/test/resources/test/swrl/exampleSWRL-noABox.owl";
-	private String obdafile = "src/test/resources/test/swrl/exampleSWRL.obda";
+	private String owlfile = "src/test/resources/test/swrl/linear-recursive-swrl.owl";
+	private String obdafile = "src/test/resources/test/swrl/linear-recursive-swrl.obda";
 	private QuestOWL reasoner;
 	private OWLOntology ontology;
 	private OWLOntologyManager manager;
 	private OBDAModel obdaModel;
 
+    private OBDADataFactory fac;
     private Connection conn;
 
 	QuestPreferences p;
 	
-	String prefix = "http://meraka/moss/exampleBooks.owl#";
+	String prefix = "http://www.example.org/linear-recursive-swrl.owl#";
 
 	@Before
 	public void setUp() throws Exception {
-
 
         String url = "jdbc:hsqldb:mem:questjunitdb";
         String username = "sa";
         String password = "";
 
-        conn = DriverManager.getConnection(url, username, password);
-        String sqlFile_create = "src/test/resources/test/swrl/exampleSWRL_create.sql";
-        String sqlFile_insert = "src/test/resources/test/swrl/exampleSWRL_insert.sql";
+        fac = OBDADataFactoryImpl.getInstance();
 
-        executeSQLFile(sqlFile_create);
-        executeSQLFile(sqlFile_insert);
+        conn = DriverManager.getConnection(url, username, password);
+//        String sqlFile_create = "src/test/resources/test/swrl/exampleSWRL_create.sql";
+//        String sqlFile_insert = "src/test/resources/test/swrl/exampleSWRL_insert.sql";
+//
+//        executeSQLFile(sqlFile_create);
+//        executeSQLFile(sqlFile_insert);
 
 		p = new QuestPreferences();
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL);
@@ -68,27 +70,28 @@ public class SWRLVirtualABoxTest {
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(new File(owlfile));
 		} catch (OWLOntologyCreationException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 
-	private void executeSQLFile(String sqlFile) throws SQLException,
-			FileNotFoundException, IOException {
-		Statement st = conn.createStatement();
-		FileReader reader = new FileReader(sqlFile);
-        BufferedReader in = new BufferedReader(reader);
-        StringBuilder bf = new StringBuilder();
-        String line = in.readLine();
-        while (line != null) {
-            bf.append(line);
-            line = in.readLine();
-        }
-
-        st.executeUpdate(bf.toString());
-        conn.commit();
-	}
-	
+//	private void executeSQLFile(String sqlFile) throws SQLException,
+//			FileNotFoundException, IOException {
+//		Statement st = conn.createStatement();
+//		FileReader reader = new FileReader(sqlFile);
+//        BufferedReader in = new BufferedReader(reader);
+//        StringBuilder bf = new StringBuilder();
+//        String line = in.readLine();
+//        while (line != null) {
+//            bf.append(line);
+//            line = in.readLine();
+//        }
+//
+//        st.executeUpdate(bf.toString());
+//        conn.commit();
+//	}
+//	
 	
 	private void startReasoner(){
 		QuestOWLFactory questOWLFactory = new QuestOWLFactory();
@@ -110,17 +113,17 @@ public class SWRLVirtualABoxTest {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
-		String query = "PREFIX : <http://www.example.org/swrl/1#> " +
+		String query = "PREFIX : <http://www.example.org/linear-recuresive-swrl.owl#> " +
 				//"SELECT ?subject ?name ?age"
-				"SELECT ?subject ?name ?age"
-				+ " WHERE { ?subject a :MaleDriver ; :name ?name ; :age ?age}";
+				"SELECT ?x ?xname ?y ?yname"
+				+ " WHERE { ?x :reach ?y. "
+				+ "?x :name ?xname . "
+				+ "?y :name ?yname .}";
 		QuestOWLResultSet rs = stmt.executeTuple(query);
 		while(rs.nextRow()){
 			System.out.print(rs.getOWLIndividual(1));
 			System.out.print(", ");
-			System.out.print(rs.getOWLLiteral(2));
-			System.out.print(", ");
-			System.out.print(rs.getOWLLiteral(3));
+			System.out.print(rs.getOWLIndividual(2));
 			System.out.println();
 		}
 	} 

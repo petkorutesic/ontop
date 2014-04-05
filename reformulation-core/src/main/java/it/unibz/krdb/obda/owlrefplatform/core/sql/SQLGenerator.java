@@ -178,6 +178,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		DatalogDependencyGraphGenerator depGraph = new DatalogDependencyGraphGenerator(
 				queryProgram);
+		
+		log.debug("Input to the SQL Generator \n{}", queryProgram);
+		
 
 		sqlAnsViewMap = new HashMap<Predicate, String>();
 

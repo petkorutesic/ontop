@@ -1,0 +1,25 @@
+[PrefixDeclaration]
+:			http://www.example.org/linear-recursive-swrl.owl#
+owl:		http://www.w3.org/2002/07/owl#
+rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
+xsd:		http://www.w3.org/2001/XMLSchema#
+rdfs:		http://www.w3.org/2000/01/rdf-schema#
+quest:		http://obda.org/quest#
+
+[SourceDeclaration]
+sourceUri	person
+connectionUrl	jdbc:postgresql://obdalin3.inf.unibz.it/swrltest
+username	postgres
+password    postgres
+driverClass	org.postgresql.Driver
+
+[MappingDeclaration] @collection [[
+mappingId	node-map
+target		:node/{id}/ a :Node ; :name {name} .
+source		select id, name from node
+
+mappingId	edge-map
+target		:node/{node1}/ :edge :node/{node2} .
+source		select node1, node2 from edge
+]]
+

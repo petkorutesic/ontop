@@ -606,7 +606,9 @@ public class DatalogNormalizer {
 			List<Term> subterms, int j, Function subTerm, Variable var1) {
 		Predicate head = subTerm.getFunctionSymbol();
 		Variable var2 = (Variable) substitutions.get(var1);
-
+		Function  newFuncTerm ;
+		Function equality;
+		
 		if (var2 == null) {
 			/*
 			 * No substitution exists, hence, no action but generate a new
@@ -615,10 +617,17 @@ public class DatalogNormalizer {
 			 */
 			var2 = fac.getVariable(var1.getName() + "f" + newVarCounter[0]);
 
-			FunctionalTermImpl newFuncTerm = (FunctionalTermImpl) fac.getFunction(head, var1);
+			if (head.getName().equals(OBDAVocabulary.QUEST_URI) && head.getArity()==2){
+				//Term template = subTerm.getTerm(0);
+				//newFuncTerm =  fac.getFunction(head, template, var1);
+				 equality = fac.getFunctionEQ(var2, var1);
+				
+			}else{
+				newFuncTerm =  fac.getFunction(head, var1);
+				equality = fac.getFunctionEQ(var2, newFuncTerm);
+			}
 			subterms.set(j, var2);
-
-			Function equality = fac.getFunctionEQ(var2, newFuncTerm);
+			
 			eqList.add(equality);
 
 		} else {
@@ -631,11 +640,22 @@ public class DatalogNormalizer {
 
 			if (atom.isDataFunction()) {
 				Variable newVariable = fac.getVariable(var1.getName() + newVarCounter[0]);
-
 				subterms.set(j, newVariable);
-				FunctionalTermImpl newFuncTerm = (FunctionalTermImpl) fac.getFunction(head, var2);
+				
+				
+				//adding the template
+				//TODO: what if it is greater than 2?
+				if (head.getName().equals(OBDAVocabulary.QUEST_URI) && head.getArity()==2){
+					//Term template = subTerm.getTerm(0);
+					//newFuncTerm =  fac.getFunction(head, template, var2);
+					 equality = fac.getFunctionEQ(newVariable, var2);
 
-				Function equality = fac.getFunctionEQ(newVariable, newFuncTerm);
+				}else{
+					newFuncTerm =  fac.getFunction(head, var2);
+					equality = fac.getFunctionEQ(newVariable, newFuncTerm);
+				}
+
+			
 				eqList.add(equality);
 
 			} else { // if its not data function, just replace
@@ -646,7 +666,17 @@ public class DatalogNormalizer {
 		newVarCounter[0] += 1;
 
 	}
-
+/**
+ * Creates substitutions renaming variables. Helper method for pull out equalities.
+ *  
+ * @param substitutions
+ * @param eqList
+ * @param newVarCounter
+ * @param atom
+ * @param subterms
+ * @param j
+ * @param subTerm
+ */
 	private static void renameVariable(Map<Variable, Term> substitutions, List<Function> eqList, int[] newVarCounter, Function atom,
 			List<Term> subterms, int j, Term subTerm) {
 		Variable var1 = (Variable) subTerm;

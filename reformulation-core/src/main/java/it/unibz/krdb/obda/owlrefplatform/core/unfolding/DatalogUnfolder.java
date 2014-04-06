@@ -638,67 +638,20 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				predicatesMightGotEmpty=updateRulesWithEmptyAnsPredicates(workingList, predicatesMightGotEmpty, touchedPredicates);
 			}
 
-			//TODO: I deserve an eternity in hell for this code... please... FIX after deadline!!!
-			List<Predicate> recVertexSet =  depGraph.getLinearRecursivePredicatesList();
-			
-			for (Predicate v: recVertexSet){
-				List<CQIE> ruleSet = (List<CQIE>) ruleIndex.get(v);
-				CQIE rule1 = ruleSet.get(0);
-				CQIE rule2 = ruleSet.get(1);
-				Function baseHead = null;
-				Function recursiveHead =  null;
-				CQIE recursiverule = null;
-				CQIE oldrule = null;
-				
-				int terms1 = rule1.getBody().size();
-				int terms2 = rule2.getBody().size();
-				Map<Variable, Term> mgu =null;
-				
-				if (terms1>terms2){
-					//rule2 is the base case
-					baseHead = rule2.getHead();
-					workingList.add(rule2);
-
-					recursiverule = rule1;
-					oldrule = rule1.clone();
-					recursiveHead = rule1.getHead();
-
-				
-				}else{
-					//rule1 is the base case
-					baseHead = rule1.getHead();
-					workingList.add(rule1);
-
-					recursiveHead = rule2.getHead();
-					recursiverule = rule2;
-					oldrule = rule2.clone();
-					
-				}
-				mgu = Unifier.getMGU(baseHead, recursiveHead);
-				recursiverule = Unifier.applyUnifier(recursiverule ,mgu,true);
-				
-				depGraph.removeRuleFromRuleIndex(v,oldrule);
-				depGraph.addRuleToRuleIndex(v, recursiverule);
-
-				if (workingList.contains(oldrule)){
-					workingList.remove(oldrule);
-				}
-				workingList.add(recursiverule);
-
-
-
-				//Update the bodyIndex
-				depGraph.removeOldRuleIndexByBodyPredicate(oldrule);
-				depGraph.updateRuleIndexByBodyPredicate(recursiverule);
-
-				
-				
-
-			}
+	
 			
 			// I add to the working list all the rules touched by the unfolder!
 			addNewRules2WorkingListFromBodyAtoms(workingList, extensionalPredicates);
 			addNewRules2WorkingListFromHeadAtoms(workingList, touchedPredicates);
+
+			/**
+			 * ADDING THE RECURSIVE RULES!!!
+			 */
+			List<Predicate> recVertexSet =  depGraph.getLinearRecursivePredicatesList();
+			for (Predicate v: recVertexSet){
+				List<CQIE> ruleSet = (List<CQIE>) ruleIndex.get(v);
+				workingList.addAll(ruleSet);
+			}
 			System.out.println(workingList);
 
 		}
@@ -2245,13 +2198,71 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			} //end if extensional
 			
 		}//end for predicates
-		return workingList;
 		
+		/**
+		 * THIS PART IS ONLY FOR RECURSIVE RULES!! REMOVING TYPES!!
+		 */
+		List<Predicate> recVertexSet =  depGraph.getLinearRecursivePredicatesList();
+		List<Term> termsToExclude = new LinkedList<Term>();
+		
+		for (Predicate v: recVertexSet){
+			List<CQIE> ruleSet = (List<CQIE>) ruleIndex.get(v);
+
+
+			for (CQIE rule: ruleSet){
+				CQIE newsourceRule= computeSourceRuleNoTypes(rule.clone(), termsToExclude);
+
+				for (Term atom: newsourceRule.getBody()){
+					if (!(atom instanceof Function)){
+						continue;
+					}
+					Function castedAtom = (Function )atom;
+					Predicate atomFunction = castedAtom.getFunctionSymbol();
+					Predicate ruleHeadFunction = newsourceRule.getHead().getFunctionSymbol();
+					if (!atomFunction.equals(ruleHeadFunction)){
+						continue;
+					}
+					//now I am in the recursive atom
+					List<Term> terms = castedAtom.getTerms();
+					 
+					for(int i=0; i<terms.size();i++){
+						Term t = terms.get(i);
+						if (!(t instanceof Function)){
+							continue;
+						}
+						//it is a function!
+						Variable var= t.getReferencedVariables().iterator().next();
+						t= var;
+					}
+				}
+
+				depGraph.removeRuleFromRuleIndex(v,rule);
+				depGraph.addRuleToRuleIndex(v, newsourceRule);
+
+				if (workingList.contains(rule)){
+					workingList.remove(rule);
+				}
+				workingList.add(newsourceRule);
+
+
+
+				//Update the bodyIndex
+				depGraph.removeOldRuleIndexByBodyPredicate(rule);
+				depGraph.updateRuleIndexByBodyPredicate(newsourceRule);
+
+
+			}
+		}
+
+
+
+		return workingList;
+
 	}
 
 
-	
-	
+
+
 
 	/**
 	 * This method will remove the types in the head of the source query. For instance, if the rules is

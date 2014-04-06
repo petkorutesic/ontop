@@ -109,7 +109,7 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 	}
 	
 	@Test
-	public void testSWRLDriver() throws OWLException, OBDAException {
+	public void test() throws OWLException, OBDAException {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();

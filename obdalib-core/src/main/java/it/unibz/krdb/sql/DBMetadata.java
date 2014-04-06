@@ -439,8 +439,6 @@ public class DBMetadata implements Serializable {
 	public ViewDefinition createViewDefinition(String name, String sqlString,
 			Collection<String> columns) {
 
-		
-
 		ViewDefinition vd = new ViewDefinition(name);
 		vd.setSQL(sqlString);
 		int pos = 1;

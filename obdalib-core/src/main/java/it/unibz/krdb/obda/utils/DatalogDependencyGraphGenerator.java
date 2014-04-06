@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 import org.jgraph.graph.DefaultEdge;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -25,6 +27,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap; 
+import com.google.common.collect.Sets;
 
 
 
@@ -48,10 +51,10 @@ import com.google.common.collect.Multimap;
  */
 public class DatalogDependencyGraphGenerator {
 
-	private DirectedGraph<Predicate, DefaultEdge> predicateDependencyGraph = new DefaultDirectedGraph<Predicate, DefaultEdge>(
+	private DefaultDirectedGraph<Predicate, DefaultEdge> predicateDependencyGraph = new DefaultDirectedGraph<Predicate, DefaultEdge>(
 			DefaultEdge.class);
 
-	private DirectedGraph<CQIE, DefaultEdge> ruleDependencyGraph = new DefaultDirectedGraph<CQIE, DefaultEdge>(
+	private DefaultDirectedGraph<CQIE, DefaultEdge> ruleDependencyGraph = new DefaultDirectedGraph<CQIE, DefaultEdge>(
 			DefaultEdge.class);
 
 	/***
@@ -71,6 +74,12 @@ public class DatalogDependencyGraphGenerator {
 	 * Bottom-up Ordered List of predicates
 	 */
 	private List<Predicate> predicatesInBottomUp = new ArrayList<Predicate>();
+
+	/**
+	 * Recursive predicates. 
+	 * Currently version only contains direct self loops from the rules.
+	 */
+	private Set<Predicate> recursivePredicates = Sets.newHashSet();
 	
 	
 	public DirectedGraph<Predicate, DefaultEdge> getPredicateDependencyGraph() {
@@ -401,7 +410,14 @@ public class DatalogDependencyGraphGenerator {
 
 		for (Predicate dependentPred : dependencyList) {
 			predicateDependencyGraph.addVertex(dependentPred);
-			predicateDependencyGraph.addEdge(headPred, dependentPred);
+			
+			
+//			// Topological sort can not handle cycles, so we do not put self-loops into the graph
+//			if(headPred.equals(dependentPred)){
+//				recursivePredicates .add(headPred);
+//			} else {
+				predicateDependencyGraph.addEdge(headPred, dependentPred);
+			//}
 		}
 	}
 
@@ -416,8 +432,20 @@ public class DatalogDependencyGraphGenerator {
 	 * </ul>
 	 */
 	private void generateOrderedDepGraph() {
+		
+		// TopologicalOrderIterator can only handles acyclic graph, so we need to remove the cycles first
+		// Now we only remove self-loops
+		
+		DefaultDirectedGraph<Predicate, DefaultEdge> cloneGraph = (DefaultDirectedGraph<Predicate, DefaultEdge>)predicateDependencyGraph.clone();
+		
+		Collection<Predicate> linearRecursivePredicates = this.getLinearRecursivePredicates();
+		
+		for(Predicate pred : linearRecursivePredicates){
+			cloneGraph.removeAllEdges(pred, pred);
+		}
+		
 		TopologicalOrderIterator<Predicate, DefaultEdge> iter =
-				new TopologicalOrderIterator<Predicate, DefaultEdge>(predicateDependencyGraph);
+				new TopologicalOrderIterator<Predicate, DefaultEdge>(cloneGraph);
 		
 		while (iter.hasNext()){
 			Predicate pred = iter.next();

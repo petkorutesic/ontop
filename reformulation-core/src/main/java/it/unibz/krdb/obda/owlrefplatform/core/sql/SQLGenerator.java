@@ -70,6 +70,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 
 /**
@@ -82,6 +83,8 @@ import com.google.common.collect.Multimap;
 public class SQLGenerator implements SQLQueryGenerator {
 
 	private static final long serialVersionUID = 7477161929752147045L;
+	
+	private enum RECURSION { LINEAR_RECURION, NO_RECURSION };
 
 	/**
 	 * Operator symbols
@@ -128,6 +131,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 	private Multimap<Predicate, CQIE> ruleIndex;
 
 	private Map<Predicate, String> sqlAnsViewMap;
+
+	private Collection<Predicate> linearRecursivePreds;
+	
+	private StringBuilder leadingWithBlock;
 
 	private static final org.slf4j.Logger log = LoggerFactory
 			.getLogger(SQLGenerator.class);
@@ -176,28 +183,36 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		normalizeProgram(queryProgram);
 
-		DatalogDependencyGraphGenerator depGraph = new DatalogDependencyGraphGenerator(
-				queryProgram);
+		DatalogDependencyGraphGenerator depGraph = new DatalogDependencyGraphGenerator(queryProgram);
 		
 		log.debug("Input to the SQL Generator \n{}", queryProgram);
 		
-		
-		Collection<Predicate> linearRecursivePreds  = depGraph.getLinearRecursivePredicates();
-		
-		log.debug("linear recurive predicates:  {}", linearRecursivePreds);
-		
-		
-		
-
 		sqlAnsViewMap = new HashMap<Predicate, String>();
 
+		leadingWithBlock = new StringBuilder();
+		
 		ruleIndex = depGraph.getRuleIndex();
 
+		
 		Multimap<Predicate, CQIE> ruleIndexByBodyPredicate = depGraph.getRuleIndexByBodyPredicate();
 
 		List<Predicate> predicatesInBottomUp = depGraph.getPredicatesInBottomUp();
 
 		List<Predicate> extensionalPredicates = depGraph.getExtensionalPredicates();
+		
+		this.linearRecursivePreds = depGraph.getLinearRecursivePredicates();
+		
+		log.debug("linear recurive predicates:  {}", linearRecursivePreds);
+		
+		for(Predicate pred : linearRecursivePreds) {
+			String sql = pred.getName().replaceAll("[^A-Za-z0-9]", "_");
+			String viewName = String.format(VIEW_ANS_NAME, pred.getName());
+			// the predicate name may be a URI, so we need to clean it
+			viewName = viewName.replaceAll("[^A-Za-z0-9]", "_");
+			List<String> columns = getTypedColumns(pred.getArity());
+			ViewDefinition def = metadata.createViewDefinition(viewName, sql, columns);
+			metadata.add(def);
+		}
 
 		isDistinct = hasSelectDistinctStatement(queryProgram);
 		isOrderBy = hasOrderByClause(queryProgram);
@@ -300,8 +315,17 @@ public class SQLGenerator implements SQLQueryGenerator {
 				 */
 			} else {
 				boolean isAns1 = false;
+				
+				RECURSION recursion;
+				
+				if(linearRecursivePreds.contains(pred)){
+					recursion = RECURSION.LINEAR_RECURION;
+				}else{
+					recursion = RECURSION.NO_RECURSION;
+				}
+				
 				createViewFrom(pred, metadata, ruleIndex,
-						ruleIndexByBodyPredicate, query, signature, isAns1);
+						ruleIndexByBodyPredicate, query, signature, isAns1, recursion);
 			}
 			i++;
 		}
@@ -325,12 +349,14 @@ public class SQLGenerator implements SQLQueryGenerator {
 			 * form of a normal SQL algebra as possible,
 			 */
 			boolean isAns1 = true;
-			String querystr = generateQueryFromSingleRule(cq, signature, isAns1);
+			String querystr = generateQueryFromSingleRule(cq, signature, isAns1, RECURSION.NO_RECURSION);
 
 			queryStrings.add(querystr);
 		}
 
 		StringBuilder result = createUnionFromSQLList(queryStrings);
+		
+		result.insert(0, this.leadingWithBlock.toString());
 
 		return result.toString();
 	}
@@ -364,6 +390,24 @@ public class SQLGenerator implements SQLQueryGenerator {
 		}
 		return result;
 	}
+	
+	
+	private String createRecursiveWITH(List<String> sqlStrings, String viewName){
+		StringBuilder sb = new StringBuilder();
+		sb.append("WITH RECURSIVE ").append(viewName).append(" AS (\n");
+		
+		if(sqlStrings.size() > 1) {
+			sb.append("(");
+			Joiner.on(")\n    UNION ALL \n(").appendTo(sb, sqlStrings);
+			sb.append(")");
+		}
+		
+		sb.append("\n)");
+		
+		return sb.toString();
+	}
+	
+	
 
 	/**
 	 * Takes 1 single Datalog rule <code> cq </code> and return the SQL
@@ -376,8 +420,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * @throws OBDAException
 	 */
 	public String generateQueryFromSingleRule(CQIE cq, List<String> signature,
-			boolean isAns1) throws OBDAException {
-		QueryAliasIndex index = new QueryAliasIndex(cq);
+			boolean isAns1, RECURSION recursion) throws OBDAException {
+		QueryAliasIndex index = new QueryAliasIndex(cq, recursion);
 
 		boolean innerdistincts = false;
 
@@ -386,7 +430,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			innerdistincts = true;
 		}
 
-		String FROM = getFROM(cq.getBody(), index);
+		String FROM = getFROM(cq.getBody(), index, recursion);
 		String WHERE = getWHERE(cq.getBody(), index);
 		String SELECT = getSelectClause(signature, cq, index, innerdistincts, isAns1);
 
@@ -467,6 +511,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * @param ruleIndexByBodyPredicate
 	 * @param query
 	 * @param signature
+	 * @param recursion 
 	 * @throws OBDAException
 	 * 
 	 * @throws Exception
@@ -475,7 +520,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	private void createViewFrom(Predicate pred, DBMetadata metadata,
 			Multimap<Predicate, CQIE> ruleIndex,
 			Multimap<Predicate, CQIE> ruleIndexByBodyPredicate,
-			DatalogProgram query, List<String> signature, boolean isAns1)
+			DatalogProgram query, List<String> signature, boolean isAns1, RECURSION recursion)
 			throws OBDAException {
 
 		/* Creates BODY of the view query */
@@ -496,40 +541,60 @@ public class SQLGenerator implements SQLQueryGenerator {
 			// headArity = cqHead.getArity();
 			headArity = cqHead.getTerms().size();
 
-			List<String> varContainer = QueryUtils
-					.getVariableNamesInAtom(cqHead);
-
+			List<String> varContainer = QueryUtils.getVariableNamesInAtom(cqHead);
+			
+			
 			/* Creates the SQL for the View */
-			String sqlQuery = generateQueryFromSingleRule(rule, varContainer,
-					isAns1);
+			String sqlQuery = generateQueryFromSingleRule(rule, varContainer, isAns1, recursion);
 
 			sqls.add(sqlQuery);
 		}
 
-		if (sqls.size() == 1) {
-			unionView = sqls.iterator().next();
-		} else {
-			unionView = "(" + Joiner.on(")\n UNION \n (").join(sqls) + ")";
-		}
-
 		String viewname = String.format(VIEW_ANS_NAME, pred);
-		// String viewname = "Q" + pred + "View";
-		/* Creates the View itself */
 
-		List<String> columns = Lists
-				.newArrayListWithExpectedSize(3 * headArity);
+		switch (recursion) {
+		case NO_RECURSION:
+			if (sqls.size() == 1) {
+				unionView = sqls.iterator().next();
+			} else {
+				unionView = "(" + Joiner.on(")\n UNION \n (").join(sqls) + ")";
+			}
+			
+			// String viewname = "Q" + pred + "View";
+			/* Creates the View itself */
+
+			List<String> columns = getTypedColumns(headArity);
+
+			ViewDefinition viewU = metadata.createViewDefinition(viewname, unionView, columns);
+			metadata.add(viewU);
+			sqlAnsViewMap.put(pred, unionView);
+
+			break;
+
+		case LINEAR_RECURION:
+		default:
+			viewname = pred.getName().replaceAll("[^A-Za-z0-9]", "_");
+			String withBlock = createRecursiveWITH(sqls, viewname);
+			leadingWithBlock.append(withBlock);
+			break;
+			
+		}
+		
+	}
+
+	/**
+	 * gets the columns for a view definition of a extensional predicates
+	 */
+	private List<String> getTypedColumns(int arity) {
+		List<String> columns = Lists.newArrayListWithExpectedSize(3 * arity);
 
 		// Hard coded variable names
-		for (int i = 0; i < headArity; i++) {
+		for (int i = 0; i < arity; i++) {
 			columns.add("v" + i + QUEST_TYPE);
 			columns.add("v" + i + "lang");
 			columns.add("v" + i);
 		}
-
-		ViewDefinition viewU = metadata.createViewDefinition(viewname,
-				unionView, columns);
-		metadata.add(viewU);
-		sqlAnsViewMap.put(pred, unionView);
+		return columns;
 	}
 
 	/***
@@ -690,12 +755,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 *            the conjunctive query. If it is, no JOIN is generated, but a
 	 *            cross product with WHERE clause. Moreover, the isLeftJoin
 	 *            argument will be ignored.
+	 * @param recursion 
 	 * 
 	 * @return
 	 */
 	private String getTableDefinitions(List<Function> inneratoms,
 			QueryAliasIndex index, boolean isTopLevel, boolean isLeftJoin,
-			String indent) {
+			String indent, RECURSION recursion) {
 		/*
 		 * We now collect the view definitions for each data atom each
 		 * condition, and each each nested Join/LeftJoin
@@ -705,8 +771,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			Term innerAtom = inneratoms.get(atomidx);
 			Function innerAtomAsFunction = (Function) innerAtom;
 			String indent2 = indent + INDENT;
-			String definition = getTableDefinition(innerAtomAsFunction, index,
-					indent2);
+			String definition = getTableDefinition(innerAtomAsFunction, index, indent2, recursion);
 			if (!definition.isEmpty()) {
 				tableDefinitions.add(definition);
 			}
@@ -816,7 +881,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * getTableDefinitions on the nested term list.
 	 */
 	private String getTableDefinition(Function atom, QueryAliasIndex index,
-			String indent) {
+			String indent, RECURSION recursion) {
 		Predicate predicate = atom.getFunctionSymbol();
 		if (predicate instanceof BooleanOperationPredicate
 				|| predicate instanceof NumericalOperationPredicate
@@ -831,11 +896,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 			if (predicate == OBDAVocabulary.SPARQL_JOIN) {
 				String indent2 = indent + INDENT;
 				String tableDefinitions = getTableDefinitions(innerTerms,
-						index, false, false, indent2);
+						index, false, false, indent2, recursion);
 				return tableDefinitions;
 			} else if (predicate == OBDAVocabulary.SPARQL_LEFTJOIN) {
 				return getTableDefinitions(innerTerms, index, false, true,
-						indent + INDENT);
+						indent + INDENT, recursion);
 			}
 		}
 
@@ -846,9 +911,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return def;
 	}
 
-	private String getFROM(List<Function> atoms, QueryAliasIndex index) {
+	private String getFROM(List<Function> atoms, QueryAliasIndex index, RECURSION recursion) {
 		String tableDefinitions = getTableDefinitions(atoms, index, true,
-				false, "");
+				false, "", recursion);
 		return "\n FROM \n" + tableDefinitions;
 	}
 
@@ -1602,8 +1667,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			Variable var = (Variable) term;
 			Collection<String> posList = index.getColumnReferences(var);
 			if (posList == null || posList.size() == 0) {
-				throw new RuntimeException(
-						"Unbound variable found in WHERE clause: " + term);
+				throw new SQLGenerationException("Unbound variable found in WHERE clause: " + term);
 			}
 			return posList.iterator().next();
 		}
@@ -1617,8 +1681,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		if (functionSymbol instanceof DataTypePredicate) {
 			if (functionSymbol.getType(0) == COL_TYPE.UNSUPPORTED) {
-				throw new RuntimeException("Unsupported type in the query: "
-						+ function);
+				throw new SQLGenerationException("Unsupported type in the query: " + function);
 			}
 			if (size == 1) {
 				// atoms of the form integer(x)
@@ -1825,9 +1888,12 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		int dataTableCount = 0;
 		boolean isEmpty = false;
+		
+		private RECURSION recursion;
 
-		public QueryAliasIndex(CQIE query) {
+		public QueryAliasIndex(CQIE query, RECURSION recursion) {
 			List<Function> body = query.getBody();
+			this.recursion = recursion;
 			generateViews(body);
 		}
 
@@ -1867,6 +1933,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 			Predicate tablePredicate = atom.getFunctionSymbol();
 			String tableName = tablePredicate.getName();
+			
+			// For RECURSION
+			// the predicate name may be a URI, so we need to clean it
+			tableName = tableName.replaceAll("[^A-Za-z0-9]", "_");
+			
 			DataDefinition def = metadata.getDefinition(tableName);
 
 			if (def == null) {
@@ -1877,6 +1948,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 				 */
 				// tableName = "Q"+tableName+"View";
 				tableName = String.format(VIEW_ANS_NAME, tableName);
+				
+				
+				
 				def = metadata.getDefinition(tableName);
 				if (def == null) {
 					isEmpty = true;
@@ -1950,30 +2024,56 @@ public class SQLGenerator implements SQLQueryGenerator {
 		public String getViewDefinition(Function atom) {
 			DataDefinition def = dataDefinitions.get(atom);
 			String viewname = viewNames.get(atom);
-			viewname = sqladapter.sqlQuote(viewname);
 
+			
 			if (def != null){
+				viewname = sqladapter.sqlQuote(viewname);
+
+				/*
+				 * atom is defined from the database
+				 */
 				if (def instanceof TableDefinition) {
 					return sqladapter.sqlTableName(tableNames.get(atom), viewname);
 				} else if (def instanceof ViewDefinition) {
+					String format = "(%s) %s";
+					
+					if(linearRecursivePreds.contains(atom.getFunctionSymbol())){
+						format ="%s %s";
+					}
+					
 					String viewdef = ((ViewDefinition) def).getStatement();
-					String formatView = String.format("(%s) %s", viewdef, viewname);
+					String formatView = String.format(format, viewdef, viewname);
 					return formatView;
 				} else {
 					throw new IllegalStateException("unkown type of def: " + def);
 				}
 			} else {
-
-				// Should be an ans atom.
+				/*
+				 * Should be an ans atom.
+				 * 
+				 */
 				Predicate pred = atom.getFunctionSymbol();
 				String view = sqlAnsViewMap.get(pred);
 
 				if (view == null) {
-					throw new SQLGenerationException("Impossible to get data definition for: " + atom + ", type: " + def);
+					
+					switch (this.recursion) {
+					case LINEAR_RECURION:
+						viewname = "Q" + pred + "View";
+						viewname = sqladapter.sqlQuote(viewname);
+						//String formatView = String.format(" %s", view, viewname);
+						return viewname;
+						
+					case NO_RECURSION:
+					default:
+						throw new SQLGenerationException("Impossible to get data definition for: " + atom + ", type: " + def);
+					}
+					
 				} else {
+					String format = "(%s) %s";
 					viewname = "Q" + pred + "View";
 					viewname = sqladapter.sqlQuote(viewname);
-					String formatView = String.format("(%s) %s", view, viewname);
+					String formatView = String.format(format, view, viewname);
 					return formatView;
 				}
 

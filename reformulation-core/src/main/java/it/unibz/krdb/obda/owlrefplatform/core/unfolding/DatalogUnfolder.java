@@ -419,12 +419,20 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			List<Predicate> predicatesInBottomUp = depGraph.getPredicatesInBottomUp();		
 			List<Predicate> extensionalPredicates = depGraph.getExtensionalPredicates();
 			List<CQIE> fatherCollection = new LinkedList<CQIE>();
+			Collection<Predicate> linearRecursivePredicates = depGraph.getLinearRecursivePredicates();
 
 			//We iterate over the ordered predicates in the program according to the dependencies
 			for (int predIdx = 0; predIdx < predicatesInBottomUp.size() -1; predIdx++) {
 
 				//get the predicate
 				Predicate pred = predicatesInBottomUp.get(predIdx);
+				
+				if(linearRecursivePredicates.contains(pred)){
+					log.debug("skip {} in computePartialEvaluationBUP()", pred);
+					continue;
+				}
+				
+				
 				//get the father predicate
 				Predicate preFather =  depGraph.getFatherPredicate(pred);
 				
@@ -795,11 +803,12 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 */
 		private void addNewRules2WorkingListFromBodyAtoms(List<CQIE> workingList,
 								List<Predicate> predicatesToAdd) {
+			Collection<Predicate> linearRecursivePredicates = depGraph.getLinearRecursivePredicates();
 			for (int predIdx = 0; predIdx < predicatesToAdd.size() ; predIdx++) {
 				Predicate pred = predicatesToAdd.get(predIdx);
 				Predicate preFather =  depGraph.getFatherPredicate(pred);
 				
-				if (depGraph.getLinearRecursivePredicates().contains(preFather)){
+				if (linearRecursivePredicates.contains(preFather)){
 					continue;
 				}
 				
@@ -2114,6 +2123,11 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 			Predicate buPredicate = predicatesInBottomUp.get(predIdx);
 			//get the father predicate
+			
+			if(depGraph.getLinearRecursivePredicates().contains(buPredicate)){
+				log.debug("skip {} in pushTypes", buPredicate);
+				continue;
+			}
 
 			if (!extensionalPredicates.contains(buPredicate) ) {// it is a defined  predicate, like ans2,3.. etc
 
@@ -2151,6 +2165,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 					//Here I iterate over the rules defining pred
 					for (int i=0; i<listsize; i++){  
 					//(CQIE sourceRule:workingRules){
+						
+						
 						
 						CQIE sourceRule = predCollection.get(i);
 						

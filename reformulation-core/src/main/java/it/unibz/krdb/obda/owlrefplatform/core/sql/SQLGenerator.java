@@ -45,7 +45,6 @@ import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.HSQLSQLDialectAdap
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.JDBCUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.PostgreSQLDialectAdapter;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQL99DialectAdapter;
-import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLAdapterFactory;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLDialectAdapter;
 import it.unibz.krdb.obda.owlrefplatform.core.srcquerygeneration.SQLQueryGenerator;
 import it.unibz.krdb.obda.utils.DatalogDependencyGraphGenerator;
@@ -58,8 +57,6 @@ import it.unibz.krdb.sql.api.Attribute;
 
 import java.sql.Types;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -424,7 +421,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * @return
 	 * @throws OBDAException
 	 */
-	public String generateQueryFromSingleRule(CQIE cq, List<String> signature,
+	private String generateQueryFromSingleRule(CQIE cq, List<String> signature,
 			boolean isAns1, RECURSION recursion) throws OBDAException {
 		QueryAliasIndex index = new QueryAliasIndex(cq, recursion);
 
@@ -607,17 +604,17 @@ public class SQLGenerator implements SQLQueryGenerator {
 		List<CQIE> recursiveRules = Lists.newArrayList();
 		
 		for (CQIE rule : ruleList) {
-			boolean recursive = ruleIndexByBodyPredicate.containsEntry(rule.getHead().getFunctionSymbol(), rule);
-			if(recursive){
+			Predicate predicate = rule.getHead().getFunctionSymbol();
+			boolean recursive = ruleIndexByBodyPredicate.containsEntry(predicate, rule);
+			if (recursive) {
 				recursiveRules.add(rule);
-			}else{
+			} else {
 				sortedRules.add(rule);
 			}
 		}
 		sortedRules.addAll(recursiveRules);
 		
-		ruleList = sortedRules;
-		return ruleList;
+		return sortedRules;
 	}
 
 	/**
@@ -708,8 +705,6 @@ public class SQLGenerator implements SQLQueryGenerator {
 				String expressionFormat = getBooleanOperatorString(functionSymbol);
 				Term left = atom.getTerm(0);
 				Term right = atom.getTerm(1);
-				
-				
 				
 				String leftOp = getSQLString(left, index, true);
 				String rightOp = getSQLString(right, index, true);
@@ -1471,13 +1466,12 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return string;
 	}
 
-	public String getSQLStringForTemplateFunction(Function ov,
+	private String getSQLStringForTemplateFunction(Function ov,
 			QueryAliasIndex index) {
 		/*
 		 * The first inner term determines the form of the result
 		 */
 		Term t = ov.getTerms().get(0);
-		Term c;
 
 		String literalValue = "";
 
@@ -1490,10 +1484,8 @@ public class SQLGenerator implements SQLQueryGenerator {
 			 * and form the CONCAT
 			 */
 			if (t instanceof BNode) {
-				c = (BNode) t;
 				literalValue = ((BNode) t).getValue();
 			} else {
-				c = (ValueConstant) t;
 				literalValue = ((ValueConstant) t).getValue();
 			}
 			Predicate pred = ov.getFunctionSymbol();
@@ -1702,7 +1694,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 	 * <p>
 	 * If its a boolean comparison, it returns the corresponding SQL comparison.
 	 */
-	public String getSQLString(Term term, QueryAliasIndex index,
+	private String getSQLString(Term term, QueryAliasIndex index,
 			boolean useBrackets) {
 		if (term == null) {
 			return "";
@@ -2017,6 +2009,9 @@ public class SQLGenerator implements SQLQueryGenerator {
 						TableDefinition tableDef = (TableDefinition)definition;
 						int position = tableDef.getAttributeKey(columnName);
 						Attribute attribute = tableDef.getAttribute(position);
+						/*
+						 * find the attribute, return the type 
+						 */
 						return attribute.getType();
 					}
 				}
@@ -2201,7 +2196,6 @@ public class SQLGenerator implements SQLQueryGenerator {
 					case LINEAR_RECURION:
 						viewname = "Q" + pred + "View";
 						viewname = sqladapter.sqlQuote(viewname);
-						//String formatView = String.format(" %s", view, viewname);
 						return viewname;
 						
 					case NO_RECURSION:

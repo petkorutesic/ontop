@@ -721,13 +721,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 					if (left instanceof Variable) {
 						leftSQLType = index.getSQLType((Variable) left);
-						System.err.println("type of " + left + ": " + leftSQLType);
 					}
 
 					if (right instanceof Variable) {
 						rightSQLType = index.getSQLType((Variable) right);
-						System.err.println("reference of " + right + ": " + rightSQLType);
-
 					}
 
 					if (leftSQLType != rightSQLType) {
@@ -2018,10 +2015,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 					DataDefinition definition = metadata.getDefinition(tableName);
 					if(definition instanceof TableDefinition){
 						TableDefinition tableDef = (TableDefinition)definition;
-						int position = tableDef.getAttributePosition(columnName);
-						// FIXME: Hacky, getAttributePosition(columnName) is 0-based;
-						// However, getAttribute(position) is 1-based
-						position = position + 1;
+						int position = tableDef.getAttributeKey(columnName);
 						Attribute attribute = tableDef.getAttribute(position);
 						return attribute.getType();
 					}

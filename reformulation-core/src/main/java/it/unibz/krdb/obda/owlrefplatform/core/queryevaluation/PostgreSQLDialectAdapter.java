@@ -49,6 +49,8 @@ public class PostgreSQLDialectAdapter extends SQL99DialectAdapter {
 		String strType = null;
 		if (type == Types.VARCHAR) {
 			strType = "VARCHAR(10485760)";
+		} else if (type == Types.INTEGER) {
+			strType = "INTEGER";
 		} else {
 			throw new RuntimeException("Unsupported SQL type");
 		}

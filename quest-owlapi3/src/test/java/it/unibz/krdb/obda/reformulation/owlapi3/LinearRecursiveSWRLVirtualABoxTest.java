@@ -123,7 +123,11 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 		while(rs.nextRow()){
 			System.out.print(rs.getOWLIndividual(1));
 			System.out.print(", ");
-			System.out.print(rs.getOWLIndividual(2));
+			System.out.print(rs.getOWLLiteral(2));
+			System.out.print(", ");
+			System.out.print(rs.getOWLIndividual(3));
+			System.out.print(", ");
+			System.out.print(rs.getOWLLiteral(4));
 			System.out.println();
 		}
 	} 

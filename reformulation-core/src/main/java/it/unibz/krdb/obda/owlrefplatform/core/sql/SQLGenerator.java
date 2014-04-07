@@ -43,6 +43,9 @@ import it.unibz.krdb.obda.owlrefplatform.core.basicoperations.DatalogNormalizer;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.DB2SQLDialectAdapter;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.HSQLSQLDialectAdapter;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.JDBCUtility;
+import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.PostgreSQLDialectAdapter;
+import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQL99DialectAdapter;
+import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLAdapterFactory;
 import it.unibz.krdb.obda.owlrefplatform.core.queryevaluation.SQLDialectAdapter;
 import it.unibz.krdb.obda.owlrefplatform.core.srcquerygeneration.SQLQueryGenerator;
 import it.unibz.krdb.obda.utils.DatalogDependencyGraphGenerator;
@@ -705,8 +708,40 @@ public class SQLGenerator implements SQLQueryGenerator {
 				String expressionFormat = getBooleanOperatorString(functionSymbol);
 				Term left = atom.getTerm(0);
 				Term right = atom.getTerm(1);
+				
+				
+				
 				String leftOp = getSQLString(left, index, true);
 				String rightOp = getSQLString(right, index, true);
+				
+				if(sqladapter instanceof PostgreSQLDialectAdapter){
+				
+					int leftSQLType = Types.OTHER;
+					int rightSQLType = Types.OTHER;
+
+					if (left instanceof Variable) {
+						leftSQLType = index.getSQLType((Variable) left);
+						System.err.println("type of " + left + ": " + leftSQLType);
+					}
+
+					if (right instanceof Variable) {
+						rightSQLType = index.getSQLType((Variable) right);
+						System.err.println("reference of " + right + ": " + rightSQLType);
+
+					}
+
+					if (leftSQLType != rightSQLType) {
+						if (leftSQLType != Types.OTHER) {
+							rightOp = sqladapter.sqlCast(rightOp, leftSQLType);
+						} else if (rightSQLType != Types.OTHER) {
+							leftOp = sqladapter.sqlCast(leftOp, rightSQLType);
+						} else {
+							throw new IllegalStateException("should not happen");
+						}
+					}
+				}
+				
+
 				return String.format("(" + expressionFormat + ")", leftOp,
 						rightOp);
 
@@ -1077,7 +1112,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		 * the form "COL1 = COL2"
 		 */
 		for (Variable var : currentLevelVariables) {
-			Collection<String> references = index.getColumnReferences(var);
+			Collection<String> references = index.getColumnReferenceStrings(var);
 			if (references.size() < 2) {
 				// No need for equality
 				continue;
@@ -1387,7 +1422,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			 */
 
 			Variable var = (Variable) ht;
-			Collection<String> columnRefs = index.getColumnReferences(var);
+			Collection<String> columnRefs = index.getColumnReferenceStrings(var);
 
 			if (columnRefs == null || columnRefs.size() == 0) {
 				throw new RuntimeException(
@@ -1504,10 +1539,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 								+ (getSQLString(currentTerm, index, false))
 								+ replace2;
 					} else {
-						repl = replace1
-								+ sqladapter
-										.sqlCast(
-												getSQLString(currentTerm,
+						repl = replace1	+ sqladapter.sqlCast(getSQLString(currentTerm,
 														index, false),
 												Types.VARCHAR) + replace2;
 					}
@@ -1597,7 +1629,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			}
 		} else if (term instanceof Variable) {
 			Collection<String> viewdef = index
-					.getColumnReferences((Variable) term);
+					.getColumnReferenceStrings((Variable) term);
 			String def = viewdef.iterator().next();
 			String col = trim(def.split("\\.")[1]);
 			String table = def.split("\\.")[0];
@@ -1700,7 +1732,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 			return jdbcutil.getSQLLexicalForm(uc.toString());
 		} else if (term instanceof Variable) {
 			Variable var = (Variable) term;
-			Collection<String> posList = index.getColumnReferences(var);
+			Collection<String> posList = index.getColumnReferenceStrings(var);
 			if (posList == null || posList.size() == 0) {
 				throw new SQLGenerationException("Unbound variable found in WHERE clause: " + term);
 			}
@@ -1907,6 +1939,35 @@ public class SQLGenerator implements SQLQueryGenerator {
 		return operator;
 	}
 
+	public class ColumnReference {
+		private String viewName;
+		private String columnName;
+		
+		public ColumnReference(String viewName, String columnName){
+			this.viewName = viewName;
+			this.columnName = columnName;
+		}
+
+		public String getViewName() {
+			return viewName;
+		}
+
+		public String getColumnName() {
+			return columnName;
+		}
+
+		@Override
+		public String toString(){
+			return viewName + "." + columnName;
+		}
+		
+		public String toString(SQL99DialectAdapter sqladapter){
+			String reference = sqladapter.sqlQualifiedColumn(viewName,
+					columnName);
+			return reference;
+		}
+	}
+	
 	/**
 	 * Utility class to resolve "database" atoms to view definitions ready to be
 	 * used in a FROM clause, and variables, to column references defined over
@@ -1917,9 +1978,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 		Map<Function, String> viewNames = new HashMap<Function, String>();
 		Map<Function, String> tableNames = new HashMap<Function, String>();
 		Map<Function, DataDefinition> dataDefinitions = new HashMap<Function, DataDefinition>();
-		// Map<Variable, LinkedHashSet<String>> columnReferences = new
-		// HashMap<Variable, LinkedHashSet<String>>();
-		Multimap<Variable, String> columnReferences = HashMultimap.create();
+		
+		Multimap<Variable, ColumnReference> columnReferences = HashMultimap.create();
+		
+		//TODO: replace by columnReferences
+		Multimap<Variable, String> columnReferenceStrings = HashMultimap.create();
+		
+		Map<String, String> simpleTableView2TableMap = Maps.newHashMap();
 
 		int dataTableCount = 0;
 		boolean isEmpty = false;
@@ -1930,6 +1995,40 @@ public class SQLGenerator implements SQLQueryGenerator {
 			List<Function> body = query.getBody();
 			this.recursion = recursion;
 			generateViews(body);
+		}
+
+		/**
+		 * gets the SQL type of the variable if the variable is used in a table; otherwise return {@code java.sql.Types.OTHER}
+		 * 
+		 * @param variable
+		 * @return 
+		 */
+		public int getSQLType(Variable variable) {
+			Collection<ColumnReference> references = columnReferences.get(variable);
+			
+			for(ColumnReference ref : references){
+				String viewName = ref.getViewName();
+				/*
+				 * the name might be quoted
+				 */
+				viewName = unquote(viewName);
+				String columnName = ref.getColumnName();
+				if(simpleTableView2TableMap.containsKey(viewName)){
+					String tableName = simpleTableView2TableMap.get(viewName);
+					DataDefinition definition = metadata.getDefinition(tableName);
+					if(definition instanceof TableDefinition){
+						TableDefinition tableDef = (TableDefinition)definition;
+						int position = tableDef.getAttributePosition(columnName);
+						// FIXME: Hacky, getAttributePosition(columnName) is 0-based;
+						// However, getAttribute(position) is 1-based
+						position = position + 1;
+						Attribute attribute = tableDef.getAttribute(position);
+						return attribute.getType();
+					}
+				}
+			}
+			
+			return Types.OTHER;
 		}
 
 		private void generateViews(List<Function> atoms) {
@@ -1984,8 +2083,6 @@ public class SQLGenerator implements SQLQueryGenerator {
 				// tableName = "Q"+tableName+"View";
 				tableName = String.format(VIEW_ANS_NAME, tableName);
 				
-				
-				
 				def = metadata.getDefinition(tableName);
 				if (def == null) {
 					isEmpty = true;
@@ -1997,6 +2094,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 				String simpleTableViewName = String.format(VIEW_NAME,
 						tableName, String.valueOf(dataTableCount));
+				simpleTableView2TableMap.put(simpleTableViewName, tableName);
 				viewNames.put(atom, simpleTableViewName);
 			}
 			dataTableCount += 1;
@@ -2033,9 +2131,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 					columnName = trim(columnName);
 
-					String reference = sqladapter.sqlQualifiedColumn(viewName,
-							columnName);
-					columnReferences.put((Variable) term, reference);
+					columnReferences.put((Variable)term, new ColumnReference(viewName, columnName));
+					
+					String reference = sqladapter.sqlQualifiedColumn(viewName, columnName);
+					columnReferenceStrings.put((Variable) term, reference);
 				}
 
 			}
@@ -2049,7 +2148,19 @@ public class SQLGenerator implements SQLQueryGenerator {
 		 * @param var
 		 *            The variable we want the referenced columns.
 		 */
-		public Collection<String> getColumnReferences(Variable var) {
+		public Collection<String> getColumnReferenceStrings(Variable var) {
+			return columnReferenceStrings.get(var);
+		}
+		
+		/***
+		 * Returns all the column aliases that correspond to this variable,
+		 * across all the DATA atoms in the query (not algebra operators or
+		 * boolean conditions.
+		 * 
+		 * @param var
+		 *            The variable we want the referenced columns.
+		 */
+		public Collection<ColumnReference> getColumnReferences(Variable var) {
 			return columnReferences.get(var);
 		}
 

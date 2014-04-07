@@ -55,6 +55,8 @@ import it.unibz.krdb.sql.api.Attribute;
 
 import java.sql.Types;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -533,6 +535,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 
 		int headArity = 0;
 
+		if(recursion.equals(RECURSION.LINEAR_RECURION)){
+			ruleList = sortRules(ruleIndexByBodyPredicate, ruleList);
+		}
+		
 		for (CQIE rule : ruleList) {
 			Function cqHead = rule.getHead();
 
@@ -580,6 +586,35 @@ public class SQLGenerator implements SQLQueryGenerator {
 			
 		}
 		
+	}
+
+	/**
+	 * We need to sort the rules such that the non-recursive rules are before the recursive ones. 
+	 * Otherwise, the generated SQL cannot be executed by postgres:
+	 * 
+	 *    org.postgresql.util.PSQLException: ERROR: recursive reference to query
+	 *     "http___www_example_org_linear_recursive_swrl_owl_reach" must not appear within its non-recursive term
+	 */
+	private Collection<CQIE> sortRules(
+			Multimap<Predicate, CQIE> ruleIndexByBodyPredicate,
+			Collection<CQIE> ruleList) {
+		
+		List<CQIE> sortedRules = Lists.newArrayList();
+		
+		List<CQIE> recursiveRules = Lists.newArrayList();
+		
+		for (CQIE rule : ruleList) {
+			boolean recursive = ruleIndexByBodyPredicate.containsEntry(rule.getHead().getFunctionSymbol(), rule);
+			if(recursive){
+				recursiveRules.add(rule);
+			}else{
+				sortedRules.add(rule);
+			}
+		}
+		sortedRules.addAll(recursiveRules);
+		
+		ruleList = sortedRules;
+		return ruleList;
 	}
 
 	/**

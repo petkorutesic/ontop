@@ -1,23 +1,18 @@
 package sesameWrapper;
 
 /*
- * #%L
- * ontop-quest-sesame
- * %%
- * Copyright (C) 2009 - 2014 Free University of Bozen-Bolzano
- * %%
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
+ * #%L ontop-quest-sesame %% Copyright (C) 2009 - 2014 Free University of
+ * Bozen-Bolzano %% Licensed under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  * 
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * #L%
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License. #L%
  */
 
 import java.io.BufferedWriter;
@@ -85,7 +80,6 @@ public class QuestSesameCMD {
 
 			querystr = new String(fileData, "UTF-8");
 
-			
 			// execute query
 			Query query = conn.prepareQuery(QueryLanguage.SPARQL, querystr);
 
@@ -110,25 +104,22 @@ public class QuestSesameCMD {
 				Writer writer = null;
 				// set handler to output file or printout
 				if (out != null) {
-					
-					writer = new BufferedWriter(new FileWriter(new File(out))); 
-					
+
+					writer = new BufferedWriter(new FileWriter(new File(out)));
 
 				} else {
 
 					writer = new BufferedWriter(new OutputStreamWriter(System.out));
-					
+
 				}
-				
 
 				// evaluate the query
 				RDFHandler handler = Rio.createWriter(RDFFormat.TURTLE, writer);
-//				conn.exportStatements(ValueFactoryImpl.getInstance().createURI("http://meraka/moss/exampleBooks.owl#author/내용/"), null, null, true, handler, null);
+				// conn.exportStatements(ValueFactoryImpl.getInstance().createURI("http://meraka/moss/exampleBooks.owl#author/내용/"),
+				// null, null, true, handler, null);
 
-				
 				tuplequery.evaluate(handler);
-				
-				
+
 			} else {
 				System.out.println("Boolean queries are not supported in this script yet.");
 			}

@@ -161,6 +161,11 @@ public class CQIEImpl implements CQIE, ListListener {
 		/* expensive, so only compute the string if necessary */
 		if (string == null) {
 			StringBuilder sb = new StringBuilder();
+			if (head == null) {
+				int as = 1;
+			}
+				
+				
 			sb.append(head.toString());
 			sb.append(SPACE);
 			sb.append(INV_IMPLIES);

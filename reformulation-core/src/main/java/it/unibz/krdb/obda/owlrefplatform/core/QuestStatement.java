@@ -31,6 +31,7 @@ import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAException;
 import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.OBDAQuery;
+import it.unibz.krdb.obda.model.OBDAQueryModifiers;
 import it.unibz.krdb.obda.model.OBDAStatement;
 import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Term;
@@ -57,6 +58,7 @@ import it.unibz.krdb.obda.owlrefplatform.core.translator.SparqlAlgebraToDatalogT
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.krdb.obda.owlrefplatform.core.unfolding.ExpressionEvaluator;
 import it.unibz.krdb.obda.renderer.DatalogProgramRenderer;
+import it.unibz.krdb.obda.utils.DatalogDependencyGraphGenerator;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -460,6 +462,11 @@ public class QuestStatement implements OBDAStatement {
 			 */
 			if( questInstance.getPreferences().getProperty(QuestPreferences.SWRL_ENTAILMENT).equals(QuestConstants.TRUE) ){
 				log.debug("appending the SWRL rules to the query rewriting result \n{}", Joiner.on("\n").join(questInstance.getRules()));
+				
+				DatalogDependencyGraphGenerator g = new DatalogDependencyGraphGenerator(program);
+				List<Predicate> exts = g.getExtensionalPredicates();
+				
+				
 				program.appendRule(questInstance.getRules());
 			}
 			
@@ -468,8 +475,19 @@ public class QuestStatement implements OBDAStatement {
 			if (questInstance.isSemIdx()==true){
 				questInstance.multiplePredIdx = questInstance.unfolder.processMultipleTemplatePredicates(questInstance.unfoldingProgram);
 			}
-			//Multimap<Predicate,Integer> multiplePredIdx = ArrayListMultimap.create();
+
+			/***
+			 * Keeeping only rules related to ans1
+			 */
+			DatalogDependencyGraphGenerator dep = new DatalogDependencyGraphGenerator(program);
+			Set<CQIE> definingRules = dep.getDefiningRules(ofac.getPredicate("ans1", 0));			
+			OBDAQueryModifiers m = program.getQueryModifiers();
+			program.removeAllRules();
+			program.appendRule(definingRules);
+			
+			
 			program = unfolder.unfold(program, "ans1",QuestConstants.BUP,false, questInstance.multiplePredIdx);
+
 
 			
 			

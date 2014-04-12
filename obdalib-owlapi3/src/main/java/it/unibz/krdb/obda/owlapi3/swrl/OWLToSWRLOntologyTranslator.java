@@ -15,6 +15,7 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLAxiom;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDeclarationAxiom;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.model.SWRLRule;
@@ -48,13 +49,18 @@ public class OWLToSWRLOntologyTranslator {
 			System.out.println("Loaded ontology: " + inputOntology);
 
 			OWLDataFactory owlDataFactory = manager.getOWLDataFactory();
-
+			Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
 			OWLToSWRLTranslator tr = new OWLToSWRLTranslator(owlDataFactory);
 
 			Set<SWRLRule> rules = tr.translate(inputOntology);
 
-			Set<OWLAxiom> axioms = new HashSet<OWLAxiom>();
 			axioms.addAll(rules);
+			for (OWLAxiom ax : inputOntology.getAxioms()) {
+				if (ax instanceof OWLDeclarationAxiom)
+				{
+					axioms.add(ax);
+				}
+			}
 
 			OWLOntology result = manager.createOntology(axioms);
 

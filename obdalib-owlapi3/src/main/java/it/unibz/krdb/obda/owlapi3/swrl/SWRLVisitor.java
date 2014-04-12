@@ -166,6 +166,11 @@ public class SWRLVisitor implements SWRLObjectVisitor {
 			// transform SWRL body in list Function
 			getBody(node.getBody());
 
+			if (head == null)
+			{ continue; }
+			
+			
+			
 			rules.add(fac.getCQIE(head, body));
 		}
 

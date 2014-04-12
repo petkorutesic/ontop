@@ -419,12 +419,20 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			List<Predicate> predicatesInBottomUp = depGraph.getPredicatesInBottomUp();		
 			List<Predicate> extensionalPredicates = depGraph.getExtensionalPredicates();
 			List<CQIE> fatherCollection = new LinkedList<CQIE>();
+			Collection<Predicate> linearRecursivePredicates = depGraph.getLinearRecursivePredicates();
 
 			//We iterate over the ordered predicates in the program according to the dependencies
 			for (int predIdx = 0; predIdx < predicatesInBottomUp.size() -1; predIdx++) {
 
 				//get the predicate
 				Predicate pred = predicatesInBottomUp.get(predIdx);
+				
+				if(linearRecursivePredicates.contains(pred)){
+					log.debug("skip {} in computePartialEvaluationBUP()", pred);
+					continue;
+				}
+				
+				
 				//get the father predicate
 				Predicate preFather =  depGraph.getFatherPredicate(pred);
 				
@@ -638,9 +646,20 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 				predicatesMightGotEmpty=updateRulesWithEmptyAnsPredicates(workingList, predicatesMightGotEmpty, touchedPredicates);
 			}
 
+	
+			
 			// I add to the working list all the rules touched by the unfolder!
 			addNewRules2WorkingListFromBodyAtoms(workingList, extensionalPredicates);
 			addNewRules2WorkingListFromHeadAtoms(workingList, touchedPredicates);
+
+			/**
+			 * ADDING THE RECURSIVE RULES!!!
+			 */
+			List<Predicate> recVertexSet =  depGraph.getLinearRecursivePredicatesList();
+			for (Predicate v: recVertexSet){
+				List<CQIE> ruleSet = (List<CQIE>) ruleIndex.get(v);
+				workingList.addAll(ruleSet);
+			}
 			System.out.println(workingList);
 
 		}
@@ -784,10 +803,15 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 */
 		private void addNewRules2WorkingListFromBodyAtoms(List<CQIE> workingList,
 								List<Predicate> predicatesToAdd) {
+			Collection<Predicate> linearRecursivePredicates = depGraph.getLinearRecursivePredicates();
 			for (int predIdx = 0; predIdx < predicatesToAdd.size() ; predIdx++) {
 				Predicate pred = predicatesToAdd.get(predIdx);
 				Predicate preFather =  depGraph.getFatherPredicate(pred);
-
+				
+				if (linearRecursivePredicates.contains(preFather)){
+					continue;
+				}
+				
 				Collection<CQIE> rulesToAdd= ruleIndex.get(preFather);
 
 				for (CQIE resultingRule: rulesToAdd){
@@ -2099,6 +2123,11 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 			Predicate buPredicate = predicatesInBottomUp.get(predIdx);
 			//get the father predicate
+			
+			if(depGraph.getLinearRecursivePredicates().contains(buPredicate)){
+				log.debug("skip {} in pushTypes", buPredicate);
+				continue;
+			}
 
 			if (!extensionalPredicates.contains(buPredicate) ) {// it is a defined  predicate, like ans2,3.. etc
 
@@ -2136,6 +2165,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 					//Here I iterate over the rules defining pred
 					for (int i=0; i<listsize; i++){  
 					//(CQIE sourceRule:workingRules){
+						
+						
 						
 						CQIE sourceRule = predCollection.get(i);
 						
@@ -2183,13 +2214,71 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			} //end if extensional
 			
 		}//end for predicates
-		return workingList;
 		
+		/**
+		 * THIS PART IS ONLY FOR RECURSIVE RULES!! REMOVING TYPES!!
+		 */
+		List<Predicate> recVertexSet =  depGraph.getLinearRecursivePredicatesList();
+		List<Term> termsToExclude = new LinkedList<Term>();
+		
+		for (Predicate v: recVertexSet){
+			List<CQIE> ruleSet = (List<CQIE>) ruleIndex.get(v);
+
+
+			for (CQIE rule: ruleSet){
+				CQIE newsourceRule= computeSourceRuleNoTypes(rule.clone(), termsToExclude);
+
+				for (Term atom: newsourceRule.getBody()){
+					if (!(atom instanceof Function)){
+						continue;
+					}
+					Function castedAtom = (Function )atom;
+					Predicate atomFunction = castedAtom.getFunctionSymbol();
+					Predicate ruleHeadFunction = newsourceRule.getHead().getFunctionSymbol();
+					if (!atomFunction.equals(ruleHeadFunction)){
+						continue;
+					}
+					//now I am in the recursive atom
+					List<Term> terms = castedAtom.getTerms();
+					 
+					for(int i=0; i<terms.size();i++){
+						Term t = terms.get(i);
+						if (!(t instanceof Function)){
+							continue;
+						}
+						//it is a function!
+						Variable var= t.getReferencedVariables().iterator().next();
+						t= var;
+					}
+				}
+
+				depGraph.removeRuleFromRuleIndex(v,rule);
+				depGraph.addRuleToRuleIndex(v, newsourceRule);
+
+				if (workingList.contains(rule)){
+					workingList.remove(rule);
+				}
+				workingList.add(newsourceRule);
+
+
+
+				//Update the bodyIndex
+				depGraph.removeOldRuleIndexByBodyPredicate(rule);
+				depGraph.updateRuleIndexByBodyPredicate(newsourceRule);
+
+
+			}
+		}
+
+
+
+		return workingList;
+
 	}
 
 
-	
-	
+
+
 
 	/**
 	 * This method will remove the types in the head of the source query. For instance, if the rules is

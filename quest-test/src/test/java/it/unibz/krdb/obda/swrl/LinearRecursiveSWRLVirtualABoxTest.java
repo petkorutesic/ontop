@@ -1,4 +1,4 @@
-package it.unibz.krdb.obda.reformulation.owlapi3;
+package it.unibz.krdb.obda.swrl;
 
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
@@ -29,8 +29,8 @@ import java.sql.Statement;
 
 public class LinearRecursiveSWRLVirtualABoxTest {
 
-	private String owlfile = "src/test/resources/test/swrl/linear-recursive-swrl.owl";
-	private String obdafile = "src/test/resources/test/swrl/linear-recursive-swrl.obda";
+	private String owlfile = "src/test/resources/swrl/linear-recursive-swrl.owl";
+	private String obdafile = "src/test/resources/swrl/linear-recursive-swrl.obda";
 	private QuestOWL reasoner;
 	private OWLOntology ontology;
 	private OWLOntologyManager manager;
@@ -46,13 +46,13 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 	@Before
 	public void setUp() throws Exception {
 
-        String url = "jdbc:hsqldb:mem:questjunitdb";
-        String username = "sa";
-        String password = "";
-
-        fac = OBDADataFactoryImpl.getInstance();
-
-        conn = DriverManager.getConnection(url, username, password);
+//        String url = "jdbc:hsqldb:mem:questjunitdb";
+//        String username = "sa";
+//        String password = "";
+//
+//        fac = OBDADataFactoryImpl.getInstance();
+//
+//        conn = DriverManager.getConnection(url, username, password);
 //        String sqlFile_create = "src/test/resources/test/swrl/exampleSWRL_create.sql";
 //        String sqlFile_insert = "src/test/resources/test/swrl/exampleSWRL_insert.sql";
 //
@@ -70,7 +70,6 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 		try {
 			ontology = manager.loadOntologyFromOntologyDocument(new File(owlfile));
 		} catch (OWLOntologyCreationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -109,7 +108,7 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 	}
 	
 	@Test
-	public void testSWRLDriver() throws OWLException, OBDAException {
+	public void test() throws OWLException, OBDAException {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
@@ -123,7 +122,11 @@ public class LinearRecursiveSWRLVirtualABoxTest {
 		while(rs.nextRow()){
 			System.out.print(rs.getOWLIndividual(1));
 			System.out.print(", ");
-			System.out.print(rs.getOWLIndividual(2));
+			System.out.print(rs.getOWLLiteral(2));
+			System.out.print(", ");
+			System.out.print(rs.getOWLIndividual(3));
+			System.out.print(", ");
+			System.out.print(rs.getOWLLiteral(4));
 			System.out.println();
 		}
 	} 

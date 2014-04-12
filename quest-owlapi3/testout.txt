@@ -1,0 +1,1 @@
+file: /Users/mariano/Dropbox/NPD-Benchmark/12queries.1/query1.txt

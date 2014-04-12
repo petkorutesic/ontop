@@ -32,6 +32,10 @@ public class SWRLNPDVirtualABoxTest {
 
 	private String owlfile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a-swrl.owl";
 	private String obdafile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a.obda";
+	private String queriesDir = "/Users/mariano/Dropbox/NPD-Benchmark/12queries.1";
+	private String logFileName = "testout.txt";
+	
+	
 	private QuestOWL reasoner;
 	private OWLOntology ontology;
 	private OWLOntologyManager manager;
@@ -45,12 +49,6 @@ public class SWRLNPDVirtualABoxTest {
 
 	@Before
 	public void setUp() throws Exception {
-
-
-
-
-        String sqlFile_create = "src/test/resources/test/swrl/exampleSWRL_create.sql";
-        String sqlFile_insert = "src/test/resources/test/swrl/exampleSWRL_insert.sql";
 
 
 		p = new QuestPreferences();
@@ -68,8 +66,6 @@ public class SWRLNPDVirtualABoxTest {
 		}
 	}
 
-
-	
 	
 	private void startReasoner(){
 		QuestOWLFactory questOWLFactory = new QuestOWLFactory();
@@ -87,15 +83,15 @@ public class SWRLNPDVirtualABoxTest {
 	}
 	
 	@Test
-	public void testSWRLDriver() throws OWLException, OBDAException, IOException {
+	public void testSWRLNPD() throws OWLException, OBDAException, IOException {
 		startReasoner();
 		QuestOWLConnection connection = reasoner.getConnection();
 		QuestOWLStatement stmt = connection.createStatement();
 		
-		File queryFolder = new File("/Users/mariano/Dropbox/NPD-Benchmark/12queries.1");
+		File queryFolder = new File(queriesDir);
 		File[] queryFiles = queryFolder.listFiles();
 		
-		BufferedWriter out = new BufferedWriter(new FileWriter("testout.txt"));
+		BufferedWriter out = new BufferedWriter(new FileWriter(logFileName));
 		
 		for (File queryFile: queryFiles) {
 			
@@ -158,6 +154,21 @@ public class SWRLNPDVirtualABoxTest {
 		
 		buf.close();
 		return str.toString();
+	}
+	
+	public static void main(String[] args) throws Exception{
+		SWRLNPDVirtualABoxTest benchmark = new SWRLNPDVirtualABoxTest();
+		if(args.length == 4 ){
+			 benchmark.owlfile = args[0];
+			 benchmark.obdafile = args[1];
+			 benchmark.queriesDir = args[2];
+			 benchmark.logFileName = args[3];
+		} else {
+			System.err.println("Usage: main owlfile obdafile queriesDir logFileName");
+			System.exit(0);
+		}
+		benchmark.setUp();
+		benchmark.testSWRLNPD();
 	}
 	
 }

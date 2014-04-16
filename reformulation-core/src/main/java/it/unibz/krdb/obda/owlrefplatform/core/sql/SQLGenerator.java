@@ -727,7 +727,7 @@ public class SQLGenerator implements SQLQueryGenerator {
 		List<Term> headterms = query.getHead().getTerms();
 		StringBuilder sb = new StringBuilder();
 
-		sb.append("SELECT DISTINCT");
+		sb.append("SELECT DISTINCT ");
 		//if (distinct) {
 			//sb.append("DISTINCT ");
 		//}

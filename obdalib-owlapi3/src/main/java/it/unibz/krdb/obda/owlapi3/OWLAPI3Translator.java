@@ -49,6 +49,7 @@ import it.unibz.krdb.obda.ontology.impl.PropertySomeDataTypeRestrictionImpl;
 import it.unibz.krdb.obda.ontology.impl.PunningException;
 import it.unibz.krdb.obda.ontology.impl.SubClassAxiomImpl;
 import it.unibz.krdb.obda.ontology.impl.SubPropertyAxiomImpl;
+import it.unibz.krdb.obda.owlapi3.swrl.SWRLToOWL2QLTranslator;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -163,7 +164,13 @@ public class OWLAPI3Translator {
 
 		Ontology translation = ofac.createOntology(uri);
 		for (OWLOntology onto : ontologies) {
-			// uris.add(onto.getIRI().toURI());
+
+			/**
+			 * Add a step to translate all SWRL-OWL2QL rules
+			 */
+			SWRLToOWL2QLTranslator swrlTrans = new SWRLToOWL2QLTranslator(onto);
+			onto = swrlTrans.getResult();
+			
 			Ontology aux = translator.translate(onto);
 			translation.addConcepts(aux.getConcepts());
 			translation.addRoles(aux.getRoles());

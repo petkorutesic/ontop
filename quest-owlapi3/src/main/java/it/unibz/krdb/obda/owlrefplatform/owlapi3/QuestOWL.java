@@ -36,6 +36,7 @@ import it.unibz.krdb.obda.ontology.PropertyFunctionalAxiom;
 import it.unibz.krdb.obda.owlapi3.OWLAPI3ABoxIterator;
 import it.unibz.krdb.obda.owlapi3.OWLAPI3Translator;
 import it.unibz.krdb.obda.owlapi3.swrl.SWRLToDatalogTranslator;
+import it.unibz.krdb.obda.owlapi3.swrl.SWRLToOWL2QLTranslator;
 import it.unibz.krdb.obda.owlrefplatform.core.Quest;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConnection;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
@@ -274,6 +275,10 @@ public class QuestOWL extends OWLReasonerBase {
         /* SWRL */
 		if(preferences.getCurrentBooleanValueFor(QuestPreferences.SWRL_ENTAILMENT)) {
 	        for(OWLOntology ont : importsClosure){
+	        	
+	        	SWRLToOWL2QLTranslator swrlOWLTrans = new SWRLToOWL2QLTranslator(ont);
+	        	ont = swrlOWLTrans.getResult();
+	        	
 	            SWRLToDatalogTranslator swrlToDatalogTranslator = new SWRLToDatalogTranslator(ont);
 	            Collection<CQIE> rules = swrlToDatalogTranslator.getRules();
 	            questInstance.appendRules(rules);

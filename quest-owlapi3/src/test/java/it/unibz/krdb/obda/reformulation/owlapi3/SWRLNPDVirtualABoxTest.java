@@ -32,7 +32,7 @@ public class SWRLNPDVirtualABoxTest {
 
 	private String owlfile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a-swrl.owl";
 	private String obdafile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a.obda";
-	private String queriesDir = "/Users/mariano/Dropbox/NPD-Benchmark/12queries.1";
+	private String queriesDir = "/Users/mariano/Dropbox/NPD-Benchmark/12queries-distinct/";
 	private String logFileName = "testout.txt";
 	
 	

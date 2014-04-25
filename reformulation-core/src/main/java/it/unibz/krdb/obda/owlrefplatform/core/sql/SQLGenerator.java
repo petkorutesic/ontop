@@ -189,11 +189,6 @@ public class SQLGenerator implements SQLQueryGenerator {
 		
 		log.debug("Input to the SQL Generator \n{}", queryProgram);
 		
-		Collection<Predicate> linearRecursivePreds  = depGraph.getLinearRecursivePredicatesList();
-		
-		log.debug("linear recurive predicates:  {}", linearRecursivePreds);
-		
-		
 		
 
 		sqlAnsViewMap = new HashMap<Predicate, String>();

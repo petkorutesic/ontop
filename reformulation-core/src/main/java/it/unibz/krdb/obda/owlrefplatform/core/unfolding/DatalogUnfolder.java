@@ -341,6 +341,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	 * @param termidx
 	 * @return
 //	 */
+	@Deprecated
 	private int computePartialEvaluationTDown(List<CQIE> workingList, boolean includeMappings) {
 
 		int[] rcount = { 0, 0 };
@@ -352,8 +353,8 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 			Stack<Integer> termidx = new Stack<Integer>();
 
 			List<Term> tempList = getBodyTerms(rule);
-
-			List<CQIE> result = computePartialEvaluation(null, tempList, rule, rcount, termidx, false, includeMappings);
+			boolean isRecursive = false;
+			List<CQIE> result = computePartialEvaluation(null, tempList, rule, rcount, termidx, false, includeMappings,isRecursive);
 
 			if (result == null) {
 
@@ -408,6 +409,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
  * @param includingMappings
  * @return
  */
+
 		private int computePartialEvaluationBUP(List<CQIE> workingList, boolean includingMappings) {
 
 			int[] rcount = { 0, 0 }; //int queryIdx = 0;
@@ -472,7 +474,9 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 						 * is a leftjoin, in case that it is an algebra atom.
 						 */
 						boolean parentIsLeftJoin = false;
-						List<CQIE> result = computePartialEvaluation( pred, fatherTerms, fatherRule, rcount, termidx, parentIsLeftJoin,includingMappings);
+						boolean isRecursive = false;
+						
+						List<CQIE> result = computePartialEvaluation( pred, fatherTerms, fatherRule, rcount, termidx, parentIsLeftJoin,includingMappings,isRecursive);
 						
 						if (result == null) {
 							/*
@@ -590,7 +594,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 
 				Predicate pred = extensionalPredicates.get(predIdx);
 				Predicate preFather =  depGraph.getFatherPredicate(pred);
-
+				boolean isRecursiveFather = depGraph.getLinearRecursivePredicates().contains(preFather);
 			
 				List<CQIE> result = new LinkedList<CQIE>();
 				List<CQIE> fatherCollection = new LinkedList<CQIE>();
@@ -611,8 +615,10 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 						List<Term> ruleTerms = getBodyTerms(fatherRule);
 						Stack<Integer> termidx = new Stack<Integer>();
 						
+						
+						
 						//here we perform the partial evaluation
-						List<CQIE> partialEvaluation = computePartialEvaluation(pred,  ruleTerms, fatherRule, rcount, termidx, false, includeMappings);
+						List<CQIE> partialEvaluation = computePartialEvaluation(pred,  ruleTerms, fatherRule, rcount, termidx, false, includeMappings, isRecursiveFather);
 						
 						
 						
@@ -1081,6 +1087,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 *            The number of resolution attemts done globaly, needed to spawn
 		 *            fresh variables.
 		 * @param includingMappings 
+		 * @param isRecursiveFather 
 		 * @param atomindx
 		 *            The location of the focustAtom in the currentlist
 		 * @return <ul>
@@ -1094,7 +1101,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 		 * @see Unifier
 		 */	
 	private List<CQIE> resolveDataAtom(Predicate resolvPred, Function focusedAtom, CQIE rule, Stack<Integer> termidx, int[] resolutionCount, boolean isLeftJoin,
-				boolean isSecondAtomInLeftJoin, boolean includingMappings) {
+				boolean isSecondAtomInLeftJoin, boolean includingMappings, boolean isRecursiveFather) {
 
 			if (!focusedAtom.isDataFunction())
 				throw new IllegalArgumentException("Cannot unfold a non-data atom: " + focusedAtom);
@@ -1157,12 +1164,18 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 //					result = new LinkedList<CQIE>();
 //					result.add(newRuleWithNullBindings);
 				}
-			} else if (hasOneMapping || !isSecondAtomInLeftJoin){
+			} else if (!isRecursiveFather && (hasOneMapping || !isSecondAtomInLeftJoin)){
 				
 				//result = generateResolutionResultParent(parentRule, focusAtom, rule, termidx, resolutionCount, rulesDefiningTheAtom, isLeftJoin, isSecondAtomInLeftJoin);
 				result = generateResolutionResult(focusedAtom, rule, termidx, resolutionCount, rulesDefiningTheAtom, isLeftJoin, isSecondAtomInLeftJoin);
-			} else if (!hasOneMapping && isSecondAtomInLeftJoin) {
+			} else if (!isRecursiveFather && !hasOneMapping && isSecondAtomInLeftJoin) {
 				// This case takes place when ans has only 1 definition, but the extensional atom have more than 1 mapping, and
+				result = Lists.newArrayListWithExpectedSize(1 + rulesDefiningTheAtom.size() + 1);
+				//result = new LinkedList<CQIE>();
+				result.add(rule);
+				result.addAll(rulesDefiningTheAtom);
+			} else if (isRecursiveFather){
+				// This case takes place when I am dealing with the atom in a recursive rule
 				result = Lists.newArrayListWithExpectedSize(1 + rulesDefiningTheAtom.size() + 1);
 				//result = new LinkedList<CQIE>();
 				result.add(rule);
@@ -1367,11 +1380,12 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 	 * @param termidx
 	 * 			a stack used to track the depth first searching (DFS) 
 	 * @param includingMappings 
+	 * @param isRecursiveFather 
 	 * @return
 	 */
 
     private List<CQIE> computePartialEvaluation(Predicate resolvPred, List<Term> currentTerms, CQIE rule, int[] resolutionCount, Stack<Integer> termidx,
-            boolean parentIsLeftJoin, boolean includingMappings) {
+            boolean parentIsLeftJoin, boolean includingMappings, boolean isRecursiveFather) {
 
 	    int nonBooleanAtomCounter = 0;
 	
@@ -1404,7 +1418,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
 //                    	return emptyList;
 //                    }
                     
-                    List<CQIE> result = computePartialEvaluation(resolvPred,  focusedLiteral.getTerms(), rule, resolutionCount, termidx, focusedAtomIsLeftJoin, includingMappings);
+                    List<CQIE> result = computePartialEvaluation(resolvPred,  focusedLiteral.getTerms(), rule, resolutionCount, termidx, focusedAtomIsLeftJoin, includingMappings,isRecursiveFather);
 
                     if (result == null)
                     	if (!isLeftJoinSecondArgument){
@@ -1435,7 +1449,7 @@ public class DatalogUnfolder implements UnfoldingMechanism {
                     
                     if (pred.equals(resolvPred)) {
                     	result = resolveDataAtom(resolvPred, focusedLiteral, rule, termidx, resolutionCount, parentIsLeftJoin,
-                    			isLeftJoinSecondArgument, includingMappings);
+                    			isLeftJoinSecondArgument, includingMappings, isRecursiveFather);
                     	if (result == null)
                     		return null;
 

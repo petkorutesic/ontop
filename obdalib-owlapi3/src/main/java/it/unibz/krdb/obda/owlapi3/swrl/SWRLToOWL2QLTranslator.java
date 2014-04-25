@@ -7,17 +7,24 @@
  */
 package it.unibz.krdb.obda.owlapi3.swrl;
 
+import it.unibz.krdb.obda.model.Predicate;
+
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.semanticweb.owlapi.model.OWLAxiom;
+import org.semanticweb.owlapi.model.OWLClass;
 import org.semanticweb.owlapi.model.OWLClassExpression;
 import org.semanticweb.owlapi.model.OWLDataFactory;
+import org.semanticweb.owlapi.model.OWLDataProperty;
 import org.semanticweb.owlapi.model.OWLDataPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLDataPropertyExpression;
 import org.semanticweb.owlapi.model.OWLDataPropertyRangeAxiom;
 import org.semanticweb.owlapi.model.OWLDataRange;
 import org.semanticweb.owlapi.model.OWLException;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
 import org.semanticweb.owlapi.model.OWLObjectPropertyDomainAxiom;
 import org.semanticweb.owlapi.model.OWLObjectPropertyExpression;
 import org.semanticweb.owlapi.model.OWLObjectPropertyRangeAxiom;
@@ -56,14 +63,26 @@ public class SWRLToOWL2QLTranslator {
 
 	OWLOntologyManager man = null;
 
+	private Collection<Predicate> recursivePredicates;
+
+	public SWRLToOWL2QLTranslator(OWLOntology input) throws OWLException {
+		this(input, null);
+	}
+	
 	/**
 	 * Returns the OWL 2 QL axiom equivalent to the SWRL rule. If there is no
 	 * such axiom returns null. Note, not all syntactic variations of OWL 2 QL
 	 * rules are handled here.
 	 */
-	public SWRLToOWL2QLTranslator(OWLOntology input) throws OWLException {
+	public SWRLToOWL2QLTranslator(OWLOntology input, Collection<Predicate> recursivePredicates) throws OWLException {
 
 		this.input = input;
+		
+		if (recursivePredicates == null) {
+			this.recursivePredicates = new LinkedList<Predicate>();
+		} else {
+			this.recursivePredicates = recursivePredicates;
+		}
 
 		man = input.getOWLOntologyManager();
 
@@ -96,6 +115,8 @@ public class SWRLToOWL2QLTranslator {
 			if (ruleAsAxiom == null)
 				continue;
 			
+			
+			
 			toDelete.add(rule);
 			toAdd.add(ruleAsAxiom);
 
@@ -125,6 +146,8 @@ public class SWRLToOWL2QLTranslator {
 		SWRLAtom body = bodyatoms.iterator().next();
 		SWRLAtom head = headatoms.iterator().next();
 
+		
+		
 		if (head instanceof SWRLUnaryAtom && body instanceof SWRLUnaryAtom) {
 			result = getOWLSubClassOfAxiom((SWRLClassAtom) head, (SWRLClassAtom) body);
 		} else if (head instanceof SWRLUnaryAtom && body instanceof SWRLBinaryAtom) {
@@ -202,6 +225,14 @@ public class SWRLToOWL2QLTranslator {
 		if (!harg.equals(barg) || !(harg instanceof SWRLVariable)) {
 			return null;
 		}
+		
+		//TODO remove, inneficient for RR paper only
+		/* dont translate rles that define recursive predicates */
+		for (OWLClass c : domain.getClassesInSignature()) {
+			for (Predicate p : recursivePredicates)
+				if (c.getIRI().toString().equals(p.getName()))
+					return null;
+		}
 
 		return fac.getOWLObjectPropertyDomainAxiom(property, domain);
 	}
@@ -218,6 +249,14 @@ public class SWRLToOWL2QLTranslator {
 		if (!harg.equals(barg) || !(harg instanceof SWRLVariable)) {
 			return null;
 		}
+		
+		//TODO remove, inneficient for RR paper only
+		/* dont translate rles that define recursive predicates */
+		for (OWLClass c : domain.getClassesInSignature()) {
+			for (Predicate p : recursivePredicates)
+				if (c.getIRI().toString().equals(p.getName()))
+					return null;
+		}
 
 		return fac.getOWLObjectPropertyRangeAxiom(property, domain);
 	}
@@ -232,6 +271,14 @@ public class SWRLToOWL2QLTranslator {
 		// argument must be a variable and it must be the same in head and body.
 		if (!harg.equals(barg) || !(harg instanceof SWRLVariable)) {
 			return null;
+		}
+		
+		//TODO remove, inneficient for RR paper only
+		/* dont translate rles that define recursive predicates */
+		for (OWLClass c : domain.getClassesInSignature()) {
+			for (Predicate p : recursivePredicates)
+				if (c.getIRI().toString().equals(p.getName()))
+					return null;
 		}
 
 		return fac.getOWLDataPropertyDomainAxiom(property, domain);
@@ -286,6 +333,14 @@ public class SWRLToOWL2QLTranslator {
 			return null;
 		}
 
+		//TODO remove, inneficient for RR paper only
+		/* dont translate rles that define recursive predicates */
+		for (OWLObjectProperty c : hexp.getObjectPropertiesInSignature()) {
+			for (Predicate p : recursivePredicates)
+				if (c.getIRI().toString().equals(p.getName()))
+					return null;
+		}
+		
 		return fac.getOWLSubObjectPropertyOfAxiom(bexp, hexp);
 	}
 
@@ -306,6 +361,14 @@ public class SWRLToOWL2QLTranslator {
 		if (!harg2.equals(barg2) || !(harg2 instanceof SWRLVariable)) {
 			return null;
 		}
+		
+		//TODO remove, inneficient for RR paper only
+		/* dont translate rles that define recursive predicates */
+		for (OWLDataProperty c : hexp.getDataPropertiesInSignature()) {
+			for (Predicate p : recursivePredicates)
+				if (c.getIRI().toString().equals(p.getName()))
+					return null;
+		}
 
 		return fac.getOWLSubDataPropertyOfAxiom(bexp, hexp);
 	}
@@ -321,6 +384,14 @@ public class SWRLToOWL2QLTranslator {
 		// argument must be a variable and it must be the same in head and body.
 		if (!harg.equals(barg) || !(harg instanceof SWRLVariable)) {
 			return null;
+		}
+		
+		//TODO remove, inneficient for RR paper only
+		/* dont translate rles that define recursive predicates */
+		for (OWLClass c : hexp.getClassesInSignature()) {
+			for (Predicate p : recursivePredicates)
+				if (c.getIRI().toString().equals(p.getName()))
+					return null;
 		}
 
 		return fac.getOWLSubClassOfAxiom(bexp, hexp);
@@ -351,6 +422,14 @@ public class SWRLToOWL2QLTranslator {
 
 			if (harg1.equals(harg2))
 				return null;
+			
+			//TODO remove, inneficient for RR paper only
+			/* dont translate rles that define recursive predicates */
+			for (OWLObjectProperty c : hexp.getObjectPropertiesInSignature()) {
+				for (Predicate p : recursivePredicates)
+					if (c.getIRI().toString().equals(p.getName()))
+						return null;
+			}
 
 			if (barg.equals(harg1)) {
 				return fac.getOWLSubClassOfAxiom(bexp, fac.getOWLObjectSomeValuesFrom(hexp, fac.getOWLThing()));
@@ -366,6 +445,14 @@ public class SWRLToOWL2QLTranslator {
 
 			if (harg1.equals(harg2))
 				return null;
+			
+			//TODO remove, inneficient for RR paper only
+			/* dont translate rles that define recursive predicates */
+			for (OWLDataProperty c : hexp.getDataPropertiesInSignature()) {
+				for (Predicate p : recursivePredicates)
+					if (c.getIRI().toString().equals(p.getName()))
+						return null;
+			}
 
 			if (barg.equals(harg1)) {
 				return fac.getOWLSubClassOfAxiom(bexp,

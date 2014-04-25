@@ -132,7 +132,7 @@ public class DatalogDependencyGraphGenerator {
 	}
 
 
-	public DatalogDependencyGraphGenerator(List<CQIE> program) {
+	public DatalogDependencyGraphGenerator(Collection<CQIE> program) {
 		for (CQIE rule : program) {
 
 			updateRuleIndexes(rule);
@@ -313,7 +313,7 @@ public class DatalogDependencyGraphGenerator {
 	 * 
 	 * @param program
 	 */
-	private void generateRuleDependencyGraph(List<CQIE> program) {
+	private void generateRuleDependencyGraph(Collection<CQIE> program) {
 		for (CQIE rule : program) {
 			ruleDependencyGraph.addVertex(rule);
 			Predicate headPred = rule.getHead().getFunctionSymbol();

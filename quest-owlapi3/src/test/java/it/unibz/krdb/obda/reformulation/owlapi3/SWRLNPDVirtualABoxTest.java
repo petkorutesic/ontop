@@ -36,7 +36,8 @@ public class SWRLNPDVirtualABoxTest {
 //	private String logFileName = "testout.txt";
 	
 	private String owlfile = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/npd-v2-ql_a-swrl-recursive.owl";
-	private String obdafile = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/npd-v2-ql_a_postgres.obda";
+	//private String obdafile = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/npd-v2-ql_a_postgres_npd_2.obda";
+	private String obdafile = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/npd-v2-ql_a_postgres_npd_10.obda";
 	private String queriesDir = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/recursive_queries/";
 	private String logFileName = "testout-recursive.txt";
 

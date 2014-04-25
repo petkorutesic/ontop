@@ -209,10 +209,11 @@ public class SQLGenerator implements SQLQueryGenerator {
 		log.debug("linear recurive predicates:  {}", linearRecursivePreds);
 		
 		for(Predicate pred : linearRecursivePreds) {
-			String sql = pred.getName().replaceAll("[^A-Za-z0-9]", "_");
-			String viewName = String.format(VIEW_ANS_NAME, pred.getName());
+			String name = pred.getName();
+			String sql = normalizeName(name);
+			String viewName = String.format(VIEW_ANS_NAME, name);
 			// the predicate name may be a URI, so we need to clean it
-			viewName = viewName.replaceAll("[^A-Za-z0-9]", "_");
+			viewName = normalizeName(viewName);
 			List<String> columns = getTypedColumns(pred.getArity());
 			ViewDefinition def = metadata.createViewDefinition(viewName, sql, columns);
 			metadata.add(def);
@@ -250,6 +251,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 					ruleIndexByBodyPredicate, predicatesInBottomUp,
 					extensionalPredicates);
 		}
+	}
+
+	/**
+	 * replace all the special character in the name by underscore "_"
+	 */
+	private String normalizeName(String name) {
+		return name.replaceAll("[^A-Za-z0-9]", "_");
 	}
 
 	private boolean hasSelectDistinctStatement(DatalogProgram query) {
@@ -558,7 +566,10 @@ public class SQLGenerator implements SQLQueryGenerator {
 			sqls.add(sqlQuery);
 		}
 
-		String viewname = String.format(VIEW_ANS_NAME, pred);
+		String predName = pred.getName();
+		String normalizedPredName = normalizeName(predName);
+		
+		String viewname = String.format(VIEW_ANS_NAME, normalizedPredName);
 
 		switch (recursion) {
 		case NO_RECURSION:

@@ -30,10 +30,16 @@ import org.semanticweb.owlapi.model.OWLOntologyManager;
 
 public class SWRLNPDVirtualABoxTest {
 
-	private String owlfile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a-swrl.owl";
-	private String obdafile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a.obda";
-	private String queriesDir = "/Users/mariano/Dropbox/NPD-Benchmark/12queries-distinct/";
-	private String logFileName = "testout.txt";
+//	private String owlfile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a-swrl.owl";
+//	private String obdafile = "/Users/mariano/Dropbox/NPD-Benchmark/npd-v2-ql_a.obda";
+//	private String queriesDir = "/Users/mariano/Dropbox/NPD-Benchmark/12queries-distinct/";
+//	private String logFileName = "testout.txt";
+	
+	private String owlfile = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/npd-v2-ql_a-swrl.owl";
+	private String obdafile = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/npd-v2-ql_a_postgres.obda";
+	private String queriesDir = "/Users/xiao/Dropbox/Optique/NPD-Benchmark/recursive_queries/";
+	private String logFileName = "testout-recursive.txt";
+
 	
 	
 	private QuestOWL reasoner;

@@ -366,7 +366,7 @@ public class QuestOWL extends OWLReasonerBase {
 	 * are used later when classify() is called.
 	 * 
 	 */
-	public Ontology loadOntologies(OWLOntology ontology) throws Exception {
+	public Ontology loadSWRLOntologies(OWLOntology ontology) throws Exception {
 		/*
 		 * We will keep track of the loaded ontologies and translate the TBox
 		 * part of them into our internal representation.
@@ -413,6 +413,42 @@ public class QuestOWL extends OWLReasonerBase {
 //			Set<OWLOntology> importsClosure = man.getImportsClosure(getRootOntology());
 
 			/* SWRL */
+
+			return mergeOntology;
+		} catch (Exception e) {
+			throw e;
+		}
+
+		// log.debug("Ontology loaded: {}", mergeOntology);
+	}
+	
+	public static Ontology loadOntologies(OWLOntology ontology) throws Exception {
+		/*
+		 * We will keep track of the loaded ontologies and translate the TBox
+		 * part of them into our internal representation.
+		 */
+		log.debug("Load ontologies called. Translating ontologies.");
+
+		OWLAPI3Translator translator = new OWLAPI3Translator();
+
+		try {
+
+			OWLOntologyManager man = ontology.getOWLOntologyManager();
+//			Set<OWLOntology> clousure = man.getImportsClosure(ontology);
+
+			OWLOntologyImportsClosureSetProvider setProvider = new OWLOntologyImportsClosureSetProvider(man, ontology);
+
+			OWLOntologyMerger merger = new OWLOntologyMerger(setProvider);
+			OWLOntology merge = merger.createMergedOntology(man, null);
+
+			//TODO remove this is temporal for RR paper, used only to find out which predicates are recursive as not to remove from the SWRL rules
+
+			
+			Ontology mergeOntology = translator.mergeTranslateOntologies(Collections.singleton(merge));
+
+			
+//			Set<OWLOntology> importsClosure = man.getImportsClosure(getRootOntology());
+
 
 			return mergeOntology;
 		} catch (Exception e) {
@@ -482,7 +518,7 @@ public class QuestOWL extends OWLReasonerBase {
 			 * axioms of the closure of the root ontology
 			 */
 
-			this.translatedOntologyMerge = loadOntologies(getRootOntology());
+			this.translatedOntologyMerge = loadSWRLOntologies(getRootOntology());
 
 			classHierarchyInfo.computeHierarchy();
 			objectPropertyHierarchyInfo.computeHierarchy();

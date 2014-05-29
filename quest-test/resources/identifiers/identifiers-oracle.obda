@@ -29,6 +29,10 @@ mappingId	Countries5
 target		:Country5-{COL} a :Country5 . 
 source		select To_Char(country_name) col FROM HR.countries
 
+mappingId	Countries6
+target		:Country6-{col} a :Country6 . 
+source		select CAST(country_name AS CHAR) col FROM HR.countries
+
 
 ]]
 

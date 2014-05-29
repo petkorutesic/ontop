@@ -166,5 +166,13 @@ public class OracleIdentifierTest extends TestCase {
 		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country5-Argentina>", val);
 	}
 	
+	public void testCast() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#> SELECT ?x WHERE {?x a :Country6} ORDER BY ?x";
+		String val =  runTests(query);
+		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country6-Argentina>", val);
+	}
+	
+
+	
 }
 

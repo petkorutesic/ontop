@@ -162,7 +162,7 @@
 	<!-- Reasoner plugins -->
 	<extension id="quest.reasoner.factory"
              point="org.protege.editor.owl.inference_reasonerfactory">
-    <name value="Quest 2.0.0 (ontop)"/>
+    <name value="Quest 2.0.0-beta-1 (ontop)"/>
     <class value="org.semanticweb.ontop.protege4.core.ProtegeOBDAOWLReformulationPlatformFactory"/>
   </extension>
 </plugin>

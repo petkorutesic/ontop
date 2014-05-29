@@ -50,7 +50,7 @@ export QUEST_JETTY_DIST=QuestJetty
 export OWL_API_DIST=QuestOWL
 
 export VERSION=2.0
-export REVISION=0-beta-1
+export REVISION=0-beta-1-SNAPSHOT
 
 
 # Start building the packages

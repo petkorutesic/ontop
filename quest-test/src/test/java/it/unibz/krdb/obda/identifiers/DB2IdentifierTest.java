@@ -151,4 +151,10 @@ public class DB2IdentifierTest extends TestCase {
 		String val = runTests(query);
 		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country3-991>", val);
 	}
+	
+	public void testCast() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#> SELECT ?x WHERE {?x a :Country4} ORDER BY ?x";
+		String val = runTests(query);
+		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country4-991>", val);
+	}
 }

@@ -143,7 +143,6 @@ public class H2IdentifierTest extends TestCase {
 	}
 	
 
-	
 	private String runTests(String query) throws Exception {
 		QuestOWLStatement st = conn.createStatement();
 		String retval;
@@ -220,6 +219,13 @@ public class H2IdentifierTest extends TestCase {
 		String query = "PREFIX : <http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#> SELECT ?x WHERE {?x a :Country3} ORDER BY ?x";
 		String val =  runTests(query);
 		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country3-BladeRunner-2020-Constant>", val);
+	}
+	
+	@Test
+	public void testCast() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#> SELECT ?x WHERE {?x a :Country6} ORDER BY ?x";
+		String val =  runTests(query);
+		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country6-1010>", val);
 	}
 	
 }

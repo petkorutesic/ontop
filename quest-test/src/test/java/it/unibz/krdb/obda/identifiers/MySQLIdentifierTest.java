@@ -154,6 +154,12 @@ public class MySQLIdentifierTest extends TestCase {
 		String val = runTests(query);
 		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country3-a>", val);
 	}
+	
+	public void testCast() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#> SELECT ?x WHERE {?x a :Country5} ORDER BY ?x";
+		String val = runTests(query);
+		assertEquals("<http://www.semanticweb.org/ontologies/2013/7/untitled-ontology-150#Country5-a>", val);
+	}
 
 	
 			

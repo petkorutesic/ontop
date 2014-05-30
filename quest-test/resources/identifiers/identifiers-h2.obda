@@ -29,6 +29,10 @@ mappingId	Countries5
 target		:Country5-{COL} a :Country5 . 
 source		select "primary_key" col FROM countries
 
+mappingId	Countries6
+target		:Country6-{COL} a :Country6 . 
+source		select CAST("primary_key" AS CHAR) col FROM countries
+
 
 ]]
 

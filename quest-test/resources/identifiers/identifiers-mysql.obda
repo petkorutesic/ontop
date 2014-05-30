@@ -25,5 +25,9 @@ mappingId	Countries4
 target		:Country4-{LETTER} a :Country4 . 
 source		select Type_Char as "LETTER" from Characters
 
+mappingId	Countries5
+target		:Country5-{LETTER} a :Country5 . 
+source		select CAST(Type_Char AS CHAR) as "LETTER" from Characters
+
 ]]
 

@@ -21,17 +21,7 @@ package it.unibz.krdb.obda.r2rml;
  */
 
 import it.unibz.krdb.obda.io.PrefixManager;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.Constant;
-import it.unibz.krdb.obda.model.DataTypePredicate;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.OBDAMappingAxiom;
-import it.unibz.krdb.obda.model.OBDAQueryModifiers;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.URITemplatePredicate;
-import it.unibz.krdb.obda.model.ValueConstant;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
 import it.unibz.krdb.obda.model.impl.SQLQueryImpl;
@@ -274,8 +264,7 @@ public class OBDAMappingTransformer {
 	 * @param prefixmng
 	 * @return
 	 */
-	public TriplesMap getTriplesMap(OBDAMappingAxiom axiom,
-			PrefixManager prefixmng) {
+	public TriplesMap getTriplesMap(OBDAMappingAxiom axiom,PrefixManager prefixmng) {
 		
 		SQLQueryImpl squery = (SQLQueryImpl) axiom.getSourceQuery();
 		CQIE tquery = (CQIE) axiom.getTargetQuery();
@@ -410,9 +399,22 @@ public class OBDAMappingTransformer {
 							
 							//check if it is not a plain literal
 							if(!objectPred.equals(OBDAVocabulary.RDFS_LITERAL)){
-								
-								//set the datatype for the typed literal								
-								obm.setDatatype(vf.createURI(objectPred.getName()));
+
+                                //check if it corresponds with the value in the ontology
+                                if (ontology != null && dataProperties.contains(dataProperty)) {
+
+                                    Set<OWLDataRange> ranges = dataProperty.getRanges(ontology);
+                                    //assign the datatype if present
+                                    if (ranges.size() == 1) {
+                                        IRI dataRange = ranges.iterator().next().asOWLDatatype().getIRI();
+                                        if(!dataRange.toString().equals(objectPred.getName())){
+                                           System.out.println("Ontology datatype " + dataRange + " for " + dataProperty + "\ndoes not correspond to datatype " + objectPred.getName() + " in mappings");
+                                        }
+                                    }
+                                }
+
+                                //set the datatype for the typed literal
+                                obm.setDatatype(vf.createURI(objectPred.getName()));
 							}
 							else{
 								//check if the plain literal has a lang value

@@ -1,0 +1,120 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+
+_:node192jnob3jx20 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node192jnob3jx6 rr:predicate <http://www.company.com/ARES#AssayID> .
+
+_:node192jnob3jx3 rr:predicateObjectMap _:node192jnob3jx6 .
+
+_:node192jnob3jx17 rr:template "{DEPARTMENT_CODE}" .
+
+_:node192jnob3jx5 a rr:TermMap .
+
+_:node192jnob3jx3 rr:subjectMap _:node192jnob3jx2 .
+
+_:node192jnob3jx9 rr:predicate <http://www.company.com/ARES#assayName> .
+
+_:node192jnob3jx6 a rr:PredicateObjectMap .
+
+_:node192jnob3jx15 rr:predicate <http://www.company.com/ARES#number> .
+
+_:node192jnob3jx5 rr:termType rr:Literal .
+
+_:node192jnob3jx3 a rr:TriplesMap .
+
+_:node192jnob3jx21 rr:predicate <http://www.company.com/ARES#hasPTTName> .
+
+_:node192jnob3jx5 rr:column "ID" .
+
+_:node192jnob3jx3 rr:predicateObjectMap _:node192jnob3jx9 .
+
+_:node192jnob3jx8 rr:template "{SHORT_NAME}" .
+
+_:node192jnob3jx15 a rr:PredicateObjectMap .
+
+_:node192jnob3jx21 rr:objectMap _:node192jnob3jx20 .
+
+_:node192jnob3jx15 rr:objectMap _:node192jnob3jx14 .
+
+_:node192jnob3jx12 a rr:PredicateObjectMap .
+
+_:node192jnob3jx8 a rr:TermMap .
+
+_:node192jnob3jx6 rr:objectMap _:node192jnob3jx5 .
+
+_:node192jnob3jx18 rr:predicate <http://www.company.com/ARES#hasDepartment> .
+
+_:node192jnob3jx14 rr:template "{ID}" .
+
+_:node192jnob3jx11 a rr:TermMap .
+
+_:node192jnob3jx1 rr:sqlQuery "select   \"HR\".\"T_ASSAY\".ID, \"HR\".\"T_ASSAY\".SHORT_NAME,   \"HR\".\"T_ASSAY\".DESCRIPTION , \"HR\".\"T_ASSAY\".DEPARTMENT_CODE,    \"HR\".\"T_ASSAY\".\"PTT_REF\"   from \"HR\".\"T_ASSAY\"" .
+
+_:node192jnob3jx11 rr:termType rr:Literal .
+
+_:node192jnob3jx3 rr:predicateObjectMap _:node192jnob3jx21 .
+
+_:node192jnob3jx18 a rr:PredicateObjectMap .
+
+_:node192jnob3jx8 rr:termType rr:Literal .
+
+_:node192jnob3jx12 rr:predicate <http://www.company.com/ARES#hasARESID> .
+
+_:node192jnob3jx14 rr:termType rr:Literal ;
+	a rr:ObjectMap .
+
+_:node192jnob3jx2 a rr:SubjectMap .
+
+_:node192jnob3jx12 rr:objectMap _:node192jnob3jx11 .
+
+_:node192jnob3jx2 rr:template "http://www.company.com/ARES#{ID}" .
+
+_:node192jnob3jx17 a rr:ObjectMap .
+
+_:node192jnob3jx2 rr:termType rr:IRI ;
+	a rr:TermMap .
+
+_:node192jnob3jx8 a rr:ObjectMap .
+
+_:node192jnob3jx3 rr:predicateObjectMap _:node192jnob3jx15 .
+
+_:node192jnob3jx20 a rr:ObjectMap .
+
+_:node192jnob3jx8 rr:datatype <http://www.w3.org/2001/XMLSchema#string> .
+
+_:node192jnob3jx3 rr:predicateObjectMap _:node192jnob3jx18 .
+
+_:node192jnob3jx9 rr:objectMap _:node192jnob3jx8 .
+
+_:node192jnob3jx2 rr:class <http://www.company.com/ARES#Assay> .
+
+_:node192jnob3jx3 rr:predicateObjectMap _:node192jnob3jx12 .
+
+_:node192jnob3jx14 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> ;
+	a rr:TermMap .
+
+_:node192jnob3jx3 rr:logicalTable _:node192jnob3jx1 .
+
+_:node192jnob3jx20 rr:termType rr:Literal ;
+	a rr:TermMap .
+
+_:node192jnob3jx9 a rr:PredicateObjectMap .
+
+_:node192jnob3jx17 rr:termType rr:Literal .
+
+_:node192jnob3jx20 rr:template "{PTT_REF}" .
+
+_:node192jnob3jx5 a rr:ObjectMap .
+
+_:node192jnob3jx18 rr:objectMap _:node192jnob3jx17 .
+
+_:node192jnob3jx1 a rr:R2RMLView .
+
+_:node192jnob3jx11 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+_:node192jnob3jx21 a rr:PredicateObjectMap .
+
+_:node192jnob3jx17 a rr:TermMap .
+
+_:node192jnob3jx11 rr:template "{ID}" ;
+	a rr:ObjectMap .

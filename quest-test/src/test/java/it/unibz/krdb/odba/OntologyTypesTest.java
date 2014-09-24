@@ -70,7 +70,7 @@ public class OntologyTypesTest{
 
 	final String owlFile = "src/test/resources/ontologyType/dataPropertiesOntologyType.owl";
 	final String obdaFile = "src/test/resources/ontologyType/dataPropertiesOntologyType.obda";
-    final String r2rmlFile = "src/test/resources/ontologyType/dataPropertiesPrettyType.ttl";
+    final String r2rmlFile = "src/test/resources/ontologyType/dataPropertiesOntologyType.ttl";
 	final String obdaErroredFile = "src/test/resources/ontologyType/erroredOntologyType.obda";
 
 	@Before

@@ -23,6 +23,7 @@ package org.semanticweb.ontop.owlrefplatform.owlapi3;
 import org.semanticweb.ontop.model.OBDAModel;
 import org.semanticweb.ontop.owlrefplatform.core.QuestConstants;
 import org.semanticweb.ontop.owlrefplatform.core.QuestPreferences;
+import org.semanticweb.ontop.sql.CompletePredicatesWRTReasoning;
 import org.semanticweb.ontop.sql.ImplicitDBConstraints;
 
 
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @see OBDAModel
  * 
- * @author Mariano Rodriguez Muro <mariano.muro@gmail.com>
+ * @author Mariano Rodriguez Muro, mrezk, Dag
  * 
  */
 public class QuestOWLFactory implements OWLReasonerFactory {
@@ -63,6 +64,13 @@ public class QuestOWLFactory implements OWLReasonerFactory {
 	 * database metadata. 
 	 */
 	private ImplicitDBConstraints userConstraints = null;
+	
+	/**
+	 * The user can supply information about keys that are not in the
+	 * database metadata. 
+	 */
+	private CompletePredicatesWRTReasoning cPredicates= null;
+	
 	private boolean applyUserConstraints = false;
 	
 	private String name = "Quest";
@@ -93,6 +101,18 @@ public class QuestOWLFactory implements OWLReasonerFactory {
 		this.userConstraints = userConstraints;
 		this.applyUserConstraints = true;
 	}
+	
+	/**
+	 * This method sets the predicates that are complete w.r.t.  ontological reasoning
+	 * @param inputPreds
+	 */
+	public void setCompletePredicates(CompletePredicatesWRTReasoning inputPreds) {
+		if(inputPreds == null)
+			throw new NullPointerException();
+		this.cPredicates = inputPreds;
+	}
+	
+	
 	
 	public void setPreferenceHolder(Properties preference) {
 		this.preferences = preference;

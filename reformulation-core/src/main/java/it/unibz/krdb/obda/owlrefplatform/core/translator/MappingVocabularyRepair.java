@@ -20,16 +20,7 @@ package it.unibz.krdb.obda.owlrefplatform.core.translator;
  * #L%
  */
 
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.DataTypePredicate;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.OBDADataSource;
-import it.unibz.krdb.obda.model.OBDAMappingAxiom;
-import it.unibz.krdb.obda.model.OBDAModel;
-import it.unibz.krdb.obda.model.OBDASQLQuery;
-import it.unibz.krdb.obda.model.Predicate;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
@@ -123,20 +114,27 @@ public class MappingVocabularyRepair {
 							Term t1= newTerms.get(0);
 							Term t2= newTerms.get(1);
 
-							if (( t1 instanceof Function) && ( t2 instanceof Function)){
+                            if ( t1 instanceof Function) {
+                                if ( t2 instanceof Function) {
 
-								Function ft1 = (Function) t1;
-								Function ft2 = (Function) t2;
+                                    Function ft1 = (Function) t1;
+                                    Function ft2 = (Function) t2;
 
-								boolean t1uri = ft1.getFunctionSymbol().getName().equals(OBDAVocabulary.QUEST_URI);
-								boolean t2uri = ft2.getFunctionSymbol().getName().equals(OBDAVocabulary.QUEST_URI);
+                                    boolean t1uri = ft1.getFunctionSymbol().getName().equals(OBDAVocabulary.QUEST_URI);
+                                    boolean t2uri = ft2.getFunctionSymbol().getName().equals(OBDAVocabulary.QUEST_URI);
 
-								if (t1uri && t2uri){
-									predicate= dfac.getObjectPropertyPredicate(p.getName());
-								}else{
-									predicate=dfac.getDataPropertyPredicate(p.getName());
-								}
-							} else {
+                                    if (t1uri && t2uri){
+                                        predicate= dfac.getObjectPropertyPredicate(p.getName());
+                                    }else{
+                                        predicate=dfac.getDataPropertyPredicate(p.getName());
+                                    }
+                                } else {
+                                    Function ft1 = (Function) t1;
+                                    Variable vt2 = (Variable) t2;
+                                    predicate = dfac.getDataPropertyPredicate(p.getName());
+                                }
+
+                            } else {
 								throw new RuntimeException("ERROR: Predicate has an incorrect arity: " + p.getName());
 							}
 						}

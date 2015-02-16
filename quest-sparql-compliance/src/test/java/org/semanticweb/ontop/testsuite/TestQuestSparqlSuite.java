@@ -20,10 +20,9 @@ package org.semanticweb.ontop.testsuite;
  * #L%
  */
 
-import org.semanticweb.ontop.quest.sparql.QuestMemorySPARQLQueryTest;
-
 import junit.framework.Test;
 import junit.framework.TestSuite;
+import org.semanticweb.ontop.quest.sparql1.QuestMemorySPARQLQueryTest;
 
 public class TestQuestSparqlSuite extends TestSuite {
 

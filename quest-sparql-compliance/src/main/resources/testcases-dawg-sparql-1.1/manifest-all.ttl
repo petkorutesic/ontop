@@ -9,7 +9,7 @@
 		#<add/manifest.ttl>
 		<aggregates/manifest.ttl>
 		#<basic-update/manifest.ttl>
-		#<bind/manifest.ttl>
+		<bind/manifest.ttl>
 		#<bindings/manifest.ttl>
 		#<clear/manifest.ttl>
 		#<construct/manifest.ttl>

@@ -32,9 +32,9 @@
     
 
 
-    <!-- http://meraka/moss/exampleBooks.owl#editedBy -->
+    <!-- http://meraka/moss/exampleBooks.owl#editedBy$ -->
 
-    <owl:ObjectProperty rdf:about="http://meraka/moss/exampleBooks.owl#editedBy">
+    <owl:ObjectProperty rdf:about="http://meraka/moss/exampleBooks.owl#editedBy$">
         <rdf:type rdf:resource="&owl;FunctionalProperty"/>
         <rdfs:domain rdf:resource="http://meraka/moss/exampleBooks.owl#Édition"/>
         <rdfs:range rdf:resource="http://meraka/moss/exampleBooks.owl#Editör"/>
@@ -210,7 +210,7 @@
     <owl:Class rdf:about="http://meraka/moss/exampleBooks.owl#Édition">
         <rdfs:subClassOf>
             <owl:Restriction>
-                <owl:onProperty rdf:resource="http://meraka/moss/exampleBooks.owl#editedBy"/>
+                <owl:onProperty rdf:resource="http://meraka/moss/exampleBooks.owl#editedBy$"/>
                 <owl:minCardinality rdf:datatype="&xsd;nonNegativeInteger">1</owl:minCardinality>
             </owl:Restriction>
         </rdfs:subClassOf>

@@ -27,14 +27,13 @@ import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.*;
+import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
 import java.io.File;
 
 public class QuestOWLExampleNotLatin {
@@ -95,7 +94,7 @@ public class QuestOWLExampleNotLatin {
 		String sparqlQuery =
 				"PREFIX : <http://meraka/moss/exampleBooks.owl#> \n" +
 				"SELECT DISTINCT ?x ?title ?author ?y ?genre ?edition \n" +
-				"WHERE { ?x a :книга; :title ?title; :النوع ?genre; :writtenBy ?y; :hasÉdition ?z. \n" +
+				"WHERE { ?x a :книга; :title ?title; :النوع ?genre; :writtenBy ?y; :hasÉdition ?z ; <http://meraka/moss/exampleBooks.owl#editedBy$> ?t .\n" +
 				"		 ?y a :作者; :name ?author. \n" +
 				"		 ?z a :Édition; :editionNumber ?edition }";
 

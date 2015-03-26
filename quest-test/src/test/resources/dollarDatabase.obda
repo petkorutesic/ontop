@@ -10,7 +10,7 @@ driverClass	org.h2.Driver
 
 [MappingDeclaration] @collection [[
 mappingId	mappingAddress
-target		:address$-{id} a :Address ; :inStreet {str$eet} ; :hasNumber$id {number$} ; :inCity {city} .
+target		<http://www.semanticweb.org/small$Database#address$-{id}> a :Address ; :inStreet {str$eet} ; <http://www.semanticweb.org/small$Database#hasNumber$id> {number$} ; :inCity {city} .
 source		select id, str$eet, number$, city from address$
 
 

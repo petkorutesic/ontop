@@ -44,6 +44,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /***
@@ -72,7 +73,7 @@ public class DollarMappingTest {
 			    try {
 			    	String text = new Scanner( new File("src/test/resources/dollarDatabase-h2.sql") ).useDelimiter("\\A").next();
 			    	s.execute(text);
-			    	//Server.startWebServer(sqlConnection);
+//			    	Server.startWebServer(sqlConnection);
 			    	 
 			    } catch(SQLException sqle) {
 			        System.out.println("Exception in creating db from script");
@@ -165,6 +166,7 @@ public class DollarMappingTest {
                 "   ?x a :Address; :inStreet ?y ;  <http://www.semanticweb.org/small$Database#hasNumber$id> ?z .\n" +
                 "}";
 		String val = runTests(query);
+        assertEquals( "<http://www.semanticweb.org/small$Database#address$-991>", val);
 
 	}
 

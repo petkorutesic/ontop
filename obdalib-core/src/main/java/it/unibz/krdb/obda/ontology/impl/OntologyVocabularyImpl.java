@@ -1,24 +1,16 @@
 package it.unibz.krdb.obda.ontology.impl;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
 import it.unibz.krdb.obda.model.DatatypeFactory;
 import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.ontology.ClassExpression;
-import it.unibz.krdb.obda.ontology.DataPropertyExpression;
-import it.unibz.krdb.obda.ontology.DataPropertyRangeExpression;
-import it.unibz.krdb.obda.ontology.DataRangeExpression;
-import it.unibz.krdb.obda.ontology.DataSomeValuesFrom;
-import it.unibz.krdb.obda.ontology.Datatype;
-import it.unibz.krdb.obda.ontology.OClass;
-import it.unibz.krdb.obda.ontology.ObjectPropertyExpression;
-import it.unibz.krdb.obda.ontology.ObjectSomeValuesFrom;
-import it.unibz.krdb.obda.ontology.OntologyFactory;
-import it.unibz.krdb.obda.ontology.OntologyVocabulary;
+import it.unibz.krdb.obda.ontology.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 public class OntologyVocabularyImpl implements OntologyVocabulary {
 
@@ -35,6 +27,7 @@ public class OntologyVocabularyImpl implements OntologyVocabulary {
 	private final Set<DataPropertyExpression> dataProperties = new HashSet<DataPropertyExpression>();
 
 	private final Set<DataPropertyExpression> auxDataProperties = new HashSet<DataPropertyExpression>();
+	private static final Logger log = LoggerFactory.getLogger(OntologyVocabularyImpl.class);
 	
 	// auxiliary symbols and built-in datatypes 
 	
@@ -68,7 +61,8 @@ public class OntologyVocabularyImpl implements OntologyVocabulary {
 	@Override
 	public OClass createClass(String uri) {
 		OClass cd = ofac.createClass(uri);
-		if (!cd.isNothing() && !cd.isThing())
+		if (cd.isNothing() )
+			log.debug("I'm nothing");
 			concepts.add(cd);
 		return cd;
 	}

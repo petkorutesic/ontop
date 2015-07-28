@@ -20,23 +20,9 @@ package it.unibz.krdb.obda.ontology.impl;
  * #L%
  */
 
-import it.unibz.krdb.obda.ontology.ClassAssertion;
-import it.unibz.krdb.obda.ontology.DataPropertyAssertion;
-import it.unibz.krdb.obda.ontology.DataPropertyExpression;
-import it.unibz.krdb.obda.ontology.DataRangeExpression;
-import it.unibz.krdb.obda.ontology.NaryAxiom;
-import it.unibz.krdb.obda.ontology.ObjectPropertyAssertion;
-import it.unibz.krdb.obda.ontology.ObjectPropertyExpression;
-import it.unibz.krdb.obda.ontology.Ontology;
-import it.unibz.krdb.obda.ontology.OntologyVocabulary;
-import it.unibz.krdb.obda.ontology.ClassExpression;
-import it.unibz.krdb.obda.ontology.BinaryAxiom;
+import it.unibz.krdb.obda.ontology.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class OntologyImpl implements Ontology {
 
@@ -90,10 +76,10 @@ public class OntologyImpl implements Ontology {
 	public void addSubClassOfAxiomWithReferencedEntities(ClassExpression concept1, ClassExpression concept2) {	
 		vocabulary.addReferencedEntries(concept1);
 		vocabulary.addReferencedEntries(concept2);
-		if (!concept1.isNothing() && !concept2.isThing()) {
+//		if (!concept1.isNothing() && !concept2.isThing()) {
 			BinaryAxiom<ClassExpression> assertion = new BinaryAxiomImpl<ClassExpression>(concept1, concept2);
 			subClassAxioms.add(assertion);
-		}
+//		}
 	}
 
 	@Override
@@ -128,10 +114,10 @@ public class OntologyImpl implements Ontology {
 	public void addSubClassOfAxiom(ClassExpression concept1, ClassExpression concept2) {
 		vocabulary.checkSignature(concept1);
 		vocabulary.checkSignature(concept2);
-		if (!concept1.isNothing() && !concept2.isThing()) {
+//		if (!concept1.isNothing() && !concept2.isThing()) {
 			BinaryAxiom<ClassExpression> ax = new BinaryAxiomImpl<ClassExpression>(concept1, concept2);
 			subClassAxioms.add(ax);
-		}
+//		}
 	}	
 
 	@Override

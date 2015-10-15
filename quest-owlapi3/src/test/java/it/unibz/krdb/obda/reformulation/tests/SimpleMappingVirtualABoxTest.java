@@ -44,6 +44,9 @@ import java.util.Properties;
 
 import junit.framework.TestCase;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
@@ -53,6 +56,9 @@ import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /***
  * A simple test that check if the system is able to handle Mappings for
  * classes/roles and attributes even if there are no URI templates. i.e., the
@@ -61,7 +67,7 @@ import org.slf4j.LoggerFactory;
  * We are going to create an H2 DB, the .sql file is fixed. We will map directly
  * there and then query on top.
  */
-public class SimpleMappingVirtualABoxTest extends TestCase {
+public class SimpleMappingVirtualABoxTest {
 
 	// TODO We need to extend this test to import the contents of the mappings
 	// into OWL and repeat everything taking form OWL
@@ -76,10 +82,8 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 	final String owlfile = "src/test/resources/test/simplemapping.owl";
 	final String obdafile = "src/test/resources/test/simplemapping.obda";
 
-	@Override
+	@Before
 	public void setUp() throws Exception {
-		
-		
 		/*
 		 * Initializing and H2 database with the stock exchange data
 		 */
@@ -94,6 +98,7 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 		Statement st = conn.createStatement();
 
 		FileReader reader = new FileReader("src/test/resources/test/simplemapping-create-h2.sql");
+
 		BufferedReader in = new BufferedReader(reader);
 		StringBuilder bf = new StringBuilder();
 		String line = in.readLine();
@@ -118,12 +123,10 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 		
 	}
 
-	@Override
+	@After
 	public void tearDown() throws Exception {
-	
 			dropTables();
 			conn.close();
-		
 	}
 
 	private void dropTables() throws SQLException, IOException {
@@ -155,12 +158,13 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 
 		QuestOWL reasoner = factory.createReasoner(ontology, new SimpleConfiguration());
 
-		// Now we are ready for querying
-		QuestOWLConnection conn = reasoner.getConnection();
-		QuestOWLStatement st = conn.createStatement();
 
 		String query = "PREFIX : <http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :A; :P ?y; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z; :P ?y; :U ?z; :P ?y ; :U ?z }";
-		try {
+		try (// Now we are ready for querying
+			 QuestOWLConnection conn = reasoner.getConnection();
+			 QuestOWLStatement st = conn.createStatement();
+			 QuestOWLResultSet rs = st.executeTuple(query);
+		){
 			
 			/*
 			 * Enable this if you want to test performance, it will run several cycles
@@ -173,7 +177,6 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 //			long end = System.currentTimeMillis();
 //			long elapsed = end-start;
 //			log.info("Elapsed time: {}", elapsed);
-			QuestOWLResultSet rs = st.executeTuple(query);
 			assertTrue(rs.nextRow());
 			OWLIndividual ind1 = rs.getOWLIndividual("x");
 			OWLIndividual ind2 = rs.getOWLIndividual("y");
@@ -181,22 +184,10 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 			assertEquals("<uri1>", ind1.toString());
 			assertEquals("<uri1>", ind2.toString());
 			assertEquals("\"value1\"", val.toString());
-			
-
-		} catch (Exception e) {
-			throw e;
-		} finally {
-			try {
-				st.close();
-			} catch (Exception e) {
-				throw e;
-			} finally {
-				conn.close();
-				reasoner.dispose();
-			}
 		}
 	}
 
+	@Test
 	public void testViEqSig() throws Exception {
 
 		QuestPreferences p = new QuestPreferences();
@@ -205,7 +196,8 @@ public class SimpleMappingVirtualABoxTest extends TestCase {
 
 		runTests(p);
 	}
-	
+
+	@Test
 	public void testClassicEqSig() throws Exception {
 
 		QuestPreferences p = new QuestPreferences();

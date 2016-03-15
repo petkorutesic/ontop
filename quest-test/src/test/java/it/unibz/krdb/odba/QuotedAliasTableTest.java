@@ -25,11 +25,10 @@ import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.ontology.Ontology;
-import it.unibz.krdb.obda.owlapi3.OWLAPI3TranslatorUtility;
+import it.unibz.krdb.obda.owlapi3.OWLAPITranslatorUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.*;
-import it.unibz.krdb.sql.api.TableJSQL;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +36,6 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLException;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +74,7 @@ public class QuotedAliasTableTest {
 		ontology = manager
 				.loadOntologyFromOntologyDocument((new File(owlfile)));
 
-		onto = OWLAPI3TranslatorUtility.translate(ontology);
+		onto = OWLAPITranslatorUtility.translate(ontology);
 
 		QuestPreferences p = new QuestPreferences();
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL);
@@ -182,12 +180,10 @@ public class QuotedAliasTableTest {
 		ModelIOManager ioManager = new ModelIOManager(obdaModel);
 		ioManager.load(obdafile);
 		// Creating a new instance of the reasoner
-		QuestOWLFactory factory = new QuestOWLFactory();
-		factory.setOBDAController(obdaModel);
-		factory.setPreferenceHolder(p);
 
-		reasonerOBDA = (QuestOWL) factory.createReasoner(ontology,
-				new SimpleConfiguration());
+        QuestOWLFactory factory = new QuestOWLFactory();
+        QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).preferences(p).build();
+        reasonerOBDA = factory.createReasoner(ontology, config);
 
 	}
 

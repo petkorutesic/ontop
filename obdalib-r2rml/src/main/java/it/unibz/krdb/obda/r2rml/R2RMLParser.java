@@ -29,6 +29,7 @@ import eu.optique.api.mapping.*;
 import eu.optique.api.mapping.TermMap.TermMapType;
 import eu.optique.api.mapping.impl.InvalidR2RMLMappingException;
 import eu.optique.api.mapping.impl.SubjectMapImpl;
+import eu.optique.api.mapping.impl.sesame.SesameR2RMLMappingManagerFactory;
 import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.DatatypePredicateImpl;
@@ -59,7 +60,7 @@ public class R2RMLParser {
 	 * empty constructor
 	 */
 	public R2RMLParser() {
-		mapManager = R2RMLMappingManagerFactory.getSesameMappingManager();
+        mapManager = new SesameR2RMLMappingManagerFactory().getR2RMLMappingManager();
 		classPredicates = new ArrayList<Predicate>();
 		joinPredObjNodes = new ArrayList<Resource>();
 	}
@@ -151,29 +152,37 @@ public class R2RMLParser {
 		// SubjectMap.getTemplateString() throws NullPointerException when
 		// template == null
 		//
-		if (sMap.getTemplate() == null) {
+		Template template = sMap.getTemplate();
+		if (template == null) {
 			subj = null;
 		} else {
 			subj = sMap.getTemplateString();
 		}
 
 		if (subj != null) {
-			// craete uri("...",var)
-			subjectAtom = getURIFunction((subj), joinCond);
+			// create uri("...",var)
+			subjectAtom = getTermTypeAtom(subj, termType, joinCond);
 		}
 
 		// process column declaration
 		subj = sMap.getColumn();
 		if (subj != null) {
-			// craete uri("...",var)
-			subjectAtom = getURIFunction((subj), joinCond);
+			if(template == null && (termType.equals(R2RMLVocabulary.iri))){
+
+				subjectAtom = fac.getUriTemplate(fac.getVariable(subj));
+
+			}
+			else {
+				// create uri("...",var)
+				subjectAtom = getTermTypeAtom(subj, termType, joinCond);
+			}
 		}
 
 		// process constant declaration
 		subj = sMap.getConstant();
 		if (subj != null) {
-			// craete uri("...",var)
-			subjectAtom = getURIFunction((subj), joinCond);
+			// create uri("...",var)
+			subjectAtom = getURIFunction(subj, joinCond);
 		}
 
 		// process termType declaration
@@ -228,7 +237,7 @@ public class R2RMLParser {
 		for (PredicateMap pm : pom.getPredicateMaps()) {
 			Template t = pm.getTemplate();
 			if (t != null) {
-				// craete uri("...",var)
+				// create uri("...",var)
 				Function predicateAtom = getURIFunction(t.toString());
 				predicateAtoms.add(predicateAtom);
 			}
@@ -306,8 +315,8 @@ public class R2RMLParser {
 			}
 		}
 
-		// we check if the object map is a column (can be only literal)
-		// if it has a datatype or language property we check it later
+		// we check if the object map is a column
+		// if it has a datatype or language property or its a iri we check it later
 		String col = om.getColumn();
 		if (col != null) {
 			col = trim(col);
@@ -355,6 +364,18 @@ public class R2RMLParser {
 					objectAtom = getTermTypeAtom(t.toString(), type, joinCond);
 				}
 			}
+		}
+		else{
+			//assign iri template
+			TermMapType termMapType = om.getTermMapType();
+			if(termMapType.equals(TermMapType.CONSTANT_VALUED)){
+
+			} else if(termMapType.equals(TermMapType.COLUMN_VALUED)){
+				if(typ.equals(R2RMLVocabulary.iri)) {
+					objectAtom = fac.getUriTemplate(objectAtom);
+				}
+			}
+
 		}
 
 		// we check if it is a literal with language tag

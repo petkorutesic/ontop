@@ -21,15 +21,17 @@ package it.unibz.krdb.obda.owlapi3;
  */
 
 import it.unibz.krdb.obda.io.TargetQueryVocabularyValidator;
-import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.model.Function;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.Predicate;
 import it.unibz.krdb.obda.model.Predicate.COL_TYPE;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.ontology.ImmutableOntologyVocabulary;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 // TODO: move to a more appropriate package
 
@@ -42,31 +44,36 @@ public class TargetQueryValidator implements TargetQueryVocabularyValidator {
 	private final OBDADataFactory dataFactory = OBDADataFactoryImpl.getInstance();
 
 	/** List of invalid predicates */
-	private Vector<String> invalidPredicates = new Vector<String>();
+	private List<String> invalidPredicates = new ArrayList<>();
+
+    @SuppressWarnings("unused")
+    Logger log = LoggerFactory.getLogger(this.getClass());
 
 	public TargetQueryValidator(ImmutableOntologyVocabulary voc) {
 		this.voc = voc;
 	}
 	
 	@Override
-	public boolean validate(CQIE targetQuery) {
+	public boolean validate(List<Function> targetQuery) {
 		// Reset the invalid list
 		invalidPredicates.clear();
 
 		// Get the predicates in the target query.
-		for (Function atom : targetQuery.getBody()) {
+		for (Function atom : targetQuery) {
 			Predicate p = atom.getFunctionSymbol();
 
 			boolean isClass = isClass(p);
 			boolean isObjectProp = isObjectProperty(p);
 			boolean isDataProp = isDataProperty(p);
+			boolean isAnnotProp = isAnnotationProperty(p);
 			boolean isTriple = isTriple(p);
+
 
 			// Check if the predicate contains in the ontology vocabulary as one
 			// of these components (i.e., class, object property, data property).
-			boolean isPredicateValid = isClass || isObjectProp || isDataProp || isTriple;
+			boolean isPredicateValid = isClass || isObjectProp || isDataProp || isAnnotProp || isTriple;
 
-			String debugMsg = "The predicate: [" + p.getName().toString() + "]";
+			String debugMsg = "The predicate: [" + p.getName() + "]";
 			if (isPredicateValid) {
 				Predicate predicate;
 				if (isClass) {
@@ -79,11 +86,16 @@ public class TargetQueryValidator implements TargetQueryVocabularyValidator {
 					predicate = dataFactory.getDataPropertyPredicate(p.getName(), COL_TYPE.LITERAL);
 					debugMsg += " is a Data property.";
 				}
+                else if (isAnnotProp){
+                    predicate =  dataFactory.getDataPropertyPredicate(p.getName(), COL_TYPE.LITERAL);
+                    debugMsg += " is an Annotation property.";
+                }
 				else
 					predicate = dataFactory.getPredicate(p.getName(), atom.getArity());
 				atom.setPredicate(predicate); // TODO Fix the API!
+//                log.debug(debugMsg);
 			} else {
-				invalidPredicates.add(p.getName().toString());
+				invalidPredicates.add(p.getName());
 			}
 		}
 		boolean isValid = true;
@@ -94,7 +106,7 @@ public class TargetQueryValidator implements TargetQueryVocabularyValidator {
 	}
 
 	@Override
-	public Vector<String> getInvalidPredicates() {
+	public List<String> getInvalidPredicates() {
 		return invalidPredicates;
 	}
 
@@ -111,6 +123,11 @@ public class TargetQueryValidator implements TargetQueryVocabularyValidator {
 	@Override
 	public boolean isDataProperty(Predicate predicate) {
 		return voc.containsDataProperty(predicate.getName());
+	}
+
+	@Override
+	public boolean isAnnotationProperty(Predicate predicate) {
+		return voc.containsAnnotationProperty(predicate.getName());
 	}
 	
 	@Override

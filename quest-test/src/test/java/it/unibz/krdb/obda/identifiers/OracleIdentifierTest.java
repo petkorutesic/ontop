@@ -33,7 +33,6 @@ import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLLiteral;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +40,7 @@ import java.io.File;
 
 /***
  * Tests that oracle identifiers for tables and columns are treated
- * correctly. Especially, that the unquoted identifers are treated as uppercase, and
+ * correctly. Especially, that the unquoted identifiers are treated as uppercase, and
  * that the case of quoted identifiers is not changed
  */
 public class OracleIdentifierTest extends TestCase {
@@ -76,12 +75,9 @@ public class OracleIdentifierTest extends TestCase {
 		p.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL);
 		p.setCurrentValueOf(QuestPreferences.OBTAIN_FULL_METADATA, QuestConstants.FALSE);
 		// Creating a new instance of the reasoner
-		QuestOWLFactory factory = new QuestOWLFactory();
-		factory.setOBDAController(obdaModel);
-
-		factory.setPreferenceHolder(p);
-
-		reasoner = (QuestOWL) factory.createReasoner(ontology, new SimpleConfiguration());
+        QuestOWLFactory factory = new QuestOWLFactory();
+        QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).preferences(p).build();
+        reasoner = factory.createReasoner(ontology, config);
 
 		// Now we are ready for querying
 		conn = reasoner.getConnection();

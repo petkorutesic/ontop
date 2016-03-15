@@ -23,7 +23,6 @@ package it.unibz.krdb.obda.model.impl;
 import it.unibz.krdb.obda.exception.DuplicateMappingException;
 import it.unibz.krdb.obda.io.PrefixManager;
 import it.unibz.krdb.obda.io.SimplePrefixManager;
-import it.unibz.krdb.obda.model.CQIE;
 import it.unibz.krdb.obda.model.Function;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDADataSource;
@@ -181,7 +180,7 @@ public class OBDAModelImpl implements OBDAModel {
 	@Override
 	public void fireSourceParametersUpdated() {
 		for (OBDAModelListener listener : sourceslisteners) {
-			listener.datasourcParametersUpdated();
+			listener.datasourceParametersUpdated();
 		}
 	}
 
@@ -386,7 +385,7 @@ public class OBDAModelImpl implements OBDAModel {
 	}
 
 	@Override
-	public void updateTargetQueryMapping(URI datasource_uri, String mapping_id, CQIE targetQuery) {
+	public void updateTargetQueryMapping(URI datasource_uri, String mapping_id, List<Function> targetQuery) {
 		OBDAMappingAxiom mapping = getMapping(datasource_uri, mapping_id);
 		if (mapping == null) {
 			return;
@@ -443,8 +442,7 @@ public class OBDAModelImpl implements OBDAModel {
 		for (OBDADataSource source : datasources.values()) {
 			ArrayList<OBDAMappingAxiom> mp = mappings.get(source.getSourceID());
 			for (OBDAMappingAxiom mapping : mp) {
-				CQIE cq = mapping.getTargetQuery();
-				List<Function> body = cq.getBody();
+				List<Function> body = mapping.getTargetQuery();
 				for (int idx = 0; idx < body.size(); idx++) {
 					Function oldatom = body.get(idx);
 					if (!oldatom.getFunctionSymbol().equals(oldname)) {
@@ -466,8 +464,7 @@ public class OBDAModelImpl implements OBDAModel {
 		for (OBDADataSource source : datasources.values()) {
 			List<OBDAMappingAxiom> mp = new ArrayList<OBDAMappingAxiom>(mappings.get(source.getSourceID()));
 			for (OBDAMappingAxiom mapping : mp) {
-				CQIE cq = mapping.getTargetQuery();
-				List<Function> body = cq.getBody();
+				List<Function> body = mapping.getTargetQuery();
 				for (int idx = 0; idx < body.size(); idx++) {
 					Function oldatom = body.get(idx);
 					if (!oldatom.getFunctionSymbol().equals(predicate)) {

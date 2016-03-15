@@ -31,7 +31,7 @@ import it.unibz.krdb.obda.model.impl.RDBMSourceParameterConstants;
 import it.unibz.krdb.obda.ontology.Ontology;
 import it.unibz.krdb.obda.ontology.OntologyVocabulary;
 import it.unibz.krdb.obda.ontology.impl.OntologyFactoryImpl;
-import it.unibz.krdb.obda.owlapi3.OWLAPI3TranslatorUtility;
+import it.unibz.krdb.obda.owlapi3.OWLAPITranslatorUtility;
 import it.unibz.krdb.obda.owlapi3.directmapping.DirectMappingEngine;
 import it.unibz.krdb.obda.owlrefplatform.core.Quest;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConnection;
@@ -40,8 +40,7 @@ import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
 import it.unibz.krdb.obda.owlrefplatform.core.abox.RDBMSSIRepositoryManager;
 import it.unibz.krdb.obda.r2rml.R2RMLReader;
 import it.unibz.krdb.sql.DBMetadata;
-import it.unibz.krdb.sql.ImplicitDBConstraints;
-
+import it.unibz.krdb.sql.ImplicitDBConstraintsReader;
 import org.openrdf.model.Model;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLOntology;
@@ -54,8 +53,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
 
 /***
  * A bean that holds all the data about a store, generates a store folder and
@@ -136,7 +135,7 @@ public class QuestDBVirtualStore extends QuestDBAbstractStore {
 	 * @param userConstraints - User-supplied database constraints (or null)
 	 * @throws Exception
 	 */
-	public QuestDBVirtualStore(String name, URI tboxFile, URI obdaUri, QuestPreferences config, ImplicitDBConstraints userConstraints) throws Exception {
+	public QuestDBVirtualStore(String name, URI tboxFile, URI obdaUri, QuestPreferences config, ImplicitDBConstraintsReader userConstraints) throws Exception {
 
 		super(name);
 
@@ -164,7 +163,7 @@ public class QuestDBVirtualStore extends QuestDBAbstractStore {
 			//read owl file
 			OWLOntology owlontology = getOntologyFromFile(tboxFile);
 			//get transformation from owlontology into ontology
-			 tbox = OWLAPI3TranslatorUtility.translateImportsClosure(owlontology);
+			 tbox = OWLAPITranslatorUtility.translateImportsClosure(owlontology);
 
 		} else { 
 			// create empty ontology
@@ -196,12 +195,20 @@ public class QuestDBVirtualStore extends QuestDBAbstractStore {
 		super(name);
 		
 		//obtain ontology
-		Ontology ontology = OWLAPI3TranslatorUtility.translateImportsClosure(tbox);
+		Ontology ontology = OWLAPITranslatorUtility.translateImportsClosure(tbox);
 		//obtain datasource
 		OBDADataSource source = getDataSourceFromConfig(config);
 		//obtain obdaModel
-		R2RMLReader reader = new R2RMLReader(mappings);
-		OBDAModel obdaModel = reader.readModel(source.getSourceID());
+		OBDAModel obdaModel;
+		if (mappings != null) {
+			R2RMLReader reader = new R2RMLReader(mappings);
+			obdaModel = reader.readModel(source.getSourceID());
+		}
+		else {
+			String baseIRI = Objects.requireNonNull(config.getProperty(QuestPreferences.BASE_IRI), "Base IRI is requires for direct mappings");
+			DirectMappingEngine dm = new DirectMappingEngine(baseIRI, 0);
+			obdaModel = dm.extractMappings(source);
+		}
 		//add data source to model
 		obdaModel.addSource(source);
 		//OBDAModelSynchronizer.declarePredicates(tbox, obdaModel);
@@ -262,7 +269,7 @@ private OBDADataSource getDataSourceFromConfig(QuestPreferences config) {
 	 * 
 	 * @param userConstraints
 	 */
-	public void setImplicitDBConstraints(ImplicitDBConstraints userConstraints){
+	public void setImplicitDBConstraints(ImplicitDBConstraintsReader userConstraints){
 		if(userConstraints == null)
 			throw new NullPointerException();
 		if(this.isinitalized)

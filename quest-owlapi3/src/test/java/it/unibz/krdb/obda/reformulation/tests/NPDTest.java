@@ -1,43 +1,30 @@
 package it.unibz.krdb.obda.reformulation.tests;
 
-import static org.junit.Assert.*;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.ontology.Ontology;
-import it.unibz.krdb.obda.owlapi3.OWLAPI3TranslatorUtility;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
-import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWL;
-import it.unibz.krdb.obda.owlrefplatform.owlapi3.QuestOWLFactory;
-
+import it.unibz.krdb.obda.owlrefplatform.owlapi3.*;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.IRI;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.semanticweb.owlapi.util.SimpleIRIMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.*;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class NPDTest {
 	
@@ -107,18 +94,62 @@ public class NPDTest {
 		pref.setCurrentValueOf(QuestPreferences.ABOX_MODE, QuestConstants.VIRTUAL);
 		pref.setCurrentValueOf(QuestPreferences.REFORMULATION_TECHNIQUE, QuestConstants.TW);
 		pref.setCurrentValueOf(QuestPreferences.REWRITE, QuestConstants.TRUE);
-		pref.setCurrentValueOf(QuestPreferences.PRINT_KEYS, QuestConstants.TRUE);
+		pref.setCurrentValueOf(QuestPreferences.PRINT_KEYS, QuestConstants.FALSE);
 
-		QuestOWLFactory factory = new QuestOWLFactory();
-		factory.setOBDAController(obdaModel);
-		factory.setPreferenceHolder(pref);
-		
 		setupDatabase();
+		QuestOWLFactory factory = new QuestOWLFactory();
+        QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).preferences(pref).build();
+        QuestOWL reasoner = factory.createReasoner(owlOnto, config);
 		
-		QuestOWL reasoner = factory.createReasoner(owlOnto, new SimpleConfiguration());
+		//QuestOWL reasoner = factory.createReasoner(owlOnto, new SimpleConfiguration());
 	
+
+			String q12 = 	"PREFIX : <http://sws.ifi.uio.no/vocab/npd-v2#>" +
+					"PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>" +
+					"PREFIX npd: <http://sws.ifi.uio.no/data/npd-v2/>" +
+					"PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>" +
+					"PREFIX npdv: <http://sws.ifi.uio.no/vocab/npd-v2#>" +
+					"SELECT DISTINCT ?unit ?well " +
+					"WHERE { " +
+					"[] npdv:wellboreStratumTopDepth     ?stratTop ; " +
+				    " npdv:wellboreStratumBottomDepth  ?stratBottom ; " +
+				    " npdv:stratumForWellbore          ?wellboreURI ; " +
+				    " npdv:inLithostratigraphicUnit [ npdv:name ?unit ] . "+
+				    "?wellboreURI npdv:name ?well . " +
+				    " "+
+				    "?core " + // "a npdv:WellboreCoreSample ; " +
+					"npdv:coreForWellbore ?wellboreURI ." +
+					"" +
+					"{ ?core npdv:coreIntervalUOM \"m\"^^xsd:string ; " +
+				    "	  npdv:coreIntervalTop     ?coreTopM ;" +
+				    " 	  npdv:coreIntervalBottom  ?coreBottomM ;" +
+				    "BIND(?coreTopM    AS ?coreTop) " +
+				    "BIND(?coreBottomM AS ?coreBottom) " +
+				    "}" +
+				    "UNION " +
+				    "{ ?core npdv:coreIntervalUOM \"ft\"^^xsd:string ; " +
+				    "	  npdv:coreIntervalTop     ?coreTopFT ; " +
+				    " 	  npdv:coreIntervalBottom  ?coreBottomFT ; " +
+				    "BIND((?coreTopFT    * 0.3048) AS ?coreTop) " +
+				    "BIND((?coreBottomFT * 0.3048) AS ?coreBottom) " +
+				    "} " +
+	                "" +
+//				    "BIND(IF(?coreTop > ?stratTop, ?coreTop, ?stratTop) AS ?max) " + 
+//				    "BIND(IF(?coreBottom < ?stratBottom, ?coreBottom, ?stratBottom) AS ?min) " +
+//				    " " +
+//				    "FILTER(?max < ?min) " +
+				    "} ORDER BY ?unit ?well";
+
+			QuestOWLConnection qconn =  reasoner.getConnection();
+			QuestOWLStatement st = qconn.createStatement();
+			
+			String unfolding = st.getUnfolding(q12);
+			st.close();
 		
+			//System.out.println(unfolding);
 	}
+	
+	
 	
 	public void setupDatabase() throws SQLException, IOException {
 		// String driver = "org.h2.Driver";
@@ -137,7 +168,7 @@ public class NPDTest {
 			for (String line = in.readLine(); line != null; line = in.readLine()) {
 				bf.append(line + "\n");
 				if (line.startsWith("--")) {
-					System.out.println("EXECUTING " + i++ + ":\n" + bf.toString());
+					//System.out.println("EXECUTING " + i++ + ":\n" + bf.toString());
 					st.executeUpdate(bf.toString());
 					conn.commit();
 					bf = new StringBuilder();
@@ -150,7 +181,8 @@ public class NPDTest {
 			int tbl = 0;
 			while (rsTables.next()) {
 				final String tblName = rsTables.getString("TABLE_NAME");
-				System.out.println("Table " + ++tbl + ": " + tblName);
+				tbl++;
+				//System.out.println("Table " + tbl + ": " + tblName);
 			}
 			assertEquals(tbl, 70);
 		}
@@ -165,7 +197,7 @@ public class NPDTest {
 				}
 			}
 		} 
-		System.out.println(pk);
+		//System.out.println(pk);
 
 		
 		try (ResultSet rsIndexes = md.getIndexInfo(null, null, "WELLBORE_CORE", true, true)) {
@@ -173,7 +205,7 @@ public class NPDTest {
 				String colName = rsIndexes.getString("COLUMN_NAME");
 				String indName = rsIndexes.getString("INDEX_NAME");
 				boolean nonUnique = rsIndexes.getBoolean("NON_UNIQUE");
-				System.out.println(indName + " " +colName + " " + nonUnique);
+				//System.out.println(indName + " " +colName + " " + nonUnique);
 			}
 		} 
 		

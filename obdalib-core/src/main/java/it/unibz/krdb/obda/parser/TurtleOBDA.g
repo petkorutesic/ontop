@@ -288,13 +288,20 @@ private class ColumnString implements FormatString {
 	
 	//this function returns nested concats 
 	//in case of more than two terms need to be concatted
-	private Function getNestedConcat(String str){
+	private Term getNestedConcat(String str){
 	   ArrayList<Term> terms = new ArrayList<Term>();
 	   terms = addToTermsList(str);
+	   if(terms.size() == 1){
+	      Variable v = (Variable) terms.get(0);
+          variableSet.add(v);
+          return v;
+	   }
+
 	   Function f = dfac.getFunctionConcat(terms.get(0),terms.get(1));
            for(int j=2;j<terms.size();j++){
               f = dfac.getFunctionConcat(f,terms.get(j));
            }
+
 	   return f;
 	}
 
@@ -378,22 +385,16 @@ private static boolean isRDFType(Term pred) {
  * PARSER RULES
  *------------------------------------------------------------------*/
 
-parse returns [CQIE value]
+parse returns [List<Function> value]
   : directiveStatement*
     t1=triplesStatement {
-      int arity = variableSet.size();
-      List<Term> distinguishVariables = new ArrayList<Term>(variableSet);
-      Function head = dfac.getFunction(dfac.getPredicate(OBDALibConstants.QUERY_HEAD, arity), distinguishVariables);
-      
-      // Create a new rule
-      List<Function> triples = $t1.value;
-      $value = dfac.getCQIE(head, triples);
+      $value =  $t1.value;
     }
       (t2=triplesStatement {
       List<Function> additionalTriples = $t2.value;
       if (additionalTriples != null) {
         // If there are additional triple statements then just add to the existing body
-        List<Function> existingBody = $value.getBody();
+        List<Function> existingBody = $value;
         existingBody.addAll(additionalTriples);
       }
     } )* EOF
@@ -592,7 +593,8 @@ concat returns [Function value]
 literal returns [Term value]
   : stringLiteral (AT language)? {
        Term lang = $language.value;
-       if (($stringLiteral.value) instanceof Function){
+       Term literal = $stringLiteral.value;
+       if (literal instanceof Function){
           Function f = (Function)$stringLiteral.value;
           if (lang != null){
              value = dfac.getTypedTerm(f,lang);
@@ -600,12 +602,20 @@ literal returns [Term value]
              value = dfac.getTypedTerm(f, COL_TYPE.LITERAL);
           }       
        }else{
+
+       //if variable we cannot assign a datatype yet
+       if (literal instanceof Variable)
+       {
+            value = dfac.getTypedTerm(literal, COL_TYPE.LITERAL);
+       }
+       else{
           ValueConstant constant = (ValueConstant)$stringLiteral.value;
           if (lang != null) {
 	     value = dfac.getTypedTerm(constant, lang);
           } else {
       	     value = dfac.getTypedTerm(constant, COL_TYPE.LITERAL);
           }
+       }
        }
     }
   | dataTypeString { $value = $dataTypeString.value; }
@@ -626,25 +636,24 @@ stringLiteral returns [Term value]
 
 dataTypeString returns [Term value]
   :  stringLiteral REFERENCE resource {
-      if (($stringLiteral.value) instanceof Function){
-          Function f = (Function)$stringLiteral.value;
-          value = dfac.getTypedTerm(f, COL_TYPE.LITERAL);
-      }else{
-          ValueConstant constant = (ValueConstant)$stringLiteral.value;
-          String functionName = $resource.value.toString();
-          Predicate functionSymbol = null;
+      Term stringValue = $stringLiteral.value;
+
           if ($resource.value instanceof Function){
-	    functionName = ( (ValueConstant) ((Function)$resource.value).getTerm(0) ).getValue();
+          	    String functionName = ( (ValueConstant) ((Function)$resource.value).getTerm(0) ).getValue();
+
+                    Predicate.COL_TYPE type = dtfac.getDatatype(functionName);
+                    if (type == null) {
+                      throw new RuntimeException("Unsupported datatype: " + functionName);
+                    }
+                    $value = dfac.getTypedTerm(stringValue, type);
+                    }
+           else {
+          value = dfac.getTypedTerm(stringValue, COL_TYPE.LITERAL);
           }
-          Predicate.COL_TYPE type = dtfac.getDatatype(functionName);
-          if (type == null) {
-            throw new RuntimeException("Unsupported datatype: " + functionName);
-          }
-          $value = dfac.getTypedTerm(constant, type);
-      }
+
   };
 
-numericLiteral returns [ValueConstant value]
+numericLiteral returns [Term value]
   : numericUnsigned { $value = $numericUnsigned.value; }
   | numericPositive { $value = $numericPositive.value; }
   | numericNegative { $value = $numericNegative.value; }
@@ -674,27 +683,59 @@ languageTag
   : VARNAME
   ;
 
-booleanLiteral returns [ValueConstant value]
-  : TRUE  { $value = dfac.getConstantLiteral($TRUE.text, COL_TYPE.BOOLEAN); }
-  | FALSE { $value = dfac.getConstantLiteral($FALSE.text, COL_TYPE.BOOLEAN); }
+booleanLiteral returns [Term value]
+  : TRUE  {
+  ValueConstant trueConstant = dfac.getConstantLiteral($TRUE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(trueConstant, COL_TYPE.BOOLEAN); }
+  | FALSE {
+  ValueConstant falseConstant = dfac.getConstantLiteral($FALSE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(falseConstant, COL_TYPE.BOOLEAN);
+  }
   ;
 
-numericUnsigned returns [ValueConstant value]
-  : INTEGER { $value = dfac.getConstantLiteral($INTEGER.text, COL_TYPE.INTEGER); }
-  | DOUBLE  { $value = dfac.getConstantLiteral($DOUBLE.text, COL_TYPE.DOUBLE); }
-  | DECIMAL { $value = dfac.getConstantLiteral($DECIMAL.text, COL_TYPE.DECIMAL); }
+numericUnsigned returns [Term value]
+  : INTEGER {
+  ValueConstant integerConstant = dfac.getConstantLiteral($INTEGER.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(integerConstant, COL_TYPE.INTEGER);
+  }
+  | DOUBLE  {
+  ValueConstant doubleConstant = dfac.getConstantLiteral($DOUBLE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(doubleConstant, COL_TYPE.DOUBLE);
+  }
+  | DECIMAL {
+  ValueConstant decimalConstant = dfac.getConstantLiteral($DECIMAL.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(decimalConstant, COL_TYPE.DECIMAL);
+   }
   ;
 
-numericPositive returns [ValueConstant value]
-  : INTEGER_POSITIVE { $value = dfac.getConstantLiteral($INTEGER_POSITIVE.text, COL_TYPE.INTEGER); }
-  | DOUBLE_POSITIVE  { $value = dfac.getConstantLiteral($DOUBLE_POSITIVE.text, COL_TYPE.DOUBLE); }
-  | DECIMAL_POSITIVE { $value = dfac.getConstantLiteral($DECIMAL_POSITIVE.text, COL_TYPE.DECIMAL); }
+numericPositive returns [Term value]
+  : INTEGER_POSITIVE {
+   ValueConstant integerConstant = dfac.getConstantLiteral($INTEGER_POSITIVE.text, COL_TYPE.LITERAL);
+   $value = dfac.getTypedTerm(integerConstant, COL_TYPE.INTEGER);
+  }
+  | DOUBLE_POSITIVE  {
+  ValueConstant doubleConstant = dfac.getConstantLiteral($DOUBLE_POSITIVE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(doubleConstant, COL_TYPE.DOUBLE);
+  }
+  | DECIMAL_POSITIVE {
+  ValueConstant decimalConstant = dfac.getConstantLiteral($DECIMAL_POSITIVE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(decimalConstant, COL_TYPE.DECIMAL);
+   }
   ;
 
-numericNegative returns [ValueConstant value]
-  : INTEGER_NEGATIVE { $value = dfac.getConstantLiteral($INTEGER_NEGATIVE.text, COL_TYPE.INTEGER); }
-  | DOUBLE_NEGATIVE  { $value = dfac.getConstantLiteral($DOUBLE_NEGATIVE.text, COL_TYPE.DOUBLE); }
-  | DECIMAL_NEGATIVE { $value = dfac.getConstantLiteral($DECIMAL_NEGATIVE.text, COL_TYPE.DECIMAL); }
+numericNegative returns [Term value]
+  : INTEGER_NEGATIVE {
+  ValueConstant integerConstant = dfac.getConstantLiteral($INTEGER_NEGATIVE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(integerConstant, COL_TYPE.INTEGER);
+  }
+  | DOUBLE_NEGATIVE  {
+   ValueConstant doubleConstant = dfac.getConstantLiteral($DOUBLE_NEGATIVE.text, COL_TYPE.LITERAL);
+   $value = dfac.getTypedTerm(doubleConstant, COL_TYPE.DOUBLE);
+  }
+  | DECIMAL_NEGATIVE {
+  ValueConstant decimalConstant = dfac.getConstantLiteral($DECIMAL_NEGATIVE.text, COL_TYPE.LITERAL);
+  $value = dfac.getTypedTerm(decimalConstant, COL_TYPE.DECIMAL);
+  }
   ;
 
 /*------------------------------------------------------------------
@@ -784,9 +825,9 @@ INTEGER
   ;
 
 DOUBLE
-  : DIGIT+ PERIOD DIGIT* ('e'|'E') ('-'|'+')?
-  | PERIOD DIGIT+ ('e'|'E') ('-'|'+')?
-  | DIGIT+ ('e'|'E') ('-'|'+')?
+  : DIGIT+ PERIOD DIGIT* ('e'|'E') ('-'|'+')? DIGIT*
+  | PERIOD DIGIT+ ('e'|'E') ('-'|'+')? DIGIT*
+  | DIGIT+ ('e'|'E') ('-'|'+')? DIGIT*
   ;
 
 DECIMAL

@@ -43,10 +43,10 @@ public class TargetQueryRenderer {
 	 * Transforms the given <code>OBDAQuery</code> into a string. The method requires
 	 * a prefix manager to shorten full IRI name.
 	 */
-	public static String encode(CQIE input, PrefixManager prefixManager) {
+	public static String encode(List<Function> input, PrefixManager prefixManager) {
 		
 		TurtleWriter turtleWriter = new TurtleWriter();
-		List<Function> body = ((CQIE) input).getBody();
+		List<Function> body = input;
 		for (Function atom : body) {
 			String subject, predicate, object = "";
 			String originalString = atom.getFunctionSymbol().toString();
@@ -146,11 +146,11 @@ public class TargetQueryRenderer {
 	 */
 	private static String getDisplayName(Term term, PrefixManager prefixManager) {
 		StringBuilder sb = new StringBuilder();
-		if (term instanceof FunctionalTermImpl) {
-			FunctionalTermImpl function = (FunctionalTermImpl) term;
+		if (term instanceof Function) {
+			Function function = (Function) term;
 			Predicate functionSymbol = function.getFunctionSymbol();
 			String fname = getAbbreviatedName(functionSymbol.toString(), prefixManager, false);
-			if (functionSymbol instanceof DatatypePredicate) {
+			if (function.isDataTypeFunction()) {
 				// if the function symbol is a data type predicate
 				if (dtfac.isLiteral(functionSymbol)) {
 					// if it is rdfs:Literal
@@ -207,13 +207,13 @@ public class TargetQueryRenderer {
 					sb.append(">");
 				}		
 				}
-			} else if (functionSymbol instanceof StringOperationPredicate) { //Concat
+			} 
+			else if (functionSymbol == ExpressionOperation.CONCAT) { //Concat
 				List<Term> terms = function.getTerms();
 				sb.append("\"");
 				getNestedConcats(sb, terms.get(0),terms.get(1));
 				sb.append("\"");
 				//sb.append("^^rdfs:Literal");
-
 			} else if (functionSymbol instanceof BNodePredicate) {
 				//function is a BNODE
 				List<Term> terms = function.getTerms();

@@ -20,20 +20,13 @@ package it.unibz.krdb.obda.io;
  * #L%
  */
 
-import it.unibz.krdb.obda.exception.DuplicateMappingException;
-import it.unibz.krdb.obda.exception.Indicator;
-import it.unibz.krdb.obda.exception.InvalidMappingException;
-import it.unibz.krdb.obda.exception.InvalidPredicateDeclarationException;
-import it.unibz.krdb.obda.exception.UnsupportedTagException;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.OBDADataFactory;
-import it.unibz.krdb.obda.model.OBDADataSource;
-import it.unibz.krdb.obda.model.OBDAMappingAxiom;
-import it.unibz.krdb.obda.model.OBDAModel;
-import it.unibz.krdb.obda.model.OBDASQLQuery;
-
+import it.unibz.krdb.obda.exception.*;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.RDBMSourceParameterConstants;
-import it.unibz.krdb.obda.parser.*;
+import it.unibz.krdb.obda.parser.TargetQueryParser;
+import it.unibz.krdb.obda.parser.TargetQueryParserException;
+import it.unibz.krdb.obda.parser.TurtleOBDASyntaxParser;
+import it.unibz.krdb.obda.parser.UnparsableTargetQueryException;
 import it.unibz.krdb.obda.renderer.SourceQueryRenderer;
 import it.unibz.krdb.obda.renderer.TargetQueryRenderer;
 import org.slf4j.Logger;
@@ -90,7 +83,6 @@ public class ModelIOManager {
 
         // Register available parsers for target query
         register(new TurtleOBDASyntaxParser(prefixManager));
-        register(new TurtleSyntaxParser(prefixManager));
     }
     
     private void register(TargetQueryParser parser) {
@@ -154,7 +146,6 @@ public class ModelIOManager {
      * @param file
      *          The target file object from which the model is loaded.
      * @throws IOException
-     * @throws InvalidPredicateDeclarationException
      * @throws InvalidMappingException 
      */
     public void load(File file) throws IOException, InvalidMappingException {
@@ -270,7 +261,7 @@ public class ModelIOManager {
             }
             writer.write(Label.mappingId.name() + "\t" + mapping.getId() + "\n");
             
-            CQIE targetQuery = mapping.getTargetQuery();
+            List<Function> targetQuery = mapping.getTargetQuery();
             writer.write(Label.target.name() + "\t\t" + printTargetQuery(targetQuery) + "\n");
             
             OBDASQLQuery sourceQuery = mapping.getSourceQuery();
@@ -281,7 +272,7 @@ public class ModelIOManager {
         writer.write("\n\n");
     }
 
-    private String printTargetQuery(CQIE query) {
+    private String printTargetQuery(List<Function> query) {
     	return TargetQueryRenderer.encode(query, prefixManager);
     }
     
@@ -334,7 +325,7 @@ public class ModelIOManager {
                     /**
                      * This is harmless when you do not need to do query answering
                      */
-                    log.warn("JDBC driver \"{}\" is not available on the class path! Query answering service will be unavailable!", inputParamter );
+                    // log.warn("JDBC driver \"{}\" is not available on the class path! Query answering service will be unavailable!", inputParamter );
 
                 }
                 datasource.setParameter(RDBMSourceParameterConstants.DATABASE_DRIVER, inputParamter);
@@ -352,7 +343,7 @@ public class ModelIOManager {
         String mappingId = "";
         String currentLabel = ""; // the reader is working on which label
         StringBuffer sourceQuery = null;
-        CQIE targetQuery = null;
+        List<Function> targetQuery = null;
         int wsCount = 0;  // length of whitespace used as the separator
         boolean isMappingValid = true; // a flag to load the mapping to the model if valid
         
@@ -441,8 +432,8 @@ public class ModelIOManager {
         }
     }
 
-	private CQIE loadTargetQuery(String targetString) throws UnparsableTargetQueryException {
-        Map<TargetQueryParser, TargetQueryParserException> exceptions = new HashMap<TargetQueryParser, TargetQueryParserException>();
+	private List<Function> loadTargetQuery(String targetString) throws UnparsableTargetQueryException {
+        Map<TargetQueryParser, TargetQueryParserException> exceptions = new HashMap<>();
 		for (TargetQueryParser parser : getParsers()) {
             try {
             	return parser.parse(targetString);
@@ -472,9 +463,10 @@ public class ModelIOManager {
         list.add(indicator);
     }
 
-    private void saveMapping(URI dataSourceUri, String mappingId, String sourceQuery, CQIE targetQuery) {
+    private void saveMapping(URI dataSourceUri, String mappingId, String sourceQuery, List<Function> targetQuery) {
         try {
-            OBDAMappingAxiom mapping = dataFactory.getRDBMSMappingAxiom(mappingId, sourceQuery, targetQuery);
+            OBDAMappingAxiom mapping = dataFactory.getRDBMSMappingAxiom(mappingId, 
+            		dataFactory.getSQLQuery(sourceQuery), targetQuery);
             model.addMapping(dataSourceUri, mapping);
         } catch (DuplicateMappingException e) {
             // NO-OP: Ignore it as duplicates won't be loaded to the model

@@ -22,18 +22,7 @@ package it.unibz.krdb.obda.renderer;
 
 import it.unibz.krdb.obda.io.PrefixManager;
 import it.unibz.krdb.obda.io.SimplePrefixManager;
-import it.unibz.krdb.obda.model.CQIE;
-import it.unibz.krdb.obda.model.Constant;
-import it.unibz.krdb.obda.model.DatatypePredicate;
-import it.unibz.krdb.obda.model.DatatypeFactory;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.Predicate;
-import it.unibz.krdb.obda.model.StringOperationPredicate;
-import it.unibz.krdb.obda.model.Term;
-import it.unibz.krdb.obda.model.URIConstant;
-import it.unibz.krdb.obda.model.URITemplatePredicate;
-import it.unibz.krdb.obda.model.ValueConstant;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.FunctionalTermImpl;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
 import it.unibz.krdb.obda.model.impl.OBDAVocabulary;
@@ -224,7 +213,22 @@ public class TargetQueryRenderer {
 				getNestedConcats(sb, terms.get(0),terms.get(1));
 				sb.append("\"");
 				//sb.append("^^rdfs:Literal");
-			} else { // for any ordinary function symbol
+
+			} else if (functionSymbol instanceof BNodePredicate) {
+				//function is a BNODE
+				List<Term> terms = function.getTerms();
+				sb.append("_:");
+
+				boolean separator = false;
+				for (Term innerTerm : function.getTerms()) {
+					if (separator) {
+						sb.append("_");
+					}
+					sb.append(getDisplayName(innerTerm, prefixManager));
+					separator = true;
+				}
+			}
+			else { // for any ordinary function symbol
 				sb.append(fname);
 				sb.append("(");
 				boolean separator = false;

@@ -52,7 +52,7 @@ public class URITemplatesTest {
 
         Function f1 = FACTORY.getUriTemplate(FACTORY.getConstantLiteral("http://example.org/{}/{}"), //
                 FACTORY.getVariable("X"), FACTORY.getVariable("Y"));
-        assertEquals("http://example.org/{X}/{Y}", URITemplates.getUriTemplateString(f1));
+        assertEquals("http://example.org/{X}/{Y}", URITemplates.getTemplateString(f1));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class URITemplatesTest {
 
         Function f1 = FACTORY.getUriTemplate(FACTORY.getConstantLiteral("{}"), //
                 FACTORY.getVariable("X"));
-        assertEquals("{X}", URITemplates.getUriTemplateString(f1));
+        assertEquals("{X}", URITemplates.getTemplateString(f1));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class URITemplatesTest {
 
         Function f1 = FACTORY.getUriTemplate(FACTORY.getConstantLiteral("{}/"), //
                 FACTORY.getVariable("X"));
-        assertEquals("{X}/", URITemplates.getUriTemplateString(f1));
+        assertEquals("{X}/", URITemplates.getTemplateString(f1));
     }
 
     @Test
@@ -79,7 +79,7 @@ public class URITemplatesTest {
 
         Function f1 = FACTORY.getUriTemplate(FACTORY.getConstantLiteral("http://example.org/{}/{}/"), //
                 FACTORY.getVariable("X"), FACTORY.getVariable("Y"));
-        assertEquals("http://example.org/{X}/{Y}/", URITemplates.getUriTemplateString(f1));
+        assertEquals("http://example.org/{X}/{Y}/", URITemplates.getTemplateString(f1));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class URITemplatesTest {
 
         Function f1 = FACTORY.getUriTemplate(FACTORY.getConstantLiteral("http://example.org/{}/{}/{}"), //
                 FACTORY.getVariable("X"), FACTORY.getVariable("Y"),FACTORY.getVariable("X"));
-        assertEquals("http://example.org/{X}/{Y}/{X}", URITemplates.getUriTemplateString(f1));
+        assertEquals("http://example.org/{X}/{Y}/{X}", URITemplates.getTemplateString(f1));
     }
 
     @Test

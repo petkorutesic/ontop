@@ -149,7 +149,7 @@ public class R2RMLParser {
 		TermMapType subjectTermType = sm.getTermMapType();
 
 		// WORKAROUND for:
-		// SubjectMap.getTemplateString() throws NullPointerException when
+		// SubjectMap.getURITemplateString() throws NullPointerException when
 		// template == null
 		//
 		Template template = sMap.getTemplate();

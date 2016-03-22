@@ -2,11 +2,10 @@
 owl:		http://www.w3.org/2002/07/owl#
 rdf:		http://www.w3.org/1999/02/22-rdf-syntax-ns#
 xsd:		http://www.w3.org/2001/XMLSchema#
-quest:		http://obda.org/quest#
 rdfs:		http://www.w3.org/2000/01/rdf-schema#
 
 [SourceDeclaration]
-sourceUri	1d47cf72-103b-43cc-ac44-1f2b5c7d432e
+sourceUri	89f5fee0-d7e4-4377-98d7-e2773ec87896
 connectionUrl	jdbc:h2:mem:questjunitdb-noprimarykeys
 username	sa
 password	
@@ -15,6 +14,6 @@ driverClass	org.h2.Drive
 [MappingDeclaration] @collection [[
 mappingId	MAPPING-ID1
 target		_:{ATTR1}_{ATTR2} a <http://www.example.org/TABLE1> ; <http://www.example.org/TABLE1#ATTR1> {ATTR1}^^xsd:integer ; <http://www.example.org/TABLE1#ATTR2> {ATTR2}^^xsd:integer . 
-source		SELECT * FROM "TABLE1"
+source		SELECT * FROM "PUBLIC"."TABLE1"
 ]]
 

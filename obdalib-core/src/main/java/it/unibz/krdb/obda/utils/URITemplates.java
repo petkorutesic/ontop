@@ -23,15 +23,11 @@ package it.unibz.krdb.obda.utils;
 import com.google.common.base.Splitter;
 import it.unibz.krdb.obda.exception.InvalidPrefixWritingException;
 import it.unibz.krdb.obda.io.PrefixManager;
-import it.unibz.krdb.obda.model.Function;
-import it.unibz.krdb.obda.model.ValueConstant;
-import it.unibz.krdb.obda.model.Variable;
+import it.unibz.krdb.obda.model.*;
 import it.unibz.krdb.obda.model.impl.TermUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A utility class for URI templates
@@ -103,6 +99,14 @@ public class URITemplates {
      * URI("http://example.org/{}/{}/{}", X, Y, X) -> "http://example.org/{X}/{Y}/{X}"
      * </pre>
      *
+     * TODO:
+     *
+     * Converts a BNode function to a BNode template
+     *
+     * For instance,
+     *
+     * BNode(X,Y) -> "_:{X}_{Y}"
+     *
      * @param uriFunction URI Function
      * @return a URI template with variable names inside the placeholders
      */
@@ -137,6 +141,22 @@ public class URITemplates {
         return templateWithVars.toString();
     }
 
+    public static String getTemplateString(Function uriFunction) {
+        if (uriFunction.getFunctionSymbol() instanceof BNodePredicate) {
+            //function is a BNODE
+            String prefixBNode = "_:";
+            List<Variable> varList = new ArrayList<>();
+            TermUtils.addReferencedVariablesTo(varList, uriFunction);
+            StringBuilder templateWithVars = new StringBuilder();
+            templateWithVars.append(prefixBNode);
+            templateWithVars.append(varList.stream().
+                    map(x -> "{" + x + "}").collect(Collectors.joining("_")));
+
+            return templateWithVars.toString();
+        }
+        else return getUriTemplateString(uriFunction);
+    }
+
     public static String getUriTemplateString(Function uriTemplate, PrefixManager prefixmng) {
         String template = getUriTemplateString(uriTemplate);
         try {
@@ -146,6 +166,4 @@ public class URITemplates {
         }
         return template;
     }
-
-
 }

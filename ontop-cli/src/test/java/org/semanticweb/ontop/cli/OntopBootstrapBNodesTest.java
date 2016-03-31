@@ -47,6 +47,8 @@ public class OntopBootstrapBNodesTest {
     private final String baseUri = "http://www.example.org/";
     private final String owlFile = "src/test/resources/test/bootstrapped-test-bnodes1.owl";
     private final String jdbcDriverClass = "org.h2.Drive";
+    private final String rdfFile = "src/test/resources/test/r2rml.ttl";
+
 
     @Before
     public void setUp() throws Exception {
@@ -135,7 +137,13 @@ public class OntopBootstrapBNodesTest {
 
         R2RMLWriter writer = new R2RMLWriter( model, sourceID, dm.getOntology());
 
-        writer.write(new File("r2rml.ttl"));
+
+        writer.write(new File(rdfFile));
+        String[] argv = {"mapping", "pretty-r2rml",
+                "-i", rdfFile,
+                "-o", rdfFile
+        };
+        Ontop.main(argv);
 
     }
   }

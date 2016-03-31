@@ -278,9 +278,11 @@ public class OBDAMappingTransformer {
 		String subjectTemplate =  URITemplates.getTemplateString(uriTemplate, prefixmng);
 		Template templs = mfact.createTemplate(subjectTemplate);
 		SubjectMap sm = mfact.createSubjectMap(templs);
-		
+        //
+		if (uriTemplate.getFunctionSymbol() instanceof BNodePredicate)
+			sm.setTermType(R2RMLVocabulary.blankNode);
 		TriplesMap tm = mfact.createTriplesMap(lt, sm);
-		
+
 		//process target query
 		for (Function func : tquery) {
 			random_number = IDGenerator.getNextUniqueID("");

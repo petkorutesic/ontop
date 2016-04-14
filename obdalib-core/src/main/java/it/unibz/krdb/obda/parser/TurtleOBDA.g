@@ -470,7 +470,7 @@ objectList returns [List<Term> value]
 subject returns [Term value]
   : resource { $value = $resource.value; }
   | variable { $value = $variable.value; }
-//  | blank
+  | blank { $value = $blank.value;}
   ;
 
 //predicate returns [String value]
@@ -492,7 +492,7 @@ object returns [Term value]
   | literal  { $value = $literal.value; }
   | typedLiteral { $value = $typedLiteral.value; }
   | variable { $value = $variable.value; }
-//  | blank
+  | blank { $value = $blank.value; }
   ;
 
 resource returns [Term value]
@@ -514,9 +514,15 @@ qname returns [String value]
     }
   ;
 
-blank
-  : nodeID
-  | BLANK
+blank returns [Term value]
+  : nodeID {
+        List<Term> t = new LinkedList<Term>();
+        $value = dfac.getBNodeTemplate(t);
+    }
+  | BLANK {
+        List<Term> t = new LinkedList<Term>();
+        $value = dfac.getBNodeTemplate(t);
+    }
   ;
 
 variable returns [Variable value]

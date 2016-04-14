@@ -278,6 +278,25 @@ public class TurtleSyntaxParserTest  {
 
 	}
 
+	// The following tests are checking Bnode syntax
+	@Test
+	public void test_9_3() {
+		final boolean result = parse("[] :hasFather :Person-{id} .");
+		assertTrue(result);
+	}
+
+	@Test
+	public void test_9_4() {
+		final boolean result = parse("[] :hasFather [] .");
+		assertTrue(result);
+	}
+
+	@Test
+	public void test_9_5() {
+		final boolean result = parse("[] :hasFather _:k .");
+		assertTrue(result);
+	}
+
 		//Test for value constant
 		@Test
 	public void test10() {

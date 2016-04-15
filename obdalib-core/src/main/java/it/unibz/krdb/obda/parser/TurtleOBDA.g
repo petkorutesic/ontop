@@ -111,8 +111,8 @@ public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet foll
 /** Map of directives */
 private HashMap<String, String> directives = new HashMap<String, String>();
 
-/** The current subject term */
-private Term currentSubject;
+/** Additional atoms generated as the consequence of the complex nesting of bnodes*/
+private List<Function> additionalBNodeAtoms;
 
 /** All variables */
 private Set<Term> variableSet = new HashSet<Term>();
@@ -378,9 +378,20 @@ private static boolean isRDFType(Term pred) {
 		return false;
 	}
 
+
+
+/**
+ * This method creates unique Bnode
+ *
+ */
+private Function createBNode() {
+    Function f;
+    List<Term> emptyTermList = new LinkedList<Term>();
+    f = dfac.getBNodeTemplate(emptyTermList);
+    return f;
 }
 
-
+} /** close of @members */
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
@@ -405,6 +416,16 @@ directiveStatement
   ;
 
 triplesStatement returns [List<Function> value]
+ @init {
+    additionalBNodeAtoms = new LinkedList<Function>();
+ }
+ @after {
+     if (additionalBNodeAtoms != null && !additionalBNodeAtoms.isEmpty() ) {
+         // If there are additional attoms which were made through nesting of bnodes
+         $value.addAll(additionalBNodeAtoms);
+     }
+  }
+
   : triples WS* PERIOD { $value = $triples.value; }
   ;
 
@@ -428,24 +449,32 @@ prefixID
   ;
 
 triples returns [List<Function> value]
-  : subject { currentSubject = $subject.value; } predicateObjectList {
+  : subject predicateObjectList[$subject.value] {
       $value = $predicateObjectList.value;
     }
+
+  | LSQ_BRACKET {
+        Term localSubject = createBNode();
+    }
+    l=predicateObjectList[localSubject]{
+        $value = $predicateObjectList.value;
+    }
+    RSQ_BRACKET
   ;
 
-predicateObjectList returns [List<Function> value]
+predicateObjectList[Term subject] returns [List<Function> value]
 @init {
    $value = new LinkedList<Function>();
 }
   : v1=verb  l1= objectList{
       for (Term object : $l1.value) {
-        Function atom = makeAtom(currentSubject, $v1.value, object);
+        Function atom = makeAtom($subject, $v1.value, object);
         $value.add(atom);
       }
     } 
     (SEMI v2=verb l2=objectList {
       for (Term object : $l2.value) {
-        Function atom = makeAtom(currentSubject, $v2.value, object);
+        Function atom = makeAtom($subject, $v2.value, object);
         $value.add(atom);
       }
     })*
@@ -464,8 +493,10 @@ objectList returns [List<Term> value]
 @init {
   $value = new ArrayList<Term>();
 }
-  : o1=object { $value.add($o1.value); } (COMMA o2=object { $value.add($o2.value); })* 
+  : o1=object { $value.add($o1.value); } (COMMA o2=object { $value.add($o2.value); })*
   ;
+
+
 
 subject returns [Term value]
   : resource { $value = $resource.value; }
@@ -488,11 +519,33 @@ predicate returns [Term value]
   ;
 
 object returns [Term value]
+  : simpleObject {$value = $simpleObject.value; }
+  | bnodeObject {$value = $bnodeObject.value; }
+  ;
+
+simpleObject returns [Term value]
   : resource { $value = $resource.value; }
   | literal  { $value = $literal.value; }
   | typedLiteral { $value = $typedLiteral.value; }
   | variable { $value = $variable.value; }
   | blank { $value = $blank.value; }
+  ;
+
+bnodeObject returns [Term value]
+  : LSQ_BRACKET {
+        Term localSubject = createBNode();
+        $value = localSubject;
+  }
+    l1=predicateObjectList[localSubject]  {
+
+        /*
+            we create bnode for this object and add it as a subject for all triples which can be created from
+            objectList elements
+        */
+        additionalBNodeAtoms.addAll($l1.value);
+
+     }
+    RSQ_BRACKET
   ;
 
 resource returns [Term value]
@@ -516,12 +569,10 @@ qname returns [String value]
 
 blank returns [Term value]
   : nodeID {
-        List<Term> t = new LinkedList<Term>();
-        $value = dfac.getBNodeTemplate(t);
+        $value = createBNode();
     }
   | BLANK {
-        List<Term> t = new LinkedList<Term>();
-        $value = dfac.getBNodeTemplate(t);
+        $value = createBNode();
     }
   ;
 

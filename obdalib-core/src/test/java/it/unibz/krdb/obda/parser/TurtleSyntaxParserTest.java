@@ -297,6 +297,53 @@ public class TurtleSyntaxParserTest  {
 		assertTrue(result);
 	}
 
+	//Nested bnodes
+	@Test
+	public void test_9_6() {
+		final boolean result = parse("[] :hasFather [ :hasFather Person-{id}, Mother  ] .");
+		assertTrue(result);
+	}
+
+	//This works in current parser implementation, but actually shouldnt work
+	@Test
+	public void test_9_6_false_1() {
+		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother :Person  ] .");
+		assertTrue(result);
+	}
+
+	//This works in current parser implementation, but actually shouldnt work
+	@Test
+	public void test_9_6_false_2() {
+		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother Person  ] .");
+		assertTrue(result);
+	}
+
+	//A subject which is also a bnode is implicitly given by nesting in square brackets
+	@Test
+	public void test_9_7() {
+		final boolean result = parse("[ :hasFather [ :hasFather :Person-{id}  ] .");
+		assertTrue(result);
+	}
+
+	@Test
+	public void test_9_8() {
+		final boolean result = parse("[ :name \"Alice\" ] .");
+		assertTrue(result);
+	}
+
+    @Test
+    public void test_9_8_1() {
+        final boolean result = parse("[ :name \"Alice\" ] :knows [  :name \"Bob\" ] .");
+        assertTrue(result);
+    }
+
+    @Test
+    public void test_9_9() {
+        final boolean result = parse("[ :name \"Alice\" ]  :knows [  :name \"Bob\" ; :knows  [ :name \"Eve\" ] ;  :mbox \"mail\" ] .");
+        assertTrue(result);
+    }
+
+
 		//Test for value constant
 		@Test
 	public void test10() {
@@ -326,6 +373,7 @@ public class TurtleSyntaxParserTest  {
 		try {
 			mapping = parser.parse(input);
 			log.debug("mapping " + mapping);
+			System.out.print("mapping " + mapping);
 		} catch (TargetQueryParserException e) {
 			log.debug(e.getMessage());
 			return false;

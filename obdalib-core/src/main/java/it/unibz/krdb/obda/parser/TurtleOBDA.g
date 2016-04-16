@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,7 @@
  * limitations under the License.
  * #L%
  */
- 
+
 grammar TurtleOBDA;
 
 @header {
@@ -73,7 +73,7 @@ import java.util.Vector;
 
 @lexer::members {
 private String error = "";
-    
+
 public String getError() {
    return error;
 }
@@ -87,7 +87,7 @@ public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, 
 public void recover(IntStream input, RecognitionException re) {
    throw new RuntimeException(error);
 }
-    
+
 @Override
 public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
    String hdr = getErrorHeader(e);
@@ -100,7 +100,7 @@ public void emitErrorMessage(String msg) {
    error = msg;
    throw new RuntimeException(error);
 }
-    
+
 @Override
 public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
    throw new RecognitionException(input);
@@ -111,7 +111,8 @@ public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet foll
 /** Map of directives */
 private HashMap<String, String> directives = new HashMap<String, String>();
 
-/** Additional atoms generated as the consequence of the complex nesting of bnodes*/
+/** Additional atoms generated as the consequence of the complex nesting of bnodes
+in the blankNodePropertyList rule*/
 private List<Function> additionalBNodeAtoms;
 
 /** All variables */
@@ -151,7 +152,7 @@ public void displayRecognitionError(String[] tokenNames, RecognitionException e)
 public void emitErrorMessage(String msg) {
    error = msg;
 }
-    
+
 public Object recoverFromMismatchedTokenrecoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
    throw new RecognitionException(input);
 }
@@ -198,7 +199,7 @@ private String removeBrackets(String text) {
 	   }
 	   return toReturn;
 	}
-	
+
 // Column placeholder pattern
 private static final String formatSpecifier = "\\{([^\\}]+)?\\}";
 private static Pattern chPattern = Pattern.compile(formatSpecifier);
@@ -243,21 +244,21 @@ private class ColumnString implements FormatString {
    @Override public String toString() { return s; }
 }
 
-	//this function distinguishes curly bracket with 
-	//back slash "\{" from curly bracket "{" 
+	//this function distinguishes curly bracket with
+	//back slash "\{" from curly bracket "{"
 	private int getIndexOfCurlyB(String str){
 	   int i;
 	   int j;
 	   i = str.indexOf("{");
 	   j = str.indexOf("\\{");
-	      while((i-1 == j) &&(j != -1)){		
+	      while((i-1 == j) &&(j != -1)){
 		i = str.indexOf("{",i+1);
-		j = str.indexOf("\\{",j+1);		
-	      }	
+		j = str.indexOf("\\{",j+1);
+	      }
 	  return i;
 	}
-	
-	//in case of concat this function parses the literal 
+
+	//in case of concat this function parses the literal
 	//and adds parsed constant literals and template literal to terms list
 	private ArrayList<Term> addToTermsList(String str){
 	   ArrayList<Term> terms = new ArrayList<Term>();
@@ -285,8 +286,8 @@ private class ColumnString implements FormatString {
 	   }
 	   return terms;
 	}
-	
-	//this function returns nested concats 
+
+	//this function returns nested concats
 	//in case of more than two terms need to be concatted
 	private Term getNestedConcat(String str){
 	   ArrayList<Term> terms = new ArrayList<Term>();
@@ -306,9 +307,9 @@ private class ColumnString implements FormatString {
 	}
 
 /**
- * This methods construct an atom from a triple 
- * 
- * For the input (subject, pred, object), the result is 
+ * This methods construct an atom from a triple
+ *
+ * For the input (subject, pred, object), the result is
  * <ul>
  *  <li> object(subject), if pred == rdf:type and subject is grounded ; </li>
  *  <li> predicate(subject, object), if pred != rdf:type and predicate is grounded ; </li>
@@ -374,7 +375,7 @@ private static boolean isRDFType(Term pred) {
 		if (pred instanceof Function && ((Function) pred).getTerm(0) instanceof Constant ) {
 			String c= ((Constant) ((Function) pred).getTerm(0)).getValue();
 			return c.equals(OBDAVocabulary.RDF_TYPE);
-		}	
+		}
 		return false;
 	}
 
@@ -452,14 +453,10 @@ triples returns [List<Function> value]
   : subject predicateObjectList[$subject.value] {
       $value = $predicateObjectList.value;
     }
-
-  | LSQ_BRACKET {
-        Term localSubject = createBNode();
-    }
-    l=predicateObjectList[localSubject]{
-        $value = $predicateObjectList.value;
-    }
-    RSQ_BRACKET
+  | bl=blankNodePropertyList {$value=$bl.listOfFunctions; }
+    (
+        pl=predicateObjectList [$bl.bnode] {$value.addAll($pl.value); }
+    )?
   ;
 
 predicateObjectList[Term subject] returns [List<Function> value]
@@ -471,7 +468,7 @@ predicateObjectList[Term subject] returns [List<Function> value]
         Function atom = makeAtom($subject, $v1.value, object);
         $value.add(atom);
       }
-    } 
+    }
     (SEMI v2=verb l2=objectList {
       for (Term object : $l2.value) {
         Function atom = makeAtom($subject, $v2.value, object);
@@ -479,7 +476,26 @@ predicateObjectList[Term subject] returns [List<Function> value]
       }
     })*
   ;
-  
+
+/** This rule can be found in the place of subject of some triple or in the place of the object.
+https://www.w3.org/TR/2014/REC-turtle-20140225/#grammar-production-blankNodePropertyList
+Since we have this twofold nature of the element we have two return parameters bnode and
+listOfFunctions.
+
+*/
+blankNodePropertyList returns [Term bnode, List<Function> listOfFunctions]
+  : LSQ_BRACKET{
+        //A new bNode is created as a subject for all triples created within predicateObjectList.
+        //The newly created bNode is passed as an input parameter of the predicateObjectList
+        $bnode = createBNode();
+    }
+    l=predicateObjectList[$bnode]{
+        $listOfFunctions = $l.value;
+    }
+    RSQ_BRACKET
+  ;
+
+
 //verb returns [String value]
 verb returns [Term value]
   : predicate { $value = $predicate.value; }
@@ -507,7 +523,7 @@ subject returns [Term value]
 //predicate returns [String value]
 predicate returns [Term value]
   : resource {
-  	$value = $resource.value; 
+  	$value = $resource.value;
 //      Term nl = $resource.value;
 //      if (nl instanceof URIConstant) {
 //        URIConstant c = (URIConstant) nl;
@@ -519,33 +535,16 @@ predicate returns [Term value]
   ;
 
 object returns [Term value]
-  : simpleObject {$value = $simpleObject.value; }
-  | bnodeObject {$value = $bnodeObject.value; }
-  ;
-
-simpleObject returns [Term value]
   : resource { $value = $resource.value; }
   | literal  { $value = $literal.value; }
   | typedLiteral { $value = $typedLiteral.value; }
   | variable { $value = $variable.value; }
   | blank { $value = $blank.value; }
-  ;
-
-bnodeObject returns [Term value]
-  : LSQ_BRACKET {
-        Term localSubject = createBNode();
-        $value = localSubject;
-  }
-    l1=predicateObjectList[localSubject]  {
-
-        /*
-            we create bnode for this object and add it as a subject for all triples which can be created from
-            objectList elements
-        */
-        additionalBNodeAtoms.addAll($l1.value);
-
-     }
-    RSQ_BRACKET
+  | bl=blankNodePropertyList {
+        $value = $bl.bnode;
+        //* Additional triples (atoms) created within blankNodePropertyList are added to a global list
+        additionalBNodeAtoms.addAll($bl.listOfFunctions);
+    }
   ;
 
 resource returns [Term value]
@@ -582,7 +581,7 @@ variable returns [Variable value]
       variableSet.add($value);
     }
   ;
-  
+
 function returns [Function value]
   : resource LPAREN terms RPAREN {
       String functionName = $resource.value.toString();
@@ -595,7 +594,7 @@ function returns [Function value]
 typedLiteral returns [Function value]
   : variable AT language {
       Variable var = $variable.value;
-      Term lang = $language.value;   
+      Term lang = $language.value;
       $value = dfac.getTypedTerm(var, lang);
 
     }
@@ -610,12 +609,12 @@ typedLiteral returns [Function value]
         throw new IllegalArgumentException("$resource.value should be an URI");
     }
     Predicate.COL_TYPE type = dtfac.getDatatype(functionName);
-    if (type == null)  
+    if (type == null)
  	  throw new RuntimeException("ERROR. A mapping involves an unsupported datatype. \nOffending datatype:" + functionName);
-    
+
       $value = dfac.getTypedTerm(var, type);
 
-	
+
      }
   ;
 
@@ -657,7 +656,7 @@ literal returns [Term value]
              value = dfac.getTypedTerm(f,lang);
           }else{
              value = dfac.getTypedTerm(f, COL_TYPE.LITERAL);
-          }       
+          }
        }else{
 
        //if variable we cannot assign a datatype yet
@@ -727,7 +726,7 @@ relativeURI // Not used
 namespace
   : NAMESPACE
   ;
-  
+
 defaultNamespace
   : COLON
   ;
@@ -903,7 +902,7 @@ INTEGER_NEGATIVE
 DOUBLE_POSITIVE
   : PLUS DOUBLE
   ;
-  
+
 DOUBLE_NEGATIVE
   : MINUS DOUBLE
   ;
@@ -911,11 +910,11 @@ DOUBLE_NEGATIVE
 DECIMAL_POSITIVE
   : PLUS DECIMAL
   ;
-  
+
 DECIMAL_NEGATIVE
   : MINUS DECIMAL
   ;
-  
+
 VARNAME
   : ALPHA CHAR*
   ;
@@ -936,14 +935,14 @@ fragment ID: ID_START (ID_CORE)*;
 
 fragment NAME_START_CHAR: (ALPHA|UNDERSCORE);
 
-fragment NAME_CHAR: (NAME_START_CHAR|DIGIT|UNDERSCORE|MINUS|PERIOD|HASH|QUESTION|SLASH|PERCENT|EQUALS|SEMI);	 
+fragment NAME_CHAR: (NAME_START_CHAR|DIGIT|UNDERSCORE|MINUS|PERIOD|HASH|QUESTION|SLASH|PERCENT|EQUALS|SEMI);
 
 NCNAME
   : NAME_START_CHAR (NAME_CHAR)*
   ;
 
 NCNAME_EXT
-  : (NAME_CHAR|LCR_BRACKET|RCR_BRACKET|HASH|SLASH)* 	
+  : (NAME_CHAR|LCR_BRACKET|RCR_BRACKET|HASH|SLASH)*
   ;
 
 NAMESPACE
@@ -981,6 +980,5 @@ STRING_WITH_CURLY_BRACKET
 STRING_URI
   : SCHEMA COLON DOUBLE_SLASH (URI_PATH)*
   ;
-  
+
 WS: (' '|'\t'|('\n'|'\r'('\n')))+ {$channel=HIDDEN;};
-  

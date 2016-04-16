@@ -285,7 +285,13 @@ public class TurtleSyntaxParserTest  {
 		assertTrue(result);
 	}
 
-	@Test
+
+    @Test
+    public void test_9_300() {
+        final boolean result = parse("_:{id} :hasFather :Person-{id} .");
+        assertTrue(result);
+    }
+    @Test
 	public void test_9_4() {
 		final boolean result = parse("[] :hasFather [] .");
 		assertTrue(result);
@@ -297,23 +303,25 @@ public class TurtleSyntaxParserTest  {
 		assertTrue(result);
 	}
 
-	//Nested bnodes
+	//Should this be recognised because "," is next to :Person-{id}
 	@Test
 	public void test_9_6() {
-		final boolean result = parse("[] :hasFather [ :hasFather Person-{id}, Mother  ] .");
-		assertTrue(result);
+	//	final boolean result = parse("[] :hasFather [ :hasSibling Person-{id}, Person-{id1}  ] .");
+        final boolean result = parse(":{id} :hasSibling :Person-{id},  :Person-{id1}.");
+        assertTrue(result);
 	}
 
 	//This works in current parser implementation, but actually shouldnt work
 	@Test
-	public void test_9_6_false_1() {
-		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother :Person  ] .");
+	public void test_9_6_1() {
+		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id} ; :hasMother :Person  ] .");
 		assertTrue(result);
 	}
 
-	//This works in current parser implementation, but actually shouldnt work
+	//This works in the current parser implementation, but actually shouldn't work
+	//what is a Person here?
 	@Test
-	public void test_9_6_false_2() {
+	public void test_9_6_false() {
 		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother Person  ] .");
 		assertTrue(result);
 	}
@@ -373,7 +381,6 @@ public class TurtleSyntaxParserTest  {
 		try {
 			mapping = parser.parse(input);
 			log.debug("mapping " + mapping);
-			System.out.print("mapping " + mapping);
 		} catch (TargetQueryParserException e) {
 			log.debug(e.getMessage());
 			return false;

@@ -285,6 +285,13 @@ public class TurtleSyntaxParserTest  {
 		assertTrue(result);
 	}
 
+	//Set of tests for labeled blank node templates
+	@Test
+	public void test10_1() {
+		final boolean result = parse("_:{id}_{age}_{name} a :Person .");
+		assertTrue(result);
+	}
+
 	private boolean compareCQIE(String input, int countBody) {
 		TurtleOBDASyntaxParser parser = new TurtleOBDASyntaxParser();
 		parser.setPrefixManager(getPrefixManager());

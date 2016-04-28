@@ -198,6 +198,48 @@ private String removeBrackets(String text) {
 	   }
 	   return toReturn;
 	}
+
+	/** A method which construct BNode templates according to the pattern given in the string text
+	 *  It is very similar to construct function for URI templates
+	 */
+    private Term constructBNode(String text) {
+       Term toReturn = null;
+       final String PLACEHOLDER = "{}";
+       List<Term> terms = new LinkedList<Term>();
+       List<FormatString> tokens = parse(text);
+       int size = tokens.size();
+       if (size == 1) {
+          FormatString token = tokens.get(0);
+          if (token instanceof FixedString) {
+              ValueConstant uriTemplate = dfac.getConstantLiteral(token.toString()); // a single URI template
+              toReturn = dfac.getBNodeTemplate(uriTemplate);
+          }
+          else if (token instanceof ColumnString) {
+             ValueConstant uriTemplate = dfac.getConstantLiteral(PLACEHOLDER); // a single URI template
+             Variable column = dfac.getVariable(token.toString());
+             terms.add(0, uriTemplate);
+             terms.add(column);
+             toReturn = dfac.getBNodeTemplate(terms);
+          }
+       }
+       else {
+          StringBuilder sb = new StringBuilder();
+          for(FormatString token : tokens) {
+             if (token instanceof FixedString) { // if part of URI template
+                sb.append(token.toString());
+             }
+             else if (token instanceof ColumnString) {
+                sb.append(PLACEHOLDER);
+                Variable column = dfac.getVariable(token.toString());
+                terms.add(column);
+             }
+          }
+          ValueConstant uriTemplate = dfac.getConstantLiteral(sb.toString()); // complete URI template
+          terms.add(0, uriTemplate);
+          toReturn = dfac.getBNodeTemplate(terms);
+       }
+       return toReturn;
+    }
 	
 // Column placeholder pattern
 private static final String formatSpecifier = "\\{([^\\}]+)?\\}";
@@ -378,7 +420,19 @@ private static boolean isRDFType(Term pred) {
 		return false;
 	}
 
+/**
+ * This method creates unique Bnode
+ *
+ */
+private Function createBNode() {
+    Function f;
+    List<Term> emptyTermList = new LinkedList<Term>();
+    f = dfac.getBNodeTemplate(emptyTermList);
+    return f;
 }
+
+
+} /** end of @members */
 
 
 /*------------------------------------------------------------------
@@ -470,7 +524,7 @@ objectList returns [List<Term> value]
 subject returns [Term value]
   : resource { $value = $resource.value; }
   | variable { $value = $variable.value; }
-//  | blank
+  | blank  { $value = $blank.value; }
   ;
 
 //predicate returns [String value]
@@ -492,7 +546,7 @@ object returns [Term value]
   | literal  { $value = $literal.value; }
   | typedLiteral { $value = $typedLiteral.value; }
   | variable { $value = $variable.value; }
-//  | blank
+  | blank  { $value = $blank.value; }
   ;
 
 resource returns [Term value]
@@ -514,9 +568,9 @@ qname returns [String value]
     }
   ;
 
-blank
-  : nodeID
-  | BLANK
+blank returns [Term value]
+  : BLANK_NODE_LABEL { $value = constructBNode($BLANK_NODE_LABEL.text); }
+  | ANON { $value = createBNode(); }
   ;
 
 variable returns [Variable value]
@@ -659,9 +713,7 @@ numericLiteral returns [Term value]
   | numericNegative { $value = $numericNegative.value; }
   ;
 
-nodeID
-  : BLANK_PREFIX name
-  ;
+
 
 relativeURI // Not used
   : STRING_URI
@@ -783,7 +835,7 @@ GREATER:       '>';
 SLASH:         '/';
 DOUBLE_SLASH:  '//';
 BACKSLASH:     '\\';
-BLANK:	       '[]';
+ANON:	       '[]';
 BLANK_PREFIX:  '_:';
 TILDE:         '~';
 CARET:         '^';
@@ -893,6 +945,11 @@ NAMESPACE
   : NAME_START_CHAR (NAME_CHAR)* COLON
   ;
 
+//This definition must be before  PREFIXED_NAME because otherwise can never be matched
+BLANK_NODE_LABEL
+  : BLANK_PREFIX NCNAME_EXT
+  ;
+
 PREFIXED_NAME
   : NCNAME? COLON NCNAME_EXT
   ;
@@ -924,6 +981,6 @@ STRING_WITH_CURLY_BRACKET
 STRING_URI
   : SCHEMA COLON DOUBLE_SLASH (URI_PATH)*
   ;
-  
+
 WS: (' '|'\t'|('\n'|'\r'('\n')))+ {$channel=HIDDEN;};
   

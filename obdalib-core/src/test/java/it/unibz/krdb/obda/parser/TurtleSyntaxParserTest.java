@@ -278,8 +278,8 @@ public class TurtleSyntaxParserTest  {
 
 	}
 
-		//Test for value constant
-		@Test
+	//Test for value constant
+	@Test
 	public void test10() {
 		final boolean result = parse(":Person-{id} a :Person ; :age 25 ; :hasDegree true ; :averageGrade 28.3 .");
 		assertTrue(result);
@@ -291,6 +291,14 @@ public class TurtleSyntaxParserTest  {
 		final boolean result = parse("_:{id}_{age}_{name} a :Person .");
 		assertTrue(result);
 	}
+
+
+	@Test
+	public void test10_2() {
+		final boolean result = parse("_:id a :Person .");
+		assertTrue(result);
+	}
+
 
 	private boolean compareCQIE(String input, int countBody) {
 		TurtleOBDASyntaxParser parser = new TurtleOBDASyntaxParser();

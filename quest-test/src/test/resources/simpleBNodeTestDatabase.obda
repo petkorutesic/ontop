@@ -15,7 +15,7 @@ source		select id, street, number, city from address
 
 
 mappingId	mappingBusinessCenter
-target		_:business-center-{co.addressid} a BusinessCenter; :hasCommonNetworth  {adrNetworth} ; :hasNumberOfCompanies {numCompanies}  .
+target		_:business-center-{co.addressid} a :BusinessCenter ; :hasCommonNetworth  {adrNetworth} ; :hasNumberOfCompanies {numCompanies}  .
 source		select  co.addressid, sum(co.networth) adrNetworth, count (co.id) numCompanies
             from company co
             group by co.addressid
@@ -54,7 +54,7 @@ target		_:company-{id} a :Fairtrade .
 source		select id, marketshares from company where marketshares = 100000
 
 mappingId	mappingWithouDefinitionInOntology
-target		:company-{id} a :MicroTrade ; :marketShare :some_{marketshares} .
+target		_:company-{id} a :MicroTrade ; :marketShare _:some_{marketshares} .
 source		select id, marketshares from company where marketshares = 0
 
 ]]

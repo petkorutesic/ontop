@@ -24,12 +24,11 @@ import it.unibz.krdb.obda.io.ModelIOManager;
 import it.unibz.krdb.obda.model.OBDADataFactory;
 import it.unibz.krdb.obda.model.OBDAModel;
 import it.unibz.krdb.obda.model.impl.OBDADataFactoryImpl;
-import it.unibz.krdb.obda.ontology.*;
+import it.unibz.krdb.obda.ontology.ClassExpression;
+import it.unibz.krdb.obda.ontology.Description;
+import it.unibz.krdb.obda.ontology.Ontology;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestConstants;
 import it.unibz.krdb.obda.owlrefplatform.core.QuestPreferences;
-import it.unibz.krdb.obda.owlrefplatform.core.dagjgrapht.Equivalences;
-import it.unibz.krdb.obda.owlrefplatform.core.dagjgrapht.TBoxReasoner;
-import it.unibz.krdb.obda.owlrefplatform.core.dagjgrapht.TBoxReasonerImpl;
 import it.unibz.krdb.obda.owlrefplatform.owlapi3.*;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +37,6 @@ import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.OWLIndividual;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
-import org.semanticweb.owlapi.reasoner.SimpleConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,10 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 
 /***
  * Test returns executes queries over the database with mapping
@@ -206,22 +201,34 @@ public class BnodeMappingTest {
 
 
 	/**
-	 * Test numbers of empty concepts
+	 * Even though the class MicroTrade is not defined in the owl file, the query works correctly
 	 * 
 	 * @throws Exception
 	 */
 	@Test
 	public void testBNodesMapping() throws Exception {
-		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :Fairtrade. ?x :marketShare ?y}";
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE { ?x a :MicroTrade}";
+		int numberResults = runTests(query);
+		assertEquals(2, numberResults);
+	}
+
+	/**
+	 * The query returns correct answer in spite of the fact that :marketShare is not defined in the ontology
+	 *
+	 * @throws Exception
+	 */
+	@Test
+	public void testBNodesMappingNotDefinedProperty() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE { ?x :marketShare ?y}";
 		int numberResults = runTests(query);
 		assertEquals(2, numberResults);
 	}
 
 	@Test
 	public void testBNodesMapping1() throws Exception {
-		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x :hasSupplier _:k.}";
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :Fairtrade.}";
 		int numberResults = runTests(query);
-		assertEquals(5, numberResults);
+		assertEquals(2, numberResults);
 	}
 
 	@Test
@@ -231,17 +238,18 @@ public class BnodeMappingTest {
 		assertEquals(5, numberResults);
 	}
 
+
 	@Test
 	public void testBNodesMapping3() throws Exception {
 		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a _:k.}";
 		int numberResults = runTests(query);
-		assertEquals(30, numberResults);
+		assertEquals(32, numberResults);
 	}
 
 
 	@Test
 	public void testBNodesMapping4() throws Exception {
-		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :CommonAddress.}";
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :BusinessCenter. ?x :hasCommonNetworth ?y}";
 		int numberResults = runTests(query);
 		assertEquals(2, numberResults);
 	}

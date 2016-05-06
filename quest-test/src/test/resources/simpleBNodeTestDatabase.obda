@@ -13,12 +13,20 @@ mappingId	mappingAddress
 target		:address-{id} a :Address ; :inStreet {street} ; :hasNumber {number} ; :inCity {city} . 
 source		select id, street, number, city from address
 
+
+mappingId	mappingBusinessCenter
+target		_:business-center-{co.addressid} a BusinessCenter; :hasCommonNetworth  {adrNetworth} ; :hasNumberOfCompanies {numCompanies}  .
+source		select  co.addressid, sum(co.networth) adrNetworth, count (co.id) numCompanies
+            from company co
+            group by co.addressid
+            having count(co.id) >= 2
+
 mappingId	mappingCompanies
-target		:company-{id} a :Company ; :companyName {name} . 
+target		_:company-{id} a :Company ; :companyName {name} .
 source		select id, name from company
 
 mappingId	mappingCompanyAddress
-target		:company-{id} :hasSupplier :address-{addressid} . 
+target		_:company-{id} :hasSupplier _:address-{addressid} .
 source		select id, addressid from company
 
 mappingId	mappingClient
@@ -44,6 +52,10 @@ source		select id, marketshares from company where marketshares < 200000
 mappingId	mappingBnodesCompanies
 target		_:company-{id} a :Fairtrade .
 source		select id, marketshares from company where marketshares = 100000
+
+mappingId	mappingWithouDefinitionInOntology
+target		:company-{id} a :MicroTrade ; :marketShare :some_{marketshares} .
+source		select id, marketshares from company where marketshares = 0
 
 ]]
 

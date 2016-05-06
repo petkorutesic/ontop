@@ -55,7 +55,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /***
  * Test returns executes queries over the database with mapping
@@ -72,9 +75,11 @@ public class BnodeMappingTest {
 	private OBDAModel obdaModel;
 	private OWLOntology ontology;
 
-	final String owlfile = "src/test/resources/emptiesDatabase.owl";
-	final String obdafile = "src/test/resources/emptiesDatabaseWithBnodes.obda";
-	
+	final String owlfile = "src/test/resources/simpleBNodeTestDatabase.owl";
+	final String obdafile = "src/test/resources/simpleBNodeTestDatabase.obda";
+//  This is a version of the mapping without blank nodes
+//	final String obdafile = "src/test/resources/emptiesDatabase.obda";
+
 //	 final String owlfile =
 //	 "src/main/resources/testcases-scenarios/virtual-mode/stockexchange/simplecq/stockexchange.owl";
 //	 final String obdafile =
@@ -101,7 +106,7 @@ public class BnodeMappingTest {
 		connection = DriverManager.getConnection(url, username, password);
 		Statement st = connection.createStatement();
 
-		FileReader reader = new FileReader("src/test/resources/emptiesDatabase-h2.sql");
+		FileReader reader = new FileReader("src/test/resources/simpleBNodeTestDatabase-h2.sql");
 		BufferedReader in = new BufferedReader(reader);
 		StringBuilder bf = new StringBuilder();
 		String line = in.readLine();
@@ -133,9 +138,10 @@ public class BnodeMappingTest {
 
 		QuestOWLConfiguration config = QuestOWLConfiguration.builder().preferences(p).obdaModel(obdaModel).build();
 
-
-
 		reasoner = (QuestOWL) factory.createReasoner(ontology, config);
+
+
+
 
 		// Now we are ready for querying
 		conn = reasoner.getConnection();
@@ -157,7 +163,7 @@ public class BnodeMappingTest {
 
 		Statement st = connection.createStatement();
 
-		FileReader reader = new FileReader("src/test/resources/emptiesDatabase-drop-h2.sql");
+		FileReader reader = new FileReader("src/test/resources/simpleBNodeTestDatabase-drop-h2.sql");
 		BufferedReader in = new BufferedReader(reader);
 		StringBuilder bf = new StringBuilder();
 		String line = in.readLine();
@@ -206,10 +212,38 @@ public class BnodeMappingTest {
 	 */
 	@Test
 	public void testBNodesMapping() throws Exception {
-		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :Fairtrade}";
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :Fairtrade. ?x :marketShare ?y}";
 		int numberResults = runTests(query);
-		assertEquals(1, numberResults);
+		assertEquals(2, numberResults);
 	}
 
+	@Test
+	public void testBNodesMapping1() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x :hasSupplier _:k.}";
+		int numberResults = runTests(query);
+		assertEquals(5, numberResults);
+	}
+
+	@Test
+	public void testBNodesMapping2() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x :hasSupplier _:k.}";
+		int numberResults = runTests(query);
+		assertEquals(5, numberResults);
+	}
+
+	@Test
+	public void testBNodesMapping3() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a _:k.}";
+		int numberResults = runTests(query);
+		assertEquals(30, numberResults);
+	}
+
+
+	@Test
+	public void testBNodesMapping4() throws Exception {
+		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :CommonAddress.}";
+		int numberResults = runTests(query);
+		assertEquals(2, numberResults);
+	}
 
 }

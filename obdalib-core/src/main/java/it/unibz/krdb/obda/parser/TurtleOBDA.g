@@ -206,6 +206,9 @@ private String removeBrackets(String text) {
        Term toReturn = null;
        final String PLACEHOLDER = "{}";
        List<Term> terms = new LinkedList<Term>();
+       if (text.startsWith("_:")){
+                   text = text.replaceFirst("_:","");
+       }
        List<FormatString> tokens = parse(text);
        int size = tokens.size();
        if (size == 1) {

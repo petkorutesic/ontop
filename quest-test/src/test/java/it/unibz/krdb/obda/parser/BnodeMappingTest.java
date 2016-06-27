@@ -56,8 +56,9 @@ import java.util.Set;
 import static org.junit.Assert.assertEquals;
 
 /***
- * Test returns executes queries over the database with mapping
- * in which bnodes have been used.
+ * Test executes queries over the database with a mapping
+ * in which blank nodes have been used.
+ * Test uses a simple in memory database
  */
 
 public class BnodeMappingTest {
@@ -135,9 +136,6 @@ public class BnodeMappingTest {
 
 		reasoner = (QuestOWL) factory.createReasoner(ontology, config);
 
-
-
-
 		// Now we are ready for querying
 		conn = reasoner.getConnection();
 
@@ -150,7 +148,6 @@ public class BnodeMappingTest {
 			dropTables();
 			reasoner.dispose();
 			connection.close();
-		
 
 	}
 
@@ -174,22 +171,18 @@ public class BnodeMappingTest {
 
 	private int runTests(String query) throws Exception {
 		QuestOWLStatement st = conn.createStatement();
-
 		int results=0;
 		try {
 			QuestOWLResultSet rs = st.executeTuple(query);
-
 			while (rs.nextRow()){
-				OWLIndividual ind1 =	rs.getOWLIndividual("x")	 ;
+				OWLIndividual ind1 = rs.getOWLIndividual("x");
 				log.debug(ind1.toString());
 				results++;
 			}
-
 		} catch (Exception e) {
 			throw e;
 		} finally {
 			try {
-
 			} catch (Exception e) {
 				st.close();
 			}

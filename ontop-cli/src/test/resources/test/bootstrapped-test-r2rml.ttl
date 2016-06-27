@@ -1,0 +1,54 @@
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+
+_:node1am6hfb69x5 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> .
+
+_:node1am6hfb69x8 rr:datatype <http://www.w3.org/2001/XMLSchema#integer> ;
+	a rr:TermMap .
+
+_:node1am6hfb69x5 rr:template "{ATTR1}" .
+
+_:node1am6hfb69x2 rr:template "_:{ATTR1}_{ATTR2}" ;
+	a rr:TermMap .
+
+_:node1am6hfb69x5 a rr:TermMap .
+
+_:node1am6hfb69x8 rr:termType rr:Literal .
+
+_:node1am6hfb69x5 rr:termType rr:Literal .
+
+_:node1am6hfb69x1 rr:sqlQuery "SELECT * FROM \"PUBLIC\".\"TABLE1\"" .
+
+_:node1am6hfb69x8 rr:template "{ATTR2}" .
+
+_:node1am6hfb69x2 rr:class <http://www.example.org/TABLE1> .
+
+_:node1am6hfb69x6 rr:objectMap _:node1am6hfb69x5 .
+
+_:node1am6hfb69x9 a rr:PredicateObjectMap .
+
+_:node1am6hfb69x6 a rr:PredicateObjectMap .
+
+_:node1am6hfb69x9 rr:objectMap _:node1am6hfb69x8 .
+
+_:node1am6hfb69x2 a rr:SubjectMap .
+
+_:node1am6hfb69x1 a rr:R2RMLView .
+
+_:node1am6hfb69x3 rr:subjectMap _:node1am6hfb69x2 ;
+	rr:logicalTable _:node1am6hfb69x1 .
+
+_:node1am6hfb69x6 rr:predicate <http://www.example.org/TABLE1#ATTR1> .
+
+_:node1am6hfb69x2 rr:termType rr:IRI .
+
+_:node1am6hfb69x3 rr:predicateObjectMap _:node1am6hfb69x6 .
+
+_:node1am6hfb69x9 rr:predicate <http://www.example.org/TABLE1#ATTR2> .
+
+_:node1am6hfb69x5 a rr:ObjectMap .
+
+_:node1am6hfb69x3 rr:predicateObjectMap _:node1am6hfb69x9 .
+
+_:node1am6hfb69x8 a rr:ObjectMap .
+
+_:node1am6hfb69x3 a rr:TriplesMap .

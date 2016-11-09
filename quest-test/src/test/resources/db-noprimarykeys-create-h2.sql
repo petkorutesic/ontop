@@ -1,6 +1,6 @@
 CREATE TABLE t_message(
-    message_time int NOT VARCHAR
-    message_text int NOT VARCHAR
+    message_time  VARCHAR,
+    message_text  VARCHAR
 );
 
 

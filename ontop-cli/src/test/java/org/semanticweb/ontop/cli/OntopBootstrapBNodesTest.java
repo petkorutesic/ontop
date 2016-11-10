@@ -2,7 +2,7 @@ package org.semanticweb.ontop.cli;
 
 /**
  *
- * Purpose of this test is crating of mapping with B-Nodes
+ * The purpose of this test is a creation of mappings with B-Nodes
  *
  * We are going to create an H2 database with simple table without primary keys, the .sql file is fixed.
  * Then, we are going to apply ontop bootstrap on that database and create corresponding
@@ -39,15 +39,19 @@ public class OntopBootstrapBNodesTest {
     private Connection conn;
 
     Logger log = LoggerFactory.getLogger(this.getClass());
-    private String mappingFile =
-             "src/test/resources/test/bootstrapped-test-bnodes1.obda";
+
+    private String mappingFile = "src/test/resources/test/bootstrapped-test-bnodes1.obda";
+    private final String owlFile = "src/test/resources/test/bootstrapped-test-bnodes1.owl";
+
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";
     private final String jdbcUrl = "jdbc:h2:mem:questjunitdb-noprimarykeys";
     private final String baseUri = "http://www.example.org/";
-    private final String owlFile = "src/test/resources/test/bootstrapped-test-bnodes1.owl";
     private final String jdbcDriverClass = "org.h2.Drive";
-    private final String rdfFile = "src/test/resources/test/r2rml.ttl";
+    private String r2rmlFile = "src/test/resources/test/bootstrapped-test-r2rml.ttl";
+    private String prettifiedr2rmlFile = "src/test/resources/test/bootstrapped-test-pretty-r2rml.ttl";
+
+    private String materializedDatabaseFile = "src/test/resources/test/bootstrapped-test-materialized-database.ttl";
 
 
     @Before
@@ -57,12 +61,7 @@ public class OntopBootstrapBNodesTest {
     /*
      * Initializing and H2 database with data
      */
-        // String driver = "org.h2.Driver";
-        String url = "jdbc:h2:mem:questjunitdb-noprimarykeys";
-        String username = "sa";
-        String password = "";
-
-        conn = DriverManager.getConnection(url, username, password);
+        conn = DriverManager.getConnection(jdbcUrl, jdbcUserName, jdbcPassword);
         Statement st = conn.createStatement();
 
         FileReader reader = new FileReader("src/test/resources/test/db-noprimarykeys-create-h2.sql");
@@ -108,7 +107,14 @@ public class OntopBootstrapBNodesTest {
         conn.commit();
     }
 
+    /**
+     * For a given database the Ontop bootstrap creates a mapping and ontology files.
+     * In fact, it creates the mapping and ontology which corresponds to the direct mapping of this
+     * database.
+     * Since the database contains a table without a primary key, we are getting mapping which
+     * uses blank nodes with place holders
 
+    */
     @Test
     public void testBootstrap() throws Exception {
 
@@ -125,10 +131,17 @@ public class OntopBootstrapBNodesTest {
 
     }
 
+    /**
+     * For a given database the Ontop creates the r2rml file which
+     * can be used for the direct mapping.
+
+     *Initial file is also "prettified" to be more readable.
+
+     */
+
     @Test
     public  void testBootstrapR2RML() throws Exception {
-        File owl = new File(owlFile);
-        File obda = new File(mappingFile);
+
         DirectMappingBootstrapper dm = new DirectMappingBootstrapper(
                 baseUri, jdbcUrl, jdbcUserName, jdbcPassword, jdbcDriverClass);
         OBDAModel model = dm.getModel();
@@ -137,13 +150,45 @@ public class OntopBootstrapBNodesTest {
 
         R2RMLWriter writer = new R2RMLWriter( model, sourceID, dm.getOntology());
 
+        writer.write(new File(r2rmlFile));
 
-        writer.write(new File(rdfFile));
+        //Prettifying r2rml file
         String[] argv = {"mapping", "pretty-r2rml",
-                "-i", rdfFile,
-                "-o", rdfFile
+                "-i", r2rmlFile,
+                "-o", prettifiedr2rmlFile
+        };
+
+        Ontop.main(argv);
+    }
+
+
+    /**
+     * This test carries out the "materialization" of the database using the r2rml
+     * file which is already generated in testBootstrapR2RML().
+     *
+     * Accordingly, testBootstrapR2RML() test must be executed prior to this one
+     * and the file prettifiedr2rmlFile have to be created
+     *
+     * @throws Exception
+     */
+
+    @Test
+    public  void testBootstrapMaterialize() throws Exception {
+
+        String[] argv = {"materialize",
+
+               // "-b", baseUri,
+                "-m", prettifiedr2rmlFile,
+            //    "-t", owlFile,
+                "-l", jdbcUrl,
+                "-u", jdbcUserName,
+                "-p", jdbcPassword,
+                "-d", jdbcDriverClass,
+
+                "-f","turtle",
+                "-o", materializedDatabaseFile
         };
         Ontop.main(argv);
-
     }
+
   }

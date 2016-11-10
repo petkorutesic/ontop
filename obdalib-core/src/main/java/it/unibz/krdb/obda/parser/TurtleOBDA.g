@@ -439,6 +439,23 @@ private Function createBNode() {
 }
 
 } /** close of @members */
+=======
+/**
+ * This method creates unique Bnode
+ *
+ */
+private Function createBNode() {
+    Function f;
+    List<Term> emptyTermList = new LinkedList<Term>();
+    f = dfac.getBNodeTemplate(emptyTermList);
+    return f;
+}
+
+
+} /** end of @members */
+
+
+>>>>>>> feature/bnode-basic
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/
@@ -563,7 +580,7 @@ objectList returns [List<Term> value]
 subject returns [Term value]
   : resource { $value = $resource.value; }
   | variable { $value = $variable.value; }
-  | blank { $value = $blank.value;}
+  | blank  { $value = $blank.value; }
   ;
 
 //predicate returns [String value]
@@ -653,7 +670,7 @@ typedLiteral returns [Function value]
     Predicate.COL_TYPE type = dtfac.getDatatype(functionName);
     if (type == null)
  	  throw new RuntimeException("ERROR. A mapping involves an unsupported datatype. \nOffending datatype:" + functionName);
-
+    
       $value = dfac.getTypedTerm(var, type);
 
 
@@ -1025,3 +1042,4 @@ STRING_URI
   ;
 
 WS: (' '|'\t'|('\n'|'\r'('\n')))+ {$channel=HIDDEN;};
+  

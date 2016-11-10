@@ -27,9 +27,9 @@
     
 
 
-    <!-- http://www.example.org/TABLE1#ATTR2 -->
+    <!-- http://www.example.org/TABLE1#STRING -->
 
-    <owl:DatatypeProperty rdf:about="http://www.example.org/TABLE1#ATTR2"/>
+    <owl:DatatypeProperty rdf:about="http://www.example.org/TABLE1#STRING"/>
     
 
 

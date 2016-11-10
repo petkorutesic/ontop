@@ -158,11 +158,9 @@ public class QueriesOverBNodesTest extends TestCase {
             QuestOWLResultSet rs = st.executeTuple(query);
             assertTrue(rs.nextRow());
             OWLObject ind1 = rs.getOWLObject("x");
-            OWLObject ind2 = rs.getOWLObject("y");
-            OWLObject val = rs.getOWLObject("z");
+
+            log.debug(ToStringRenderer.getInstance().getRendering(ind1));
             assertEquals("hallo", ToStringRenderer.getInstance().getRendering(ind1));
-            assertEquals("<uri1>", ToStringRenderer.getInstance().getRendering(ind2));
-            assertEquals("\"value1\"", ToStringRenderer.getInstance().getRendering(val));
 
 
         } catch (Exception e) {

@@ -438,24 +438,8 @@ private Function createBNode() {
     return f;
 }
 
-} /** close of @members */
-=======
-/**
- * This method creates unique Bnode
- *
- */
-private Function createBNode() {
-    Function f;
-    List<Term> emptyTermList = new LinkedList<Term>();
-    f = dfac.getBNodeTemplate(emptyTermList);
-    return f;
-}
-
-
 } /** end of @members */
 
-
->>>>>>> feature/bnode-basic
 /*------------------------------------------------------------------
  * PARSER RULES
  *------------------------------------------------------------------*/

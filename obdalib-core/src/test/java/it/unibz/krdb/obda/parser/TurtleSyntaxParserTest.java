@@ -126,7 +126,7 @@ public class TurtleSyntaxParserTest  {
 		final boolean result = parse(":Person-{id} :firstName \"hello {fname}\"^^xsd:double .");
 		assertTrue(result);
 	}
-	
+	@Test
 	public void test_3_3() {
 		final boolean result = parse(":Person-{id} :firstName {fname}@en-US .");
 		assertTrue(result);
@@ -298,6 +298,12 @@ public class TurtleSyntaxParserTest  {
 	}
 
 	@Test
+	public void test_9_4_1() {
+		final boolean result = parse("_:id a :Person .");
+		assertTrue(result);
+	}
+
+	@Test
 	public void test_9_5() {
 		final boolean result = parse("[] :hasFather _:k .");
 		assertTrue(result);
@@ -320,9 +326,10 @@ public class TurtleSyntaxParserTest  {
 
 	//This works in the current parser implementation, but actually shouldn't work
 	//what is a Person here?
+	//even with :Person doesn't work correctly
 	@Test
 	public void test_9_6_false() {
-		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother Person  ] .");
+		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother :Person  ] .");
 		assertTrue(result);
 	}
 
@@ -367,11 +374,7 @@ public class TurtleSyntaxParserTest  {
 	}
 
 
-	@Test
-	public void test10_2() {
-		final boolean result = parse("_:id a :Person .");
-		assertTrue(result);
-	}
+
 
 
 	private boolean compareCQIE(String input, int countBody) {

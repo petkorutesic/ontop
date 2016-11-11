@@ -126,7 +126,7 @@ public class TurtleSyntaxParserTest  {
 		final boolean result = parse(":Person-{id} :firstName \"hello {fname}\"^^xsd:double .");
 		assertTrue(result);
 	}
-	
+	@Test
 	public void test_3_3() {
 		final boolean result = parse(":Person-{id} :firstName {fname}@en-US .");
 		assertTrue(result);
@@ -278,12 +278,104 @@ public class TurtleSyntaxParserTest  {
 
 	}
 
+	// The following tests are checking Bnode syntax
+	@Test
+	public void test_9_3() {
+		final boolean result = parse("[] :hasFather :Person-{id} .");
+		assertTrue(result);
+	}
+
+
+    @Test
+    public void test_9_300() {
+        final boolean result = parse("_:{id} :hasFather :Person-{id} .");
+        assertTrue(result);
+    }
+    @Test
+	public void test_9_4() {
+		final boolean result = parse("[] :hasFather [] .");
+		assertTrue(result);
+	}
+
+	@Test
+	public void test_9_4_1() {
+		final boolean result = parse("_:id a :Person .");
+		assertTrue(result);
+	}
+
+	@Test
+	public void test_9_5() {
+		final boolean result = parse("[] :hasFather _:k .");
+		assertTrue(result);
+	}
+
+	//Should this be recognised because "," is next to :Person-{id}
+	@Test
+	public void test_9_6() {
+	//	final boolean result = parse("[] :hasFather [ :hasSibling Person-{id}, Person-{id1}  ] .");
+        final boolean result = parse(":{id} :hasSibling :Person-{id},  :Person-{id1}.");
+        assertTrue(result);
+	}
+
+	//This works in current parser implementation, but actually shouldnt work
+	@Test
+	public void test_9_6_1() {
+		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id} ; :hasMother :Person  ] .");
+		assertTrue(result);
+	}
+
+	//This works in the current parser implementation, but actually shouldn't work
+	//what is a Person here?
+	//even with :Person doesn't work correctly
+	@Test
+	public void test_9_6_false() {
+		final boolean result = parse("[] :hasFather [ :hasFather :Person-{id}, :hasMother :Person  ] .");
+		assertTrue(result);
+	}
+
+	//A subject which is also a bnode is implicitly given by nesting in square brackets
+	@Test
+	public void test_9_7() {
+		final boolean result = parse("[ :hasFather [ :hasFather :Person-{id}  ] .");
+		assertTrue(result);
+	}
+
+	@Test
+	public void test_9_8() {
+		final boolean result = parse("[ :name \"Alice\" ] .");
+		assertTrue(result);
+	}
+
+    @Test
+    public void test_9_8_1() {
+        final boolean result = parse("[ :name \"Alice\" ] :knows [  :name \"Bob\" ] .");
+        assertTrue(result);
+    }
+
+    @Test
+    public void test_9_9() {
+        final boolean result = parse("[ :name \"Alice\" ]  :knows [  :name \"Bob\" ; :knows  [ :name \"Eve\" ] ;  :mbox \"mail\" ] .");
+        assertTrue(result);
+    }
+
+
 		//Test for value constant
 		@Test
 	public void test10() {
 		final boolean result = parse(":Person-{id} a :Person ; :age 25 ; :hasDegree true ; :averageGrade 28.3 .");
 		assertTrue(result);
 	}
+
+	//Set of tests for labeled blank node templates
+	@Test
+	public void test10_1() {
+		final boolean result = parse("_:{id}_{age}_{name} a :Person .");
+		assertTrue(result);
+	}
+
+
+
+
 
 	private boolean compareCQIE(String input, int countBody) {
 		TurtleOBDASyntaxParser parser = new TurtleOBDASyntaxParser();

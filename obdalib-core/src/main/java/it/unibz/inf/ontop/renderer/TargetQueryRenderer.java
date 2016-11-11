@@ -231,7 +231,20 @@ public class TargetQueryRenderer {
 				getNestedConcats(sb, terms.get(0),terms.get(1));
 				sb.append("\"");
 				//sb.append("^^rdfs:Literal");
-			} 
+			} else if (functionSymbol instanceof BNodePredicate) {
+				//function is a BNODE
+				List<Term> terms = function.getTerms();
+				sb.append("_:");
+
+				boolean separator = false;
+				for (Term innerTerm : function.getTerms()) {
+					if (separator) {
+						sb.append("_");
+					}
+					sb.append(getDisplayName(innerTerm, prefixManager));
+					separator = true;
+				}
+			}
 			else { // for any ordinary function symbol
 				sb.append(fname);
 				sb.append("(");

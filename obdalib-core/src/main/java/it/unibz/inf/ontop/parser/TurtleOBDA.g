@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,6 +17,7 @@
  * limitations under the License.
  * #L%
  */
+
 
  /*
   HOW TO GENERATE JAVA FILES:
@@ -81,7 +82,7 @@ import java.util.Vector;
 
 @lexer::members {
 private String error = "";
-    
+
 public String getError() {
    return error;
 }
@@ -95,7 +96,7 @@ public Object recoverFromMismatchedSet(IntStream input, RecognitionException e, 
 public void recover(IntStream input, RecognitionException re) {
    throw new RuntimeException(error);
 }
-    
+
 @Override
 public void displayRecognitionError(String[] tokenNames, RecognitionException e) {
    String hdr = getErrorHeader(e);
@@ -108,7 +109,7 @@ public void emitErrorMessage(String msg) {
    error = msg;
    throw new RuntimeException(error);
 }
-    
+
 @Override
 public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
    throw new RecognitionException(input);
@@ -119,8 +120,9 @@ public Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet foll
 /** Map of directives */
 private HashMap<String, String> directives = new HashMap<String, String>();
 
-/** The current subject term */
-private Term currentSubject;
+/** Additional atoms generated as the consequence of the complex nesting of bnodes
+in the blankNodePropertyList rule*/
+private List<Function> additionalBNodeAtoms;
 
 /** All variables */
 private Set<Term> variableSet = new HashSet<Term>();
@@ -205,7 +207,53 @@ private String removeBrackets(String text) {
 	   }
 	   return toReturn;
 	}
-	
+
+	/** A method which construct BNode templates according to the pattern given in the string text
+	 *  It is very similar to construct function for URI templates
+	 */
+    private Term constructBNode(String text) {
+       Term toReturn = null;
+       final String PLACEHOLDER = "{}";
+       List<Term> terms = new LinkedList<Term>();
+       if (text.startsWith("_:")){
+                   text = text.replaceFirst("_:","");
+       }
+       List<FormatString> tokens = parse(text);
+       int size = tokens.size();
+       if (size == 1) {
+          FormatString token = tokens.get(0);
+          if (token instanceof FixedString) {
+              ValueConstant uriTemplate = dfac.getConstantLiteral(token.toString()); // a single URI template
+              toReturn = dfac.getBNodeTemplate(uriTemplate);
+          }
+          else if (token instanceof ColumnString) {
+             ValueConstant uriTemplate = dfac.getConstantLiteral(PLACEHOLDER); // a single URI template
+             Variable column = dfac.getVariable(token.toString());
+             terms.add(0, uriTemplate);
+             terms.add(column);
+             toReturn = dfac.getBNodeTemplate(terms);
+          }
+       }
+       else {
+          StringBuilder sb = new StringBuilder();
+          for(FormatString token : tokens) {
+             if (token instanceof FixedString) { // if part of URI template
+                sb.append(token.toString());
+             }
+             else if (token instanceof ColumnString) {
+                sb.append(PLACEHOLDER);
+                Variable column = dfac.getVariable(token.toString());
+                terms.add(column);
+             }
+          }
+          ValueConstant uriTemplate = dfac.getConstantLiteral(sb.toString()); // complete URI template
+          terms.add(0, uriTemplate);
+          toReturn = dfac.getBNodeTemplate(terms);
+       }
+       return toReturn;
+    }
+
+
 // Column placeholder pattern
 private static final String formatSpecifier = "\\{([^\\}]+)?\\}";
 private static Pattern chPattern = Pattern.compile(formatSpecifier);
@@ -250,21 +298,21 @@ private class ColumnString implements FormatString {
    @Override public String toString() { return s; }
 }
 
-	//this function distinguishes curly bracket with 
-	//back slash "\{" from curly bracket "{" 
+	//this function distinguishes curly bracket with
+	//back slash "\{" from curly bracket "{"
 	private int getIndexOfCurlyB(String str){
 	   int i;
 	   int j;
 	   i = str.indexOf("{");
 	   j = str.indexOf("\\{");
-	      while((i-1 == j) &&(j != -1)){		
+	      while((i-1 == j) &&(j != -1)){
 		i = str.indexOf("{",i+1);
-		j = str.indexOf("\\{",j+1);		
-	      }	
+		j = str.indexOf("\\{",j+1);
+	      }
 	  return i;
 	}
-	
-	//in case of concat this function parses the literal 
+
+	//in case of concat this function parses the literal
 	//and adds parsed constant literals and template literal to terms list
 	private ArrayList<Term> addToTermsList(String str){
 	   ArrayList<Term> terms = new ArrayList<Term>();
@@ -292,8 +340,8 @@ private class ColumnString implements FormatString {
 	   }
 	   return terms;
 	}
-	
-	//this function returns nested concats 
+
+	//this function returns nested concats
 	//in case of more than two terms need to be concatted
 	private Term getNestedConcat(String str){
 	   ArrayList<Term> terms = new ArrayList<Term>();
@@ -385,8 +433,20 @@ private static boolean isRDFType(Term pred) {
 		return false;
 	}
 
+
+
+/**
+ * This method creates unique Bnode
+ *
+ */
+private Function createBNode() {
+    Function f;
+    List<Term> emptyTermList = new LinkedList<Term>();
+    f = dfac.getBNodeTemplate(emptyTermList);
+    return f;
 }
 
+} /** end of @members */
 
 /*------------------------------------------------------------------
  * PARSER RULES
@@ -412,6 +472,16 @@ directiveStatement
   ;
 
 triplesStatement returns [List<Function> value]
+ @init {
+    additionalBNodeAtoms = new LinkedList<Function>();
+ }
+ @after {
+     if (additionalBNodeAtoms != null && !additionalBNodeAtoms.isEmpty() ) {
+         // If there are additional attoms which were made through nesting of bnodes
+         $value.addAll(additionalBNodeAtoms);
+     }
+  }
+
   : triples WS* PERIOD { $value = $triples.value; }
   ;
 
@@ -435,29 +505,52 @@ prefixID
   ;
 
 triples returns [List<Function> value]
-  : subject { currentSubject = $subject.value; } predicateObjectList {
+  : subject predicateObjectList[$subject.value] {
       $value = $predicateObjectList.value;
     }
+  | bl=blankNodePropertyList {$value=$bl.listOfFunctions; }
+    (
+        pl=predicateObjectList [$bl.bnode] {$value.addAll($pl.value); }
+    )?
   ;
 
-predicateObjectList returns [List<Function> value]
+predicateObjectList[Term subject] returns [List<Function> value]
 @init {
    $value = new LinkedList<Function>();
 }
   : v1=verb  l1= objectList{
       for (Term object : $l1.value) {
-        Function atom = makeAtom(currentSubject, $v1.value, object);
+        Function atom = makeAtom($subject, $v1.value, object);
         $value.add(atom);
       }
-    } 
+    }
     (SEMI v2=verb l2=objectList {
       for (Term object : $l2.value) {
-        Function atom = makeAtom(currentSubject, $v2.value, object);
+        Function atom = makeAtom($subject, $v2.value, object);
         $value.add(atom);
       }
     })*
   ;
-  
+
+/** This rule can be found in the place of subject of some triple or in the place of the object.
+https://www.w3.org/TR/2014/REC-turtle-20140225/#grammar-production-blankNodePropertyList
+Since we have this twofold nature of the element we have two return parameters bnode and
+listOfFunctions.
+
+*/
+blankNodePropertyList returns [Term bnode, List<Function> listOfFunctions]
+  : LSQ_BRACKET{
+        //A new bNode is created as a subject for all triples created within predicateObjectList.
+        //The newly created bNode is passed as an input parameter of the predicateObjectList
+        $bnode = createBNode();
+    }
+    l=predicateObjectList[$bnode]{
+        $listOfFunctions = $l.value;
+    }
+    RSQ_BRACKET
+  ;
+
+
 //verb returns [String value]
 verb returns [Term value]
   : predicate { $value = $predicate.value; }
@@ -471,19 +564,19 @@ objectList returns [List<Term> value]
 @init {
   $value = new ArrayList<Term>();
 }
-  : o1=object { $value.add($o1.value); } (COMMA o2=object { $value.add($o2.value); })* 
+  : o1=object { $value.add($o1.value); } (COMMA o2=object { $value.add($o2.value); })*
   ;
 
 subject returns [Term value]
   : resource { $value = $resource.value; }
   | variable { $value = $variable.value; }
-//  | blank
+  | blank  { $value = $blank.value; }
   ;
 
 //predicate returns [String value]
 predicate returns [Term value]
   : resource {
-  	$value = $resource.value; 
+  	$value = $resource.value;
 //      Term nl = $resource.value;
 //      if (nl instanceof URIConstant) {
 //        URIConstant c = (URIConstant) nl;
@@ -499,7 +592,12 @@ object returns [Term value]
   | literal  { $value = $literal.value; }
   | typedLiteral { $value = $typedLiteral.value; }
   | variable { $value = $variable.value; }
-//  | blank
+  | blank { $value = $blank.value; }
+  | bl=blankNodePropertyList {
+        $value = $bl.bnode;
+        //* Additional triples (atoms) created within blankNodePropertyList are added to a global list
+        additionalBNodeAtoms.addAll($bl.listOfFunctions);
+    }
   ;
 
 resource returns [Term value]
@@ -521,9 +619,9 @@ qname returns [String value]
     }
   ;
 
-blank
-  : nodeID
-  | BLANK
+blank returns [Term value]
+  : BLANK_NODE_LABEL { $value = constructBNode($BLANK_NODE_LABEL.text); }
+  | ANON { $value = createBNode(); }
   ;
 
 variable returns [Variable value]
@@ -532,7 +630,7 @@ variable returns [Variable value]
       variableSet.add($value);
     }
   ;
-  
+
 function returns [Function value]
   : resource LPAREN terms RPAREN {
       String functionName = $resource.value.toString();
@@ -545,7 +643,7 @@ function returns [Function value]
 typedLiteral returns [Function value]
   : variable AT language {
       Variable var = $variable.value;
-      Term lang = $language.value;   
+      Term lang = $language.value;
       $value = dfac.getTypedTerm(var, lang);
 
     }
@@ -560,12 +658,12 @@ typedLiteral returns [Function value]
         throw new IllegalArgumentException("$resource.value should be an URI");
     }
     Predicate.COL_TYPE type = dtfac.getDatatype(functionName);
-    if (type == null)  
+    if (type == null)
  	  throw new RuntimeException("ERROR. A mapping involves an unsupported datatype. \nOffending datatype:" + functionName);
     
       $value = dfac.getTypedTerm(var, type);
 
-	
+
      }
   ;
 
@@ -607,7 +705,7 @@ literal returns [Term value]
              value = dfac.getTypedTerm(f,lang);
           }else{
              value = dfac.getTypedTerm(f, COL_TYPE.LITERAL);
-          }       
+          }
        }else{
 
        //if variable we cannot assign a datatype yet
@@ -666,10 +764,6 @@ numericLiteral returns [Term value]
   | numericNegative { $value = $numericNegative.value; }
   ;
 
-nodeID
-  : BLANK_PREFIX name
-  ;
-
 relativeURI // Not used
   : STRING_URI
   ;
@@ -677,7 +771,7 @@ relativeURI // Not used
 namespace
   : NAMESPACE
   ;
-  
+
 defaultNamespace
   : COLON
   ;
@@ -790,7 +884,7 @@ GREATER:       '>';
 SLASH:         '/';
 DOUBLE_SLASH:  '//';
 BACKSLASH:     '\\';
-BLANK:	       '[]';
+ANON:	       '[]';
 BLANK_PREFIX:  '_:';
 TILDE:         '~';
 CARET:         '^';
@@ -853,7 +947,7 @@ INTEGER_NEGATIVE
 DOUBLE_POSITIVE
   : PLUS DOUBLE
   ;
-  
+
 DOUBLE_NEGATIVE
   : MINUS DOUBLE
   ;
@@ -861,7 +955,7 @@ DOUBLE_NEGATIVE
 DECIMAL_POSITIVE
   : PLUS DECIMAL
   ;
-  
+
 DECIMAL_NEGATIVE
   : MINUS DECIMAL
   ;
@@ -900,6 +994,11 @@ NAMESPACE
   : NAME_START_CHAR (NAME_CHAR)* COLON
   ;
 
+//This definition must be before  PREFIXED_NAME because otherwise can never be matched
+BLANK_NODE_LABEL
+  : BLANK_PREFIX NCNAME_EXT
+  ;
+
 PREFIXED_NAME
   : NCNAME? COLON NCNAME_EXT
   ;
@@ -931,6 +1030,6 @@ STRING_WITH_CURLY_BRACKET
 STRING_URI
   : SCHEMA COLON DOUBLE_SLASH (URI_PATH)*
   ;
-  
+
 WS: (' '|'\t'|('\n'|'\r'('\n')))+ {$channel=HIDDEN;};
   

@@ -124,7 +124,7 @@ public class OBDAMappingTransformer {
 
 		//Now we add the template!!
 		Function uriTemplate = (Function) tquery.get(0).getTerm(0); //URI("..{}..", , )
-		String subjectTemplate =  URITemplates.getUriTemplateString(uriTemplate, prefixmng);
+		String subjectTemplate =  URITemplates.getTemplateString(uriTemplate, prefixmng);
 		
 		//add template subject
 		statements.add(vf.createStatement(subjectNode, R2RMLVocabulary.template, vf.createLiteral(subjectTemplate)));
@@ -151,7 +151,7 @@ public class OBDAMappingTransformer {
 					}
 				    else {
 						//custom predicate
-						predURIString = URITemplates.getUriTemplateString(predf, prefixmng);
+						predURIString = URITemplates.getTemplateString(predf, prefixmng);
 						predUri = vf.createURI(predURIString);
 					}
 				}
@@ -212,7 +212,7 @@ public class OBDAMappingTransformer {
 					//check if uritemplate
 					Predicate objectPred = ((Function) object).getFunctionSymbol();
 					if (objectPred instanceof URITemplatePredicate) {
-						String objectURI =  URITemplates.getUriTemplateString((Function)object, prefixmng);
+						String objectURI =  URITemplates.getTemplateString((Function)object, prefixmng);
 						//add template object
 						statements.add(vf.createStatement(objNode, R2RMLVocabulary.template, vf.createLiteral(objectURI)));
 					}
@@ -275,12 +275,14 @@ public class OBDAMappingTransformer {
 		
 		//SubjectMap
 		Function uriTemplate = (Function) tquery.get(0).getTerm(0); //URI("..{}..", , )
-		String subjectTemplate =  URITemplates.getUriTemplateString(uriTemplate, prefixmng);		
+		String subjectTemplate =  URITemplates.getTemplateString(uriTemplate, prefixmng);
 		Template templs = mfact.createTemplate(subjectTemplate);
 		SubjectMap sm = mfact.createSubjectMap(templs);
-		
+        //
+		if (uriTemplate.getFunctionSymbol() instanceof BNodePredicate)
+			sm.setTermType(R2RMLVocabulary.blankNode);
 		TriplesMap tm = mfact.createTriplesMap(lt, sm);
-		
+
 		//process target query
 		for (Function func : tquery) {
 			random_number = IDGenerator.getNextUniqueID("");
@@ -298,7 +300,7 @@ public class OBDAMappingTransformer {
 					}
 					else {
 						//custom predicate
-						predURIString = URITemplates.getUriTemplateString(predf, prefixmng);
+						predURIString = URITemplates.getTemplateString(predf, prefixmng);
 						predUri = vf.createURI(predURIString);
 					}
 				}	
@@ -378,7 +380,7 @@ public class OBDAMappingTransformer {
 						}
 						else {
 
-							String objectURI = URITemplates.getUriTemplateString((Function) object, prefixmng);
+							String objectURI = URITemplates.getTemplateString((Function) object, prefixmng);
 							//add template object
 							//statements.add(vf.createStatement(objNode, R2RMLVocabulary.template, vf.createLiteral(objectURI)));
 							//obm.setTemplate(mfact.createTemplate(objectURI));

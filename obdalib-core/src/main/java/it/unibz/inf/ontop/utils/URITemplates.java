@@ -103,14 +103,47 @@ public class URITemplates {
      * URI("http://example.org/{}/{}/{}", X, Y, X) -> "http://example.org/{X}/{Y}/{X}"
      * </pre>
      *
-     * @param uriFunction URI Function
+     * TODO:
+     *
+     * Converts a BNode function to a BNode template
+     *
+     * For instance,
+     *
+     * BNode(X,Y) -> "_:{X}_{Y}"
+     *
+     * @param uriOrBNodeFunction URI Function
      * @return a URI template with variable names inside the placeholders
      */
-    public static String getUriTemplateString(Function uriFunction) {
-        ValueConstant term = (ValueConstant) uriFunction.getTerm(0);
-        final String template = term.getValue();
+    public static String getTemplateString(Function uriOrBNodeFunction) {
+
+        if (uriOrBNodeFunction.getFunctionSymbol() instanceof BNodePredicate) {
+            return getBNodeTemplateString(uriOrBNodeFunction);
+        } else if (uriOrBNodeFunction.getFunctionSymbol() instanceof URITemplatePredicate){
+             return getURITemplateString(uriOrBNodeFunction);
+        } else {
+            throw new IllegalArgumentException("Unkown predicate" + uriOrBNodeFunction);
+        }
+
+    }
+
+    private static String getBNodeTemplateString(Function uriFunction) {
+        //function is a BNODE
+        String prefixBNode = "_:";
         List<Variable> varList = new ArrayList<>();
         TermUtils.addReferencedVariablesTo(varList, uriFunction);
+        StringBuilder templateWithVars = new StringBuilder();
+        templateWithVars.append(prefixBNode);
+        templateWithVars.append(varList.stream().
+                map(x -> "{" + x + "}").collect(Collectors.joining("_")));
+
+        return templateWithVars.toString();
+    }
+
+    public static String getURITemplateString(Function bNodeFunction) {
+        ValueConstant term = (ValueConstant) bNodeFunction.getTerm(0);
+        final String template = term.getValue();
+        List<Variable> varList = new ArrayList<>();
+        TermUtils.addReferencedVariablesTo(varList, bNodeFunction);
 
         List<String> splitParts = Splitter.on(PLACE_HOLDER).splitToList(template);
 
@@ -137,8 +170,8 @@ public class URITemplates {
         return templateWithVars.toString();
     }
 
-    public static String getUriTemplateString(Function uriTemplate, PrefixManager prefixmng) {
-        String template = getUriTemplateString(uriTemplate);
+    public static String getTemplateString(Function uriTemplate, PrefixManager prefixmng) {
+        String template = getTemplateString(uriTemplate);
         try {
             template = prefixmng.getExpandForm(template);
         } catch (InvalidPrefixWritingException ex) {

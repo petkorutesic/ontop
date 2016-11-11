@@ -111,9 +111,16 @@ public class R2RMLReader {
 	}
 	
 
+    /*
+    Actual:
+    SELECT * FROM "PUBLIC"."TABLE1" ==> [http://www.example.org/TABLE1(URI("http://example.com/base/_:{}_{}",ATTR1,ATTR2)), http://www.example.org/TABLE1#ATTR1(URI("http://example.com/base/_:{}_{}",ATTR1,ATTR2),http://www.w3.org/2001/XMLSchema#integer(ATTR1)), http://www.example.org/TABLE1#ATTR2(URI("http://example.com/base/_:{}_{}",ATTR1,ATTR2),http://www.w3.org/2001/XMLSchema#integer(ATTR2))]
+
+Expected:
+SELECT * FROM "PUBLIC"."TABLE1" ==> [http://www.example.org/TABLE1(BNode(ATTR1,ATTR2)), http://www.example.org/TABLE1#ATTR1(BNode(ATTR1,ATTR2),http://www.w3.org/2001/XMLSchema#integer(ATTR1)), http://www.example.org/TABLE1#ATTR2(BNode(ATTR1,ATTR2),http://www.w3.org/2001/XMLSchema#integer(ATTR2))]
+    */
 	public static void main(String args[])
 	{
-		String file = "/Users/mindaugas/r2rml/test26.ttl";
+		String file = "/Users/xiao/Projects/petko-ontop/ontop-cli/r2rml.ttl";
 		R2RMLReader reader = null;
 		try {
 			reader = new R2RMLReader(file);

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 /***
- * This is a hack class that helps fix and OBDA model in which the mappings
+ * This is a hack class that helps fix an OBDA model in which the mappings
  * include predicates that have not been properly typed.
  *
  * @author mariano
@@ -155,7 +155,8 @@ public class MappingVocabularyRepair {
         Function newatom;
         if (arguments.size() == 1) {
             Term t0 = arguments.get(0);
-            if ((t0 instanceof Function) && ((Function)t0).getFunctionSymbol() instanceof URITemplatePredicate) {
+            if ((t0 instanceof Function) && (((Function)t0).getFunctionSymbol() instanceof URITemplatePredicate ||
+                    ((Function)t0).getFunctionSymbol() instanceof BNodePredicate)) {
                 newatom = dfac.getFunction(predicate, arguments.get(0));
             } else {
                 String message = String.format("" +
@@ -169,13 +170,15 @@ public class MappingVocabularyRepair {
         } else if (arguments.size() == 2) {
 
             Term t0 = arguments.get(0);
-            if ((t0 instanceof Function) && ((Function) t0).getFunctionSymbol() instanceof URITemplatePredicate) {
+            if ((t0 instanceof Function) && (((Function) t0).getFunctionSymbol() instanceof URITemplatePredicate ||
+                    ((Function) t0).getFunctionSymbol() instanceof BNodePredicate)) {
 
                 //object property
                 if (predicate.isObjectProperty()) {
 
                     Term t1 = arguments.get(1);
-                    if ((t1 instanceof Function) && ((Function) t1).getFunctionSymbol() instanceof URITemplatePredicate) {
+                    if ((t1 instanceof Function) && (((Function) t1).getFunctionSymbol() instanceof URITemplatePredicate ||
+                            ((Function)t1).getFunctionSymbol() instanceof BNodePredicate)) {
                         newatom = dfac.getFunction(predicate, arguments.get(0), arguments.get(1));
 
                     } else {
@@ -202,7 +205,8 @@ public class MappingVocabularyRepair {
                         if (predTarget.isObjectProperty()) {
 
                             Term t1 = arguments.get(1);
-                            if ((t1 instanceof Function) && ((Function) t1).getFunctionSymbol() instanceof URITemplatePredicate) {
+                            if ((t1 instanceof Function) && (((Function) t1).getFunctionSymbol() instanceof URITemplatePredicate ||
+                                    ((Function)t1).getFunctionSymbol() instanceof BNodePredicate)) {
                                 newatom = dfac.getFunction(predTarget, arguments.get(0), arguments.get(1));
 
                             } else {
@@ -249,7 +253,8 @@ public class MappingVocabularyRepair {
         Function fixedTarget;
         if (arguments.size() == 1) {
             Term t0 = arguments.get(0);
-            if ((t0 instanceof Function) && ((Function)t0).getFunctionSymbol() instanceof URITemplatePredicate) {
+            if ((t0 instanceof Function) && (((Function)t0).getFunctionSymbol() instanceof URITemplatePredicate ||
+                    ((Function)t0).getFunctionSymbol() instanceof BNodePredicate)) {
                 Predicate pred = dfac.getClassPredicate(undeclaredPredicate.getName());
                 fixedTarget = dfac.getFunction(pred, arguments.get(0));
             } else {
@@ -270,8 +275,10 @@ public class MappingVocabularyRepair {
                     Function ft0 = (Function) t0;
                     Function ft1 = (Function) t1;
 
-                    boolean t0uri = (ft0.getFunctionSymbol() instanceof URITemplatePredicate);
-                    boolean t1uri = (ft1.getFunctionSymbol() instanceof URITemplatePredicate);
+                    boolean t0uri = ((ft0.getFunctionSymbol() instanceof URITemplatePredicate)||
+                            (ft0.getFunctionSymbol() instanceof BNodePredicate));
+                    boolean t1uri = ((ft1.getFunctionSymbol() instanceof URITemplatePredicate) ||
+                            (ft1.getFunctionSymbol() instanceof BNodePredicate));
 
                     if (t0uri && t1uri) {
                         Predicate pred = dfac.getObjectPropertyPredicate(undeclaredPredicate.getName());

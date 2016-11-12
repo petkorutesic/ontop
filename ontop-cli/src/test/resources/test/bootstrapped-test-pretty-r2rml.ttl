@@ -5,24 +5,24 @@
                            rr:sqlQuery  "SELECT * FROM \"PUBLIC\".\"TABLE1\""
                          ] ;
   rr:predicateObjectMap  [ a             rr:PredicateObjectMap ;
-                           rr:objectMap  [ a            rr:TermMap , rr:ObjectMap ;
-                                           rr:datatype  <http://www.w3.org/2001/XMLSchema#integer> ;
-                                           rr:template  "{ATTR1}" ;
-                                           rr:termType  rr:Literal
-                                         ] ;
-                           rr:predicate  <http://www.example.org/TABLE1#ATTR1>
-                         ] ;
-  rr:predicateObjectMap  [ a             rr:PredicateObjectMap ;
-                           rr:objectMap  [ a            rr:TermMap , rr:ObjectMap ;
+                           rr:objectMap  [ a            rr:ObjectMap , rr:TermMap ;
                                            rr:datatype  <http://www.w3.org/2001/XMLSchema#integer> ;
                                            rr:template  "{ATTR2}" ;
                                            rr:termType  rr:Literal
                                          ] ;
                            rr:predicate  <http://www.example.org/TABLE1#ATTR2>
                          ] ;
-  rr:subjectMap          [ a            rr:TermMap , rr:SubjectMap ;
+  rr:predicateObjectMap  [ a             rr:PredicateObjectMap ;
+                           rr:objectMap  [ a            rr:ObjectMap , rr:TermMap ;
+                                           rr:datatype  <http://www.w3.org/2001/XMLSchema#integer> ;
+                                           rr:template  "{ATTR1}" ;
+                                           rr:termType  rr:Literal
+                                         ] ;
+                           rr:predicate  <http://www.example.org/TABLE1#ATTR1>
+                         ] ;
+  rr:subjectMap          [ a            rr:SubjectMap , rr:TermMap ;
                            rr:class     <http://www.example.org/TABLE1> ;
                            rr:template  "_:{ATTR1}_{ATTR2}" ;
-                           rr:termType  rr:IRI
+                           rr:termType  rr:BlankNode
                          ]
 ] .

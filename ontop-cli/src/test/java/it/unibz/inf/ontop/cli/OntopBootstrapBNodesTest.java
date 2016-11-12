@@ -1,22 +1,23 @@
-package org.semanticweb.ontop.cli;
+package it.unibz.inf.ontop.cli;
 
 /**
  *
- * The purpose of this test is a creation of mappings with B-Nodes
+ * The purpose of this test is to create mappings making use of blank nodes
  *
- * We are going to create an H2 database with simple table without primary keys, the .sql file is fixed.
- * Then, we are going to apply ontop bootstrap on that database and create corresponding
- * owl and obda files
- * there and then query on top.
+ * We create an H2 database with simple table without primary keys,
+ * that will be used for testing.
+ *
+ * Then, we apply ontop bootstrap on that database and create corresponding
+ * owl and obda files and r2rml files which corresponding to
+ * the direct mapping of the database
  */
 
-import it.unibz.krdb.obda.model.OBDAModel;
-import it.unibz.krdb.obda.owlapi3.bootstrapping.DirectMappingBootstrapper;
-import it.unibz.krdb.obda.r2rml.R2RMLWriter;
+import it.unibz.inf.ontop.model.OBDAModel;
+import it.unibz.inf.ontop.owlapi.bootstrapping.DirectMappingBootstrapper;
+import it.unibz.inf.ontop.r2rml.R2RMLWriter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.semanticweb.owlapi.model.OWLOntology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -108,10 +108,10 @@ public class OntopBootstrapBNodesTest {
     }
 
     /**
-     * For a given database the Ontop bootstrap creates a mapping and ontology files.
+     * For the given database the Ontop bootstrap creates the mapping and ontology files.
      * In fact, it creates the mapping and ontology which corresponds to the direct mapping of this
      * database.
-     * Since the database contains a table without a primary key, we are getting mapping which
+     * Since the database contains a table without primary key, we get the mapping which
      * uses blank nodes with place holders
 
     */
@@ -132,10 +132,9 @@ public class OntopBootstrapBNodesTest {
     }
 
     /**
-     * For a given database the Ontop creates the r2rml file which
-     * can be used for the direct mapping.
-
-     *Initial file is also "prettified" to be more readable.
+     * For the given simple database with no primary keys
+     * Ontop creates an r2rml file which can be used for the direct mapping.
+     * Later that file is also "prettified" to be more readable.
 
      */
 
@@ -169,7 +168,6 @@ public class OntopBootstrapBNodesTest {
      * Accordingly, testBootstrapR2RML() test must be executed prior to this one
      * and the file prettifiedr2rmlFile have to be created
      *
-     * @throws Exception
      */
 
     @Test

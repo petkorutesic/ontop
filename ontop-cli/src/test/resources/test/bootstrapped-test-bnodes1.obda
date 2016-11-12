@@ -5,7 +5,7 @@ xsd:		http://www.w3.org/2001/XMLSchema#
 rdfs:		http://www.w3.org/2000/01/rdf-schema#
 
 [SourceDeclaration]
-sourceUri	50c2cc79-f6bd-432c-a85e-addac218a006
+sourceUri	afc4d159-c58e-48d2-935d-9031eecfde1a
 connectionUrl	jdbc:h2:mem:questjunitdb-noprimarykeys
 username	sa
 password	
@@ -13,7 +13,7 @@ driverClass	org.h2.Drive
 
 [MappingDeclaration] @collection [[
 mappingId	MAPPING-ID1
-target		_:{ATTR1}_{STRING} a <http://www.example.org/TABLE1> ; <http://www.example.org/TABLE1#ATTR1> {ATTR1}^^xsd:integer ; <http://www.example.org/TABLE1#STRING> {STRING} . 
+target		_:{ATTR1}_{ATTR2} a <http://www.example.org/TABLE1> ; <http://www.example.org/TABLE1#ATTR1> {ATTR1}^^xsd:integer ; <http://www.example.org/TABLE1#ATTR2> {ATTR2}^^xsd:integer . 
 source		SELECT * FROM "PUBLIC"."TABLE1"
 ]]
 

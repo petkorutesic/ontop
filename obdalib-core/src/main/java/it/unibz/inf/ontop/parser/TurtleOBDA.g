@@ -48,6 +48,7 @@ import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl;
 import it.unibz.inf.ontop.model.impl.OBDAVocabulary;
 import it.unibz.inf.ontop.utils.QueryUtils;
 import it.unibz.inf.ontop.model.URITemplatePredicate;
+import it.unibz.inf.ontop.model.ExpressionOperation;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -352,9 +353,10 @@ private class ColumnString implements FormatString {
           return v;
 	   }
 
-	   Function f = dfac.getFunctionConcat(terms.get(0),terms.get(1));
-           for(int j=2;j<terms.size();j++){
-              f = dfac.getFunctionConcat(f,terms.get(j));
+       Function f = dfac.getFunction(ExpressionOperation.CONCAT, terms.get(0), terms.get(1));
+           for(int j=2;j<terms.size();j++) {
+              f = dfac.getFunction(ExpressionOperation.CONCAT, f, terms.get(j));
+
            }
 
 	   return f;
@@ -691,7 +693,7 @@ term returns [Term value]
 /*
 concat returns [Function value]
 : QUOTE_DOUBLE t1=term t2=term QUOTE_DOUBLE{
-        $value = dfac.getFunctionConcat($t1.value, $t2.value);
+        $value = dfac.getFunction(ExpressionOperation.CONCAT, $t1.value, $t2.value);
 }
 ;
 */

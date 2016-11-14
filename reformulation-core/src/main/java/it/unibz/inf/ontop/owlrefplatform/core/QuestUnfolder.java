@@ -82,9 +82,15 @@ public class QuestUnfolder {
 		 */
 		preprocessProjection(mappings, metadata);
 
-		/**
-		 * Split the mapping (creates a new set of mappings)
-		 */
+        /**
+         * Substitute unlabel BNodes BNode[i] with proper templates
+         */
+        preprocessUnlabeledBlankNodeTemplates(mappings, metadata);
+
+
+        /**
+         * Split the mapping (creates a new set of mappings)
+         */
 		Collection<OBDAMappingAxiom> splittedMappings = MappingSplitter.splitMappings(mappings);
 		
 		/**
@@ -141,9 +147,14 @@ public class QuestUnfolder {
 		
 		this.ufp = unfoldingProgram;
 	}
-	
-		
-	/**
+
+    private void preprocessUnlabeledBlankNodeTemplates(Collection<OBDAMappingAxiom> mappings, DBMetadata metadata) {
+        // TODO: replace UnlabeledBlankNodeTemplates with proper ones
+        // you can use the metadata object to retrieve primary keys
+    }
+
+
+    /**
 	 * Setting up the unfolder and SQL generation
 	 * @param reformulationReasoner 
 	 * @param mappings
@@ -418,13 +429,13 @@ public class QuestUnfolder {
 
 				List<Function> targetQuery = axiom.getTargetQuery();
 				Set<Variable> variables = new HashSet<>();
-				for (Function atom : targetQuery) 
+				for (Function atom : targetQuery)
 					TermUtils.addReferencedVariablesTo(variables, atom);
-				
+
 				PreprocessProjection ps = new PreprocessProjection(metadata);
 				String query = ps.getMappingQuery(select, variables);
 				axiom.setSourceQuery(fac.getSQLQuery(query));
-			} 
+			}
 			catch (JSQLParserException e) {
 				log.debug("SQL Query cannot be preprocessed by the parser");
 			}

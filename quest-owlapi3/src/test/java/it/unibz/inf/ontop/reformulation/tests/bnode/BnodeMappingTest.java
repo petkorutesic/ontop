@@ -231,7 +231,7 @@ public class BnodeMappingTest {
 	public void testBNodesMapping3() throws Exception {
 		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a _:k.}";
 		int numberResults = runTests(query);
-		assertEquals(32, numberResults);
+		assertEquals(30, numberResults);
 	}
 
 }

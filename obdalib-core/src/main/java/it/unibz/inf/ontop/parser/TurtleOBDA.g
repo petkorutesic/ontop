@@ -520,7 +520,7 @@ triples returns [List<Function> value]
   : subject predicateObjectList[$subject.value] {
       $value = $predicateObjectList.value;
     }
-  | bl=blankNodePropertyList {$value=$bl.listOfFunctions; }
+  | bl=blankNodePropertyList {$value=$bl.nestedTriplePatternsInBNode; }
     (
         pl=predicateObjectList [$bl.bnode] {$value.addAll($pl.value); }
     )?
@@ -547,17 +547,17 @@ predicateObjectList[Term subject] returns [List<Function> value]
 /** This rule can be found in the place of subject of some triple or in the place of the object.
 https://www.w3.org/TR/2014/REC-turtle-20140225/#grammar-production-blankNodePropertyList
 Since we have this twofold nature of the element we have two return parameters bnode and
-listOfFunctions.
+nestedTriplePatternsInBNode.
 
 */
-blankNodePropertyList returns [Term bnode, List<Function> listOfFunctions]
+blankNodePropertyList returns [Term bnode, List<Function> nestedTriplePatternsInBNode]
   : LSQ_BRACKET{
         //A new bNode is created as a subject for all triples created within predicateObjectList.
         //The newly created bNode is passed as an input parameter of the predicateObjectList
         $bnode = createBNode();
     }
     l=predicateObjectList[$bnode]{
-        $listOfFunctions = $l.value;
+        $nestedTriplePatternsInBNode = $l.value;
     }
     RSQ_BRACKET
   ;
@@ -608,7 +608,7 @@ object returns [Term value]
   | bl=blankNodePropertyList {
         $value = $bl.bnode;
         //* Additional triples (atoms) created within blankNodePropertyList are added to a global list
-        additionalBNodeAtoms.addAll($bl.listOfFunctions);
+        additionalBNodeAtoms.addAll($bl.nestedTriplePatternsInBNode);
     }
   ;
 

@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 TurtleOBDA.g 2016-11-14 13:45:30
+// $ANTLR 3.5.2 TurtleOBDA.g 2016-11-14 14:57:23
 
 package it.unibz.inf.ontop.parser;
 
@@ -504,7 +504,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "parse"
-	// TurtleOBDA.g:465:1: parse returns [List<Function> value] : ( directiveStatement )* t1= triplesStatement (t2= triplesStatement )* EOF ;
+	// TurtleOBDA.g:467:1: parse returns [List<Function> value] : ( directiveStatement )* t1= triplesStatement (t2= triplesStatement )* EOF ;
 	public final List<Function> parse() throws RecognitionException {
 		List<Function> value = null;
 
@@ -513,10 +513,10 @@ public class TurtleOBDAParser extends Parser {
 		List<Function> t2 =null;
 
 		try {
-			// TurtleOBDA.g:466:3: ( ( directiveStatement )* t1= triplesStatement (t2= triplesStatement )* EOF )
-			// TurtleOBDA.g:466:5: ( directiveStatement )* t1= triplesStatement (t2= triplesStatement )* EOF
+			// TurtleOBDA.g:468:3: ( ( directiveStatement )* t1= triplesStatement (t2= triplesStatement )* EOF )
+			// TurtleOBDA.g:468:5: ( directiveStatement )* t1= triplesStatement (t2= triplesStatement )* EOF
 			{
-			// TurtleOBDA.g:466:5: ( directiveStatement )*
+			// TurtleOBDA.g:468:5: ( directiveStatement )*
 			loop1:
 			while (true) {
 				int alt1=2;
@@ -527,9 +527,9 @@ public class TurtleOBDAParser extends Parser {
 
 				switch (alt1) {
 				case 1 :
-					// TurtleOBDA.g:466:5: directiveStatement
+					// TurtleOBDA.g:468:5: directiveStatement
 					{
-					pushFollow(FOLLOW_directiveStatement_in_parse60);
+					pushFollow(FOLLOW_directiveStatement_in_parse61);
 					directiveStatement();
 					state._fsp--;
 
@@ -541,14 +541,14 @@ public class TurtleOBDAParser extends Parser {
 				}
 			}
 
-			pushFollow(FOLLOW_triplesStatement_in_parse69);
+			pushFollow(FOLLOW_triplesStatement_in_parse70);
 			t1=triplesStatement();
 			state._fsp--;
 
 
 			      value =  t1;
 			    
-			// TurtleOBDA.g:470:7: (t2= triplesStatement )*
+			// TurtleOBDA.g:472:7: (t2= triplesStatement )*
 			loop2:
 			while (true) {
 				int alt2=2;
@@ -559,9 +559,9 @@ public class TurtleOBDAParser extends Parser {
 
 				switch (alt2) {
 				case 1 :
-					// TurtleOBDA.g:470:8: t2= triplesStatement
+					// TurtleOBDA.g:472:8: t2= triplesStatement
 					{
-					pushFollow(FOLLOW_triplesStatement_in_parse82);
+					pushFollow(FOLLOW_triplesStatement_in_parse83);
 					t2=triplesStatement();
 					state._fsp--;
 
@@ -581,7 +581,7 @@ public class TurtleOBDAParser extends Parser {
 				}
 			}
 
-			match(input,EOF,FOLLOW_EOF_in_parse89); 
+			match(input,EOF,FOLLOW_EOF_in_parse90); 
 			}
 
 		}
@@ -599,17 +599,17 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "directiveStatement"
-	// TurtleOBDA.g:480:1: directiveStatement : directive PERIOD ;
+	// TurtleOBDA.g:482:1: directiveStatement : directive PERIOD ;
 	public final void directiveStatement() throws RecognitionException {
 		try {
-			// TurtleOBDA.g:481:3: ( directive PERIOD )
-			// TurtleOBDA.g:481:5: directive PERIOD
+			// TurtleOBDA.g:483:3: ( directive PERIOD )
+			// TurtleOBDA.g:483:5: directive PERIOD
 			{
-			pushFollow(FOLLOW_directive_in_directiveStatement102);
+			pushFollow(FOLLOW_directive_in_directiveStatement103);
 			directive();
 			state._fsp--;
 
-			match(input,PERIOD,FOLLOW_PERIOD_in_directiveStatement104); 
+			match(input,PERIOD,FOLLOW_PERIOD_in_directiveStatement105); 
 			}
 
 		}
@@ -626,7 +626,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "triplesStatement"
-	// TurtleOBDA.g:484:1: triplesStatement returns [List<Function> value] : triples ( WS )* PERIOD ;
+	// TurtleOBDA.g:486:1: triplesStatement returns [List<Function> value] : triples ( WS )* PERIOD ;
 	public final List<Function> triplesStatement() throws RecognitionException {
 		List<Function> value = null;
 
@@ -637,14 +637,14 @@ public class TurtleOBDAParser extends Parser {
 		    additionalBNodeAtoms = new LinkedList<Function>();
 		 
 		try {
-			// TurtleOBDA.g:495:3: ( triples ( WS )* PERIOD )
-			// TurtleOBDA.g:495:5: triples ( WS )* PERIOD
+			// TurtleOBDA.g:497:3: ( triples ( WS )* PERIOD )
+			// TurtleOBDA.g:497:5: triples ( WS )* PERIOD
 			{
-			pushFollow(FOLLOW_triples_in_triplesStatement134);
+			pushFollow(FOLLOW_triples_in_triplesStatement135);
 			triples1=triples();
 			state._fsp--;
 
-			// TurtleOBDA.g:495:13: ( WS )*
+			// TurtleOBDA.g:497:13: ( WS )*
 			loop3:
 			while (true) {
 				int alt3=2;
@@ -655,9 +655,9 @@ public class TurtleOBDAParser extends Parser {
 
 				switch (alt3) {
 				case 1 :
-					// TurtleOBDA.g:495:13: WS
+					// TurtleOBDA.g:497:13: WS
 					{
-					match(input,WS,FOLLOW_WS_in_triplesStatement136); 
+					match(input,WS,FOLLOW_WS_in_triplesStatement137); 
 					}
 					break;
 
@@ -666,7 +666,7 @@ public class TurtleOBDAParser extends Parser {
 				}
 			}
 
-			match(input,PERIOD,FOLLOW_PERIOD_in_triplesStatement139); 
+			match(input,PERIOD,FOLLOW_PERIOD_in_triplesStatement140); 
 			 value = triples1; 
 			}
 
@@ -691,10 +691,10 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "directive"
-	// TurtleOBDA.g:498:1: directive : ( base | prefixID );
+	// TurtleOBDA.g:500:1: directive : ( base | prefixID );
 	public final void directive() throws RecognitionException {
 		try {
-			// TurtleOBDA.g:499:3: ( base | prefixID )
+			// TurtleOBDA.g:501:3: ( base | prefixID )
 			int alt4=2;
 			int LA4_0 = input.LA(1);
 			if ( (LA4_0==AT) ) {
@@ -728,18 +728,18 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt4) {
 				case 1 :
-					// TurtleOBDA.g:499:5: base
+					// TurtleOBDA.g:501:5: base
 					{
-					pushFollow(FOLLOW_base_in_directive154);
+					pushFollow(FOLLOW_base_in_directive155);
 					base();
 					state._fsp--;
 
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:500:5: prefixID
+					// TurtleOBDA.g:502:5: prefixID
 					{
-					pushFollow(FOLLOW_prefixID_in_directive160);
+					pushFollow(FOLLOW_prefixID_in_directive161);
 					prefixID();
 					state._fsp--;
 
@@ -761,15 +761,15 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "base"
-	// TurtleOBDA.g:503:1: base : AT BASE uriref ;
+	// TurtleOBDA.g:505:1: base : AT BASE uriref ;
 	public final void base() throws RecognitionException {
 		try {
-			// TurtleOBDA.g:504:3: ( AT BASE uriref )
-			// TurtleOBDA.g:504:5: AT BASE uriref
+			// TurtleOBDA.g:506:3: ( AT BASE uriref )
+			// TurtleOBDA.g:506:5: AT BASE uriref
 			{
-			match(input,AT,FOLLOW_AT_in_base173); 
-			match(input,BASE,FOLLOW_BASE_in_base175); 
-			pushFollow(FOLLOW_uriref_in_base177);
+			match(input,AT,FOLLOW_AT_in_base174); 
+			match(input,BASE,FOLLOW_BASE_in_base176); 
+			pushFollow(FOLLOW_uriref_in_base178);
 			uriref();
 			state._fsp--;
 
@@ -789,7 +789,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "prefixID"
-	// TurtleOBDA.g:507:1: prefixID : AT PREFIX ( namespace | defaultNamespace ) uriref ;
+	// TurtleOBDA.g:509:1: prefixID : AT PREFIX ( namespace | defaultNamespace ) uriref ;
 	public final void prefixID() throws RecognitionException {
 		ParserRuleReturnScope namespace2 =null;
 		ParserRuleReturnScope defaultNamespace3 =null;
@@ -799,12 +799,12 @@ public class TurtleOBDAParser extends Parser {
 		  String prefix = "";
 
 		try {
-			// TurtleOBDA.g:511:3: ( AT PREFIX ( namespace | defaultNamespace ) uriref )
-			// TurtleOBDA.g:511:5: AT PREFIX ( namespace | defaultNamespace ) uriref
+			// TurtleOBDA.g:513:3: ( AT PREFIX ( namespace | defaultNamespace ) uriref )
+			// TurtleOBDA.g:513:5: AT PREFIX ( namespace | defaultNamespace ) uriref
 			{
-			match(input,AT,FOLLOW_AT_in_prefixID195); 
-			match(input,PREFIX,FOLLOW_PREFIX_in_prefixID197); 
-			// TurtleOBDA.g:511:15: ( namespace | defaultNamespace )
+			match(input,AT,FOLLOW_AT_in_prefixID196); 
+			match(input,PREFIX,FOLLOW_PREFIX_in_prefixID198); 
+			// TurtleOBDA.g:513:15: ( namespace | defaultNamespace )
 			int alt5=2;
 			int LA5_0 = input.LA(1);
 			if ( (LA5_0==NAMESPACE) ) {
@@ -822,9 +822,9 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt5) {
 				case 1 :
-					// TurtleOBDA.g:511:16: namespace
+					// TurtleOBDA.g:513:16: namespace
 					{
-					pushFollow(FOLLOW_namespace_in_prefixID200);
+					pushFollow(FOLLOW_namespace_in_prefixID201);
 					namespace2=namespace();
 					state._fsp--;
 
@@ -832,9 +832,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:511:58: defaultNamespace
+					// TurtleOBDA.g:513:58: defaultNamespace
 					{
-					pushFollow(FOLLOW_defaultNamespace_in_prefixID206);
+					pushFollow(FOLLOW_defaultNamespace_in_prefixID207);
 					defaultNamespace3=defaultNamespace();
 					state._fsp--;
 
@@ -844,7 +844,7 @@ public class TurtleOBDAParser extends Parser {
 
 			}
 
-			pushFollow(FOLLOW_uriref_in_prefixID211);
+			pushFollow(FOLLOW_uriref_in_prefixID212);
 			uriref4=uriref();
 			state._fsp--;
 
@@ -868,7 +868,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "triples"
-	// TurtleOBDA.g:517:1: triples returns [List<Function> value] : ( subject predicateObjectList[$subject.value] |bl= blankNodePropertyList (pl= predicateObjectList[$bl.bnode] )? );
+	// TurtleOBDA.g:519:1: triples returns [List<Function> value] : ( subject predicateObjectList[$subject.value] |bl= blankNodePropertyList (pl= predicateObjectList[$bl.bnode] )? );
 	public final List<Function> triples() throws RecognitionException {
 		List<Function> value = null;
 
@@ -879,7 +879,7 @@ public class TurtleOBDAParser extends Parser {
 		List<Function> predicateObjectList6 =null;
 
 		try {
-			// TurtleOBDA.g:518:3: ( subject predicateObjectList[$subject.value] |bl= blankNodePropertyList (pl= predicateObjectList[$bl.bnode] )? )
+			// TurtleOBDA.g:520:3: ( subject predicateObjectList[$subject.value] |bl= blankNodePropertyList (pl= predicateObjectList[$bl.bnode] )? )
 			int alt7=2;
 			int LA7_0 = input.LA(1);
 			if ( (LA7_0==ANON||LA7_0==BLANK_NODE_LABEL||LA7_0==PREFIXED_NAME||(LA7_0 >= STRING_WITH_BRACKET && LA7_0 <= STRING_WITH_CURLY_BRACKET)) ) {
@@ -897,13 +897,13 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt7) {
 				case 1 :
-					// TurtleOBDA.g:518:5: subject predicateObjectList[$subject.value]
+					// TurtleOBDA.g:520:5: subject predicateObjectList[$subject.value]
 					{
-					pushFollow(FOLLOW_subject_in_triples230);
+					pushFollow(FOLLOW_subject_in_triples231);
 					subject5=subject();
 					state._fsp--;
 
-					pushFollow(FOLLOW_predicateObjectList_in_triples232);
+					pushFollow(FOLLOW_predicateObjectList_in_triples233);
 					predicateObjectList6=predicateObjectList(subject5);
 					state._fsp--;
 
@@ -913,14 +913,14 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:521:5: bl= blankNodePropertyList (pl= predicateObjectList[$bl.bnode] )?
+					// TurtleOBDA.g:523:5: bl= blankNodePropertyList (pl= predicateObjectList[$bl.bnode] )?
 					{
-					pushFollow(FOLLOW_blankNodePropertyList_in_triples243);
+					pushFollow(FOLLOW_blankNodePropertyList_in_triples244);
 					bl=blankNodePropertyList();
 					state._fsp--;
 
-					value =(bl!=null?((TurtleOBDAParser.blankNodePropertyList_return)bl).listOfFunctions:null); 
-					// TurtleOBDA.g:522:5: (pl= predicateObjectList[$bl.bnode] )?
+					value =(bl!=null?((TurtleOBDAParser.blankNodePropertyList_return)bl).nestedTriplePatternsInBNode:null); 
+					// TurtleOBDA.g:524:5: (pl= predicateObjectList[$bl.bnode] )?
 					int alt6=2;
 					int LA6_0 = input.LA(1);
 					if ( (LA6_0==PREFIXED_NAME||LA6_0==STRING_WITH_BRACKET||LA6_0==78) ) {
@@ -928,9 +928,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					switch (alt6) {
 						case 1 :
-							// TurtleOBDA.g:523:9: pl= predicateObjectList[$bl.bnode]
+							// TurtleOBDA.g:525:9: pl= predicateObjectList[$bl.bnode]
 							{
-							pushFollow(FOLLOW_predicateObjectList_in_triples263);
+							pushFollow(FOLLOW_predicateObjectList_in_triples264);
 							pl=predicateObjectList((bl!=null?((TurtleOBDAParser.blankNodePropertyList_return)bl).bnode:null));
 							state._fsp--;
 
@@ -959,7 +959,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "predicateObjectList"
-	// TurtleOBDA.g:527:1: predicateObjectList[Term subject] returns [List<Function> value] : v1= verb l1= objectList ( SEMI v2= verb l2= objectList )* ;
+	// TurtleOBDA.g:529:1: predicateObjectList[Term subject] returns [List<Function> value] : v1= verb l1= objectList ( SEMI v2= verb l2= objectList )* ;
 	public final List<Function> predicateObjectList(Term subject) throws RecognitionException {
 		List<Function> value = null;
 
@@ -973,14 +973,14 @@ public class TurtleOBDAParser extends Parser {
 		   value = new LinkedList<Function>();
 
 		try {
-			// TurtleOBDA.g:531:3: (v1= verb l1= objectList ( SEMI v2= verb l2= objectList )* )
-			// TurtleOBDA.g:531:5: v1= verb l1= objectList ( SEMI v2= verb l2= objectList )*
+			// TurtleOBDA.g:533:3: (v1= verb l1= objectList ( SEMI v2= verb l2= objectList )* )
+			// TurtleOBDA.g:533:5: v1= verb l1= objectList ( SEMI v2= verb l2= objectList )*
 			{
-			pushFollow(FOLLOW_verb_in_predicateObjectList299);
+			pushFollow(FOLLOW_verb_in_predicateObjectList300);
 			v1=verb();
 			state._fsp--;
 
-			pushFollow(FOLLOW_objectList_in_predicateObjectList305);
+			pushFollow(FOLLOW_objectList_in_predicateObjectList306);
 			l1=objectList();
 			state._fsp--;
 
@@ -990,7 +990,7 @@ public class TurtleOBDAParser extends Parser {
 			        value.add(atom);
 			      }
 			    
-			// TurtleOBDA.g:537:5: ( SEMI v2= verb l2= objectList )*
+			// TurtleOBDA.g:539:5: ( SEMI v2= verb l2= objectList )*
 			loop8:
 			while (true) {
 				int alt8=2;
@@ -1001,14 +1001,14 @@ public class TurtleOBDAParser extends Parser {
 
 				switch (alt8) {
 				case 1 :
-					// TurtleOBDA.g:537:6: SEMI v2= verb l2= objectList
+					// TurtleOBDA.g:539:6: SEMI v2= verb l2= objectList
 					{
-					match(input,SEMI,FOLLOW_SEMI_in_predicateObjectList313); 
-					pushFollow(FOLLOW_verb_in_predicateObjectList317);
+					match(input,SEMI,FOLLOW_SEMI_in_predicateObjectList314); 
+					pushFollow(FOLLOW_verb_in_predicateObjectList318);
 					v2=verb();
 					state._fsp--;
 
-					pushFollow(FOLLOW_objectList_in_predicateObjectList321);
+					pushFollow(FOLLOW_objectList_in_predicateObjectList322);
 					l2=objectList();
 					state._fsp--;
 
@@ -1043,12 +1043,12 @@ public class TurtleOBDAParser extends Parser {
 
 	public static class blankNodePropertyList_return extends ParserRuleReturnScope {
 		public Term bnode;
-		public List<Function> listOfFunctions;
+		public List<Function> nestedTriplePatternsInBNode;
 	};
 
 
 	// $ANTLR start "blankNodePropertyList"
-	// TurtleOBDA.g:551:1: blankNodePropertyList returns [Term bnode, List<Function> listOfFunctions] : LSQ_BRACKET l= predicateObjectList[$bnode] RSQ_BRACKET ;
+	// TurtleOBDA.g:553:1: blankNodePropertyList returns [Term bnode, List<Function> nestedTriplePatternsInBNode] : LSQ_BRACKET l= predicateObjectList[$bnode] RSQ_BRACKET ;
 	public final TurtleOBDAParser.blankNodePropertyList_return blankNodePropertyList() throws RecognitionException {
 		TurtleOBDAParser.blankNodePropertyList_return retval = new TurtleOBDAParser.blankNodePropertyList_return();
 		retval.start = input.LT(1);
@@ -1056,23 +1056,23 @@ public class TurtleOBDAParser extends Parser {
 		List<Function> l =null;
 
 		try {
-			// TurtleOBDA.g:552:3: ( LSQ_BRACKET l= predicateObjectList[$bnode] RSQ_BRACKET )
-			// TurtleOBDA.g:552:5: LSQ_BRACKET l= predicateObjectList[$bnode] RSQ_BRACKET
+			// TurtleOBDA.g:554:3: ( LSQ_BRACKET l= predicateObjectList[$bnode] RSQ_BRACKET )
+			// TurtleOBDA.g:554:5: LSQ_BRACKET l= predicateObjectList[$bnode] RSQ_BRACKET
 			{
-			match(input,LSQ_BRACKET,FOLLOW_LSQ_BRACKET_in_blankNodePropertyList344); 
+			match(input,LSQ_BRACKET,FOLLOW_LSQ_BRACKET_in_blankNodePropertyList345); 
 
 			        //A new bNode is created as a subject for all triples created within predicateObjectList.
 			        //The newly created bNode is passed as an input parameter of the predicateObjectList
 			        retval.bnode = createBNode();
 			    
-			pushFollow(FOLLOW_predicateObjectList_in_blankNodePropertyList353);
+			pushFollow(FOLLOW_predicateObjectList_in_blankNodePropertyList354);
 			l=predicateObjectList(retval.bnode);
 			state._fsp--;
 
 
-			        retval.listOfFunctions = l;
+			        retval.nestedTriplePatternsInBNode = l;
 			    
-			match(input,RSQ_BRACKET,FOLLOW_RSQ_BRACKET_in_blankNodePropertyList361); 
+			match(input,RSQ_BRACKET,FOLLOW_RSQ_BRACKET_in_blankNodePropertyList362); 
 			}
 
 			retval.stop = input.LT(-1);
@@ -1092,7 +1092,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "verb"
-	// TurtleOBDA.g:565:1: verb returns [Term value] : ( predicate | 'a' );
+	// TurtleOBDA.g:567:1: verb returns [Term value] : ( predicate | 'a' );
 	public final Term verb() throws RecognitionException {
 		Term value = null;
 
@@ -1100,7 +1100,7 @@ public class TurtleOBDAParser extends Parser {
 		Term predicate7 =null;
 
 		try {
-			// TurtleOBDA.g:566:3: ( predicate | 'a' )
+			// TurtleOBDA.g:568:3: ( predicate | 'a' )
 			int alt9=2;
 			int LA9_0 = input.LA(1);
 			if ( (LA9_0==PREFIXED_NAME||LA9_0==STRING_WITH_BRACKET) ) {
@@ -1118,9 +1118,9 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt9) {
 				case 1 :
-					// TurtleOBDA.g:566:5: predicate
+					// TurtleOBDA.g:568:5: predicate
 					{
-					pushFollow(FOLLOW_predicate_in_verb380);
+					pushFollow(FOLLOW_predicate_in_verb381);
 					predicate7=predicate();
 					state._fsp--;
 
@@ -1128,9 +1128,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:567:5: 'a'
+					// TurtleOBDA.g:569:5: 'a'
 					{
-					match(input,78,FOLLOW_78_in_verb388); 
+					match(input,78,FOLLOW_78_in_verb389); 
 
 					  Term constant = dfac.getConstantLiteral(OBDAVocabulary.RDF_TYPE);
 					  value = dfac.getUriTemplate(constant);
@@ -1154,7 +1154,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "objectList"
-	// TurtleOBDA.g:573:1: objectList returns [List<Term> value] : o1= object ( COMMA o2= object )* ;
+	// TurtleOBDA.g:575:1: objectList returns [List<Term> value] : o1= object ( COMMA o2= object )* ;
 	public final List<Term> objectList() throws RecognitionException {
 		List<Term> value = null;
 
@@ -1166,15 +1166,15 @@ public class TurtleOBDAParser extends Parser {
 		  value = new ArrayList<Term>();
 
 		try {
-			// TurtleOBDA.g:577:3: (o1= object ( COMMA o2= object )* )
-			// TurtleOBDA.g:577:5: o1= object ( COMMA o2= object )*
+			// TurtleOBDA.g:579:3: (o1= object ( COMMA o2= object )* )
+			// TurtleOBDA.g:579:5: o1= object ( COMMA o2= object )*
 			{
-			pushFollow(FOLLOW_object_in_objectList414);
+			pushFollow(FOLLOW_object_in_objectList415);
 			o1=object();
 			state._fsp--;
 
 			 value.add(o1); 
-			// TurtleOBDA.g:577:42: ( COMMA o2= object )*
+			// TurtleOBDA.g:579:42: ( COMMA o2= object )*
 			loop10:
 			while (true) {
 				int alt10=2;
@@ -1185,10 +1185,10 @@ public class TurtleOBDAParser extends Parser {
 
 				switch (alt10) {
 				case 1 :
-					// TurtleOBDA.g:577:43: COMMA o2= object
+					// TurtleOBDA.g:579:43: COMMA o2= object
 					{
-					match(input,COMMA,FOLLOW_COMMA_in_objectList419); 
-					pushFollow(FOLLOW_object_in_objectList423);
+					match(input,COMMA,FOLLOW_COMMA_in_objectList420); 
+					pushFollow(FOLLOW_object_in_objectList424);
 					o2=object();
 					state._fsp--;
 
@@ -1218,7 +1218,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "subject"
-	// TurtleOBDA.g:580:1: subject returns [Term value] : ( resource | variable | blank );
+	// TurtleOBDA.g:582:1: subject returns [Term value] : ( resource | variable | blank );
 	public final Term subject() throws RecognitionException {
 		Term value = null;
 
@@ -1228,7 +1228,7 @@ public class TurtleOBDAParser extends Parser {
 		Term blank10 =null;
 
 		try {
-			// TurtleOBDA.g:581:3: ( resource | variable | blank )
+			// TurtleOBDA.g:583:3: ( resource | variable | blank )
 			int alt11=3;
 			switch ( input.LA(1) ) {
 			case PREFIXED_NAME:
@@ -1255,9 +1255,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt11) {
 				case 1 :
-					// TurtleOBDA.g:581:5: resource
+					// TurtleOBDA.g:583:5: resource
 					{
-					pushFollow(FOLLOW_resource_in_subject444);
+					pushFollow(FOLLOW_resource_in_subject445);
 					resource8=resource();
 					state._fsp--;
 
@@ -1265,9 +1265,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:582:5: variable
+					// TurtleOBDA.g:584:5: variable
 					{
-					pushFollow(FOLLOW_variable_in_subject452);
+					pushFollow(FOLLOW_variable_in_subject453);
 					variable9=variable();
 					state._fsp--;
 
@@ -1275,9 +1275,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:583:5: blank
+					// TurtleOBDA.g:585:5: blank
 					{
-					pushFollow(FOLLOW_blank_in_subject460);
+					pushFollow(FOLLOW_blank_in_subject461);
 					blank10=blank();
 					state._fsp--;
 
@@ -1301,7 +1301,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "predicate"
-	// TurtleOBDA.g:587:1: predicate returns [Term value] : resource ;
+	// TurtleOBDA.g:589:1: predicate returns [Term value] : resource ;
 	public final Term predicate() throws RecognitionException {
 		Term value = null;
 
@@ -1309,10 +1309,10 @@ public class TurtleOBDAParser extends Parser {
 		Term resource11 =null;
 
 		try {
-			// TurtleOBDA.g:588:3: ( resource )
-			// TurtleOBDA.g:588:5: resource
+			// TurtleOBDA.g:590:3: ( resource )
+			// TurtleOBDA.g:590:5: resource
 			{
-			pushFollow(FOLLOW_resource_in_predicate481);
+			pushFollow(FOLLOW_resource_in_predicate482);
 			resource11=resource();
 			state._fsp--;
 
@@ -1343,7 +1343,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "object"
-	// TurtleOBDA.g:600:1: object returns [Term value] : ( resource | literal | typedLiteral | variable | blank |bl= blankNodePropertyList );
+	// TurtleOBDA.g:602:1: object returns [Term value] : ( resource | literal | typedLiteral | variable | blank |bl= blankNodePropertyList );
 	public final Term object() throws RecognitionException {
 		Term value = null;
 
@@ -1356,7 +1356,7 @@ public class TurtleOBDAParser extends Parser {
 		Term blank16 =null;
 
 		try {
-			// TurtleOBDA.g:601:3: ( resource | literal | typedLiteral | variable | blank |bl= blankNodePropertyList )
+			// TurtleOBDA.g:603:3: ( resource | literal | typedLiteral | variable | blank |bl= blankNodePropertyList )
 			int alt12=6;
 			switch ( input.LA(1) ) {
 			case PREFIXED_NAME:
@@ -1423,9 +1423,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt12) {
 				case 1 :
-					// TurtleOBDA.g:601:5: resource
+					// TurtleOBDA.g:603:5: resource
 					{
-					pushFollow(FOLLOW_resource_in_object500);
+					pushFollow(FOLLOW_resource_in_object501);
 					resource12=resource();
 					state._fsp--;
 
@@ -1433,9 +1433,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:602:5: literal
+					// TurtleOBDA.g:604:5: literal
 					{
-					pushFollow(FOLLOW_literal_in_object508);
+					pushFollow(FOLLOW_literal_in_object509);
 					literal13=literal();
 					state._fsp--;
 
@@ -1443,9 +1443,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:603:5: typedLiteral
+					// TurtleOBDA.g:605:5: typedLiteral
 					{
-					pushFollow(FOLLOW_typedLiteral_in_object517);
+					pushFollow(FOLLOW_typedLiteral_in_object518);
 					typedLiteral14=typedLiteral();
 					state._fsp--;
 
@@ -1453,9 +1453,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 4 :
-					// TurtleOBDA.g:604:5: variable
+					// TurtleOBDA.g:606:5: variable
 					{
-					pushFollow(FOLLOW_variable_in_object525);
+					pushFollow(FOLLOW_variable_in_object526);
 					variable15=variable();
 					state._fsp--;
 
@@ -1463,9 +1463,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 5 :
-					// TurtleOBDA.g:605:5: blank
+					// TurtleOBDA.g:607:5: blank
 					{
-					pushFollow(FOLLOW_blank_in_object533);
+					pushFollow(FOLLOW_blank_in_object534);
 					blank16=blank();
 					state._fsp--;
 
@@ -1473,16 +1473,16 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 6 :
-					// TurtleOBDA.g:606:5: bl= blankNodePropertyList
+					// TurtleOBDA.g:608:5: bl= blankNodePropertyList
 					{
-					pushFollow(FOLLOW_blankNodePropertyList_in_object543);
+					pushFollow(FOLLOW_blankNodePropertyList_in_object544);
 					bl=blankNodePropertyList();
 					state._fsp--;
 
 
 					        value = (bl!=null?((TurtleOBDAParser.blankNodePropertyList_return)bl).bnode:null);
 					        //* Additional triples (atoms) created within blankNodePropertyList are added to a global list
-					        additionalBNodeAtoms.addAll((bl!=null?((TurtleOBDAParser.blankNodePropertyList_return)bl).listOfFunctions:null));
+					        additionalBNodeAtoms.addAll((bl!=null?((TurtleOBDAParser.blankNodePropertyList_return)bl).nestedTriplePatternsInBNode:null));
 					    
 					}
 					break;
@@ -1503,7 +1503,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "resource"
-	// TurtleOBDA.g:613:1: resource returns [Term value] : ( uriref | qname );
+	// TurtleOBDA.g:615:1: resource returns [Term value] : ( uriref | qname );
 	public final Term resource() throws RecognitionException {
 		Term value = null;
 
@@ -1512,7 +1512,7 @@ public class TurtleOBDAParser extends Parser {
 		String qname18 =null;
 
 		try {
-			// TurtleOBDA.g:614:4: ( uriref | qname )
+			// TurtleOBDA.g:616:4: ( uriref | qname )
 			int alt13=2;
 			int LA13_0 = input.LA(1);
 			if ( (LA13_0==STRING_WITH_BRACKET) ) {
@@ -1530,9 +1530,9 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt13) {
 				case 1 :
-					// TurtleOBDA.g:614:6: uriref
+					// TurtleOBDA.g:616:6: uriref
 					{
-					pushFollow(FOLLOW_uriref_in_resource563);
+					pushFollow(FOLLOW_uriref_in_resource564);
 					uriref17=uriref();
 					state._fsp--;
 
@@ -1540,9 +1540,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:615:6: qname
+					// TurtleOBDA.g:617:6: qname
 					{
-					pushFollow(FOLLOW_qname_in_resource572);
+					pushFollow(FOLLOW_qname_in_resource573);
 					qname18=qname();
 					state._fsp--;
 
@@ -1566,7 +1566,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "uriref"
-	// TurtleOBDA.g:620:1: uriref returns [String value] : STRING_WITH_BRACKET ;
+	// TurtleOBDA.g:622:1: uriref returns [String value] : STRING_WITH_BRACKET ;
 	public final String uriref() throws RecognitionException {
 		String value = null;
 
@@ -1574,10 +1574,10 @@ public class TurtleOBDAParser extends Parser {
 		Token STRING_WITH_BRACKET19=null;
 
 		try {
-			// TurtleOBDA.g:621:3: ( STRING_WITH_BRACKET )
-			// TurtleOBDA.g:621:5: STRING_WITH_BRACKET
+			// TurtleOBDA.g:623:3: ( STRING_WITH_BRACKET )
+			// TurtleOBDA.g:623:5: STRING_WITH_BRACKET
 			{
-			STRING_WITH_BRACKET19=(Token)match(input,STRING_WITH_BRACKET,FOLLOW_STRING_WITH_BRACKET_in_uriref597); 
+			STRING_WITH_BRACKET19=(Token)match(input,STRING_WITH_BRACKET,FOLLOW_STRING_WITH_BRACKET_in_uriref598); 
 			 value = removeBrackets((STRING_WITH_BRACKET19!=null?STRING_WITH_BRACKET19.getText():null)); 
 			}
 
@@ -1596,7 +1596,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "qname"
-	// TurtleOBDA.g:624:1: qname returns [String value] : PREFIXED_NAME ;
+	// TurtleOBDA.g:626:1: qname returns [String value] : PREFIXED_NAME ;
 	public final String qname() throws RecognitionException {
 		String value = null;
 
@@ -1604,10 +1604,10 @@ public class TurtleOBDAParser extends Parser {
 		Token PREFIXED_NAME20=null;
 
 		try {
-			// TurtleOBDA.g:625:3: ( PREFIXED_NAME )
-			// TurtleOBDA.g:625:5: PREFIXED_NAME
+			// TurtleOBDA.g:627:3: ( PREFIXED_NAME )
+			// TurtleOBDA.g:627:5: PREFIXED_NAME
 			{
-			PREFIXED_NAME20=(Token)match(input,PREFIXED_NAME,FOLLOW_PREFIXED_NAME_in_qname616); 
+			PREFIXED_NAME20=(Token)match(input,PREFIXED_NAME,FOLLOW_PREFIXED_NAME_in_qname617); 
 
 			      String[] tokens = (PREFIXED_NAME20!=null?PREFIXED_NAME20.getText():null).split(":", 2);
 			      String uri = directives.get(tokens[0]);  // the first token is the prefix
@@ -1630,7 +1630,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "blank"
-	// TurtleOBDA.g:632:1: blank returns [Term value] : ( BLANK_NODE_LABEL | ANON );
+	// TurtleOBDA.g:634:1: blank returns [Term value] : ( BLANK_NODE_LABEL | ANON );
 	public final Term blank() throws RecognitionException {
 		Term value = null;
 
@@ -1638,7 +1638,7 @@ public class TurtleOBDAParser extends Parser {
 		Token BLANK_NODE_LABEL21=null;
 
 		try {
-			// TurtleOBDA.g:633:3: ( BLANK_NODE_LABEL | ANON )
+			// TurtleOBDA.g:635:3: ( BLANK_NODE_LABEL | ANON )
 			int alt14=2;
 			int LA14_0 = input.LA(1);
 			if ( (LA14_0==BLANK_NODE_LABEL) ) {
@@ -1656,16 +1656,16 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt14) {
 				case 1 :
-					// TurtleOBDA.g:633:5: BLANK_NODE_LABEL
+					// TurtleOBDA.g:635:5: BLANK_NODE_LABEL
 					{
-					BLANK_NODE_LABEL21=(Token)match(input,BLANK_NODE_LABEL,FOLLOW_BLANK_NODE_LABEL_in_blank635); 
+					BLANK_NODE_LABEL21=(Token)match(input,BLANK_NODE_LABEL,FOLLOW_BLANK_NODE_LABEL_in_blank636); 
 					 value = constructBNode((BLANK_NODE_LABEL21!=null?BLANK_NODE_LABEL21.getText():null)); 
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:634:5: ANON
+					// TurtleOBDA.g:636:5: ANON
 					{
-					match(input,ANON,FOLLOW_ANON_in_blank643); 
+					match(input,ANON,FOLLOW_ANON_in_blank644); 
 					 value = createBNode(); 
 					}
 					break;
@@ -1686,7 +1686,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "variable"
-	// TurtleOBDA.g:637:1: variable returns [Variable value] : STRING_WITH_CURLY_BRACKET ;
+	// TurtleOBDA.g:639:1: variable returns [Variable value] : STRING_WITH_CURLY_BRACKET ;
 	public final Variable variable() throws RecognitionException {
 		Variable value = null;
 
@@ -1694,10 +1694,10 @@ public class TurtleOBDAParser extends Parser {
 		Token STRING_WITH_CURLY_BRACKET22=null;
 
 		try {
-			// TurtleOBDA.g:638:3: ( STRING_WITH_CURLY_BRACKET )
-			// TurtleOBDA.g:638:5: STRING_WITH_CURLY_BRACKET
+			// TurtleOBDA.g:640:3: ( STRING_WITH_CURLY_BRACKET )
+			// TurtleOBDA.g:640:5: STRING_WITH_CURLY_BRACKET
 			{
-			STRING_WITH_CURLY_BRACKET22=(Token)match(input,STRING_WITH_CURLY_BRACKET,FOLLOW_STRING_WITH_CURLY_BRACKET_in_variable662); 
+			STRING_WITH_CURLY_BRACKET22=(Token)match(input,STRING_WITH_CURLY_BRACKET,FOLLOW_STRING_WITH_CURLY_BRACKET_in_variable663); 
 
 			      value = dfac.getVariable(removeBrackets((STRING_WITH_CURLY_BRACKET22!=null?STRING_WITH_CURLY_BRACKET22.getText():null)));
 			      variableSet.add(value);
@@ -1719,7 +1719,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "function"
-	// TurtleOBDA.g:644:1: function returns [Function value] : resource LPAREN terms RPAREN ;
+	// TurtleOBDA.g:646:1: function returns [Function value] : resource LPAREN terms RPAREN ;
 	public final Function function() throws RecognitionException {
 		Function value = null;
 
@@ -1728,19 +1728,19 @@ public class TurtleOBDAParser extends Parser {
 		Vector<Term> terms24 =null;
 
 		try {
-			// TurtleOBDA.g:645:3: ( resource LPAREN terms RPAREN )
-			// TurtleOBDA.g:645:5: resource LPAREN terms RPAREN
+			// TurtleOBDA.g:647:3: ( resource LPAREN terms RPAREN )
+			// TurtleOBDA.g:647:5: resource LPAREN terms RPAREN
 			{
-			pushFollow(FOLLOW_resource_in_function681);
+			pushFollow(FOLLOW_resource_in_function682);
 			resource23=resource();
 			state._fsp--;
 
-			match(input,LPAREN,FOLLOW_LPAREN_in_function683); 
-			pushFollow(FOLLOW_terms_in_function685);
+			match(input,LPAREN,FOLLOW_LPAREN_in_function684); 
+			pushFollow(FOLLOW_terms_in_function686);
 			terms24=terms();
 			state._fsp--;
 
-			match(input,RPAREN,FOLLOW_RPAREN_in_function687); 
+			match(input,RPAREN,FOLLOW_RPAREN_in_function688); 
 
 			      String functionName = resource23.toString();
 			      int arity = terms24.size();
@@ -1764,7 +1764,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "typedLiteral"
-	// TurtleOBDA.g:653:1: typedLiteral returns [Function value] : ( variable AT language | variable REFERENCE resource );
+	// TurtleOBDA.g:655:1: typedLiteral returns [Function value] : ( variable AT language | variable REFERENCE resource );
 	public final Function typedLiteral() throws RecognitionException {
 		Function value = null;
 
@@ -1775,7 +1775,7 @@ public class TurtleOBDAParser extends Parser {
 		Term resource28 =null;
 
 		try {
-			// TurtleOBDA.g:654:3: ( variable AT language | variable REFERENCE resource )
+			// TurtleOBDA.g:656:3: ( variable AT language | variable REFERENCE resource )
 			int alt15=2;
 			int LA15_0 = input.LA(1);
 			if ( (LA15_0==STRING_WITH_CURLY_BRACKET) ) {
@@ -1809,14 +1809,14 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt15) {
 				case 1 :
-					// TurtleOBDA.g:654:5: variable AT language
+					// TurtleOBDA.g:656:5: variable AT language
 					{
-					pushFollow(FOLLOW_variable_in_typedLiteral706);
+					pushFollow(FOLLOW_variable_in_typedLiteral707);
 					variable25=variable();
 					state._fsp--;
 
-					match(input,AT,FOLLOW_AT_in_typedLiteral708); 
-					pushFollow(FOLLOW_language_in_typedLiteral710);
+					match(input,AT,FOLLOW_AT_in_typedLiteral709); 
+					pushFollow(FOLLOW_language_in_typedLiteral711);
 					language26=language();
 					state._fsp--;
 
@@ -1829,14 +1829,14 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:660:5: variable REFERENCE resource
+					// TurtleOBDA.g:662:5: variable REFERENCE resource
 					{
-					pushFollow(FOLLOW_variable_in_typedLiteral718);
+					pushFollow(FOLLOW_variable_in_typedLiteral719);
 					variable27=variable();
 					state._fsp--;
 
-					match(input,REFERENCE,FOLLOW_REFERENCE_in_typedLiteral720); 
-					pushFollow(FOLLOW_resource_in_typedLiteral722);
+					match(input,REFERENCE,FOLLOW_REFERENCE_in_typedLiteral721); 
+					pushFollow(FOLLOW_resource_in_typedLiteral723);
 					resource28=resource();
 					state._fsp--;
 
@@ -1877,7 +1877,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "language"
-	// TurtleOBDA.g:680:1: language returns [Term value] : ( languageTag | variable );
+	// TurtleOBDA.g:682:1: language returns [Term value] : ( languageTag | variable );
 	public final Term language() throws RecognitionException {
 		Term value = null;
 
@@ -1886,7 +1886,7 @@ public class TurtleOBDAParser extends Parser {
 		Variable variable30 =null;
 
 		try {
-			// TurtleOBDA.g:681:3: ( languageTag | variable )
+			// TurtleOBDA.g:683:3: ( languageTag | variable )
 			int alt16=2;
 			int LA16_0 = input.LA(1);
 			if ( (LA16_0==VARNAME) ) {
@@ -1904,9 +1904,9 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt16) {
 				case 1 :
-					// TurtleOBDA.g:681:5: languageTag
+					// TurtleOBDA.g:683:5: languageTag
 					{
-					pushFollow(FOLLOW_languageTag_in_language741);
+					pushFollow(FOLLOW_languageTag_in_language742);
 					languageTag29=languageTag();
 					state._fsp--;
 
@@ -1916,9 +1916,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:684:5: variable
+					// TurtleOBDA.g:686:5: variable
 					{
-					pushFollow(FOLLOW_variable_in_language749);
+					pushFollow(FOLLOW_variable_in_language750);
 					variable30=variable();
 					state._fsp--;
 
@@ -1944,7 +1944,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "terms"
-	// TurtleOBDA.g:689:1: terms returns [Vector<Term> value] : t1= term ( COMMA t2= term )* ;
+	// TurtleOBDA.g:691:1: terms returns [Vector<Term> value] : t1= term ( COMMA t2= term )* ;
 	public final Vector<Term> terms() throws RecognitionException {
 		Vector<Term> value = null;
 
@@ -1956,15 +1956,15 @@ public class TurtleOBDAParser extends Parser {
 		  value = new Vector<Term>();
 
 		try {
-			// TurtleOBDA.g:693:3: (t1= term ( COMMA t2= term )* )
-			// TurtleOBDA.g:693:5: t1= term ( COMMA t2= term )*
+			// TurtleOBDA.g:695:3: (t1= term ( COMMA t2= term )* )
+			// TurtleOBDA.g:695:5: t1= term ( COMMA t2= term )*
 			{
-			pushFollow(FOLLOW_term_in_terms775);
+			pushFollow(FOLLOW_term_in_terms776);
 			t1=term();
 			state._fsp--;
 
 			 value.add(t1); 
-			// TurtleOBDA.g:693:40: ( COMMA t2= term )*
+			// TurtleOBDA.g:695:40: ( COMMA t2= term )*
 			loop17:
 			while (true) {
 				int alt17=2;
@@ -1975,10 +1975,10 @@ public class TurtleOBDAParser extends Parser {
 
 				switch (alt17) {
 				case 1 :
-					// TurtleOBDA.g:693:41: COMMA t2= term
+					// TurtleOBDA.g:695:41: COMMA t2= term
 					{
-					match(input,COMMA,FOLLOW_COMMA_in_terms780); 
-					pushFollow(FOLLOW_term_in_terms784);
+					match(input,COMMA,FOLLOW_COMMA_in_terms781); 
+					pushFollow(FOLLOW_term_in_terms785);
 					t2=term();
 					state._fsp--;
 
@@ -2008,7 +2008,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "term"
-	// TurtleOBDA.g:696:1: term returns [Term value] : ( function | variable | literal );
+	// TurtleOBDA.g:698:1: term returns [Term value] : ( function | variable | literal );
 	public final Term term() throws RecognitionException {
 		Term value = null;
 
@@ -2018,7 +2018,7 @@ public class TurtleOBDAParser extends Parser {
 		Term literal33 =null;
 
 		try {
-			// TurtleOBDA.g:697:3: ( function | variable | literal )
+			// TurtleOBDA.g:699:3: ( function | variable | literal )
 			int alt18=3;
 			switch ( input.LA(1) ) {
 			case PREFIXED_NAME:
@@ -2055,9 +2055,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt18) {
 				case 1 :
-					// TurtleOBDA.g:697:5: function
+					// TurtleOBDA.g:699:5: function
 					{
-					pushFollow(FOLLOW_function_in_term805);
+					pushFollow(FOLLOW_function_in_term806);
 					function31=function();
 					state._fsp--;
 
@@ -2065,9 +2065,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:698:5: variable
+					// TurtleOBDA.g:700:5: variable
 					{
-					pushFollow(FOLLOW_variable_in_term813);
+					pushFollow(FOLLOW_variable_in_term814);
 					variable32=variable();
 					state._fsp--;
 
@@ -2075,9 +2075,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:699:5: literal
+					// TurtleOBDA.g:701:5: literal
 					{
-					pushFollow(FOLLOW_literal_in_term821);
+					pushFollow(FOLLOW_literal_in_term822);
 					literal33=literal();
 					state._fsp--;
 
@@ -2101,7 +2101,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "literal"
-	// TurtleOBDA.g:708:1: literal returns [Term value] : ( stringLiteral ( AT language )? | dataTypeString | numericLiteral | booleanLiteral );
+	// TurtleOBDA.g:710:1: literal returns [Term value] : ( stringLiteral ( AT language )? | dataTypeString | numericLiteral | booleanLiteral );
 	public final Term literal() throws RecognitionException {
 		Term value = null;
 
@@ -2113,7 +2113,7 @@ public class TurtleOBDAParser extends Parser {
 		Term booleanLiteral38 =null;
 
 		try {
-			// TurtleOBDA.g:709:3: ( stringLiteral ( AT language )? | dataTypeString | numericLiteral | booleanLiteral )
+			// TurtleOBDA.g:711:3: ( stringLiteral ( AT language )? | dataTypeString | numericLiteral | booleanLiteral )
 			int alt20=4;
 			switch ( input.LA(1) ) {
 			case STRING_WITH_QUOTE_DOUBLE:
@@ -2166,13 +2166,13 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt20) {
 				case 1 :
-					// TurtleOBDA.g:709:5: stringLiteral ( AT language )?
+					// TurtleOBDA.g:711:5: stringLiteral ( AT language )?
 					{
-					pushFollow(FOLLOW_stringLiteral_in_literal841);
+					pushFollow(FOLLOW_stringLiteral_in_literal842);
 					stringLiteral35=stringLiteral();
 					state._fsp--;
 
-					// TurtleOBDA.g:709:19: ( AT language )?
+					// TurtleOBDA.g:711:19: ( AT language )?
 					int alt19=2;
 					int LA19_0 = input.LA(1);
 					if ( (LA19_0==AT) ) {
@@ -2180,10 +2180,10 @@ public class TurtleOBDAParser extends Parser {
 					}
 					switch (alt19) {
 						case 1 :
-							// TurtleOBDA.g:709:20: AT language
+							// TurtleOBDA.g:711:20: AT language
 							{
-							match(input,AT,FOLLOW_AT_in_literal844); 
-							pushFollow(FOLLOW_language_in_literal846);
+							match(input,AT,FOLLOW_AT_in_literal845); 
+							pushFollow(FOLLOW_language_in_literal847);
 							language34=language();
 							state._fsp--;
 
@@ -2222,9 +2222,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:736:5: dataTypeString
+					// TurtleOBDA.g:738:5: dataTypeString
 					{
-					pushFollow(FOLLOW_dataTypeString_in_literal856);
+					pushFollow(FOLLOW_dataTypeString_in_literal857);
 					dataTypeString36=dataTypeString();
 					state._fsp--;
 
@@ -2232,9 +2232,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:737:5: numericLiteral
+					// TurtleOBDA.g:739:5: numericLiteral
 					{
-					pushFollow(FOLLOW_numericLiteral_in_literal864);
+					pushFollow(FOLLOW_numericLiteral_in_literal865);
 					numericLiteral37=numericLiteral();
 					state._fsp--;
 
@@ -2242,9 +2242,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 4 :
-					// TurtleOBDA.g:738:5: booleanLiteral
+					// TurtleOBDA.g:740:5: booleanLiteral
 					{
-					pushFollow(FOLLOW_booleanLiteral_in_literal872);
+					pushFollow(FOLLOW_booleanLiteral_in_literal873);
 					booleanLiteral38=booleanLiteral();
 					state._fsp--;
 
@@ -2268,7 +2268,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "stringLiteral"
-	// TurtleOBDA.g:741:1: stringLiteral returns [Term value] : STRING_WITH_QUOTE_DOUBLE ;
+	// TurtleOBDA.g:743:1: stringLiteral returns [Term value] : STRING_WITH_QUOTE_DOUBLE ;
 	public final Term stringLiteral() throws RecognitionException {
 		Term value = null;
 
@@ -2276,10 +2276,10 @@ public class TurtleOBDAParser extends Parser {
 		Token STRING_WITH_QUOTE_DOUBLE39=null;
 
 		try {
-			// TurtleOBDA.g:742:3: ( STRING_WITH_QUOTE_DOUBLE )
-			// TurtleOBDA.g:742:5: STRING_WITH_QUOTE_DOUBLE
+			// TurtleOBDA.g:744:3: ( STRING_WITH_QUOTE_DOUBLE )
+			// TurtleOBDA.g:744:5: STRING_WITH_QUOTE_DOUBLE
 			{
-			STRING_WITH_QUOTE_DOUBLE39=(Token)match(input,STRING_WITH_QUOTE_DOUBLE,FOLLOW_STRING_WITH_QUOTE_DOUBLE_in_stringLiteral891); 
+			STRING_WITH_QUOTE_DOUBLE39=(Token)match(input,STRING_WITH_QUOTE_DOUBLE,FOLLOW_STRING_WITH_QUOTE_DOUBLE_in_stringLiteral892); 
 
 			      String str = (STRING_WITH_QUOTE_DOUBLE39!=null?STRING_WITH_QUOTE_DOUBLE39.getText():null);
 			      if (str.contains("{")){
@@ -2305,7 +2305,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "dataTypeString"
-	// TurtleOBDA.g:752:1: dataTypeString returns [Term value] : stringLiteral REFERENCE resource ;
+	// TurtleOBDA.g:754:1: dataTypeString returns [Term value] : stringLiteral REFERENCE resource ;
 	public final Term dataTypeString() throws RecognitionException {
 		Term value = null;
 
@@ -2314,15 +2314,15 @@ public class TurtleOBDAParser extends Parser {
 		Term resource41 =null;
 
 		try {
-			// TurtleOBDA.g:753:3: ( stringLiteral REFERENCE resource )
-			// TurtleOBDA.g:753:6: stringLiteral REFERENCE resource
+			// TurtleOBDA.g:755:3: ( stringLiteral REFERENCE resource )
+			// TurtleOBDA.g:755:6: stringLiteral REFERENCE resource
 			{
-			pushFollow(FOLLOW_stringLiteral_in_dataTypeString911);
+			pushFollow(FOLLOW_stringLiteral_in_dataTypeString912);
 			stringLiteral40=stringLiteral();
 			state._fsp--;
 
-			match(input,REFERENCE,FOLLOW_REFERENCE_in_dataTypeString913); 
-			pushFollow(FOLLOW_resource_in_dataTypeString915);
+			match(input,REFERENCE,FOLLOW_REFERENCE_in_dataTypeString914); 
+			pushFollow(FOLLOW_resource_in_dataTypeString916);
 			resource41=resource();
 			state._fsp--;
 
@@ -2360,7 +2360,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "numericLiteral"
-	// TurtleOBDA.g:771:1: numericLiteral returns [Term value] : ( numericUnsigned | numericPositive | numericNegative );
+	// TurtleOBDA.g:773:1: numericLiteral returns [Term value] : ( numericUnsigned | numericPositive | numericNegative );
 	public final Term numericLiteral() throws RecognitionException {
 		Term value = null;
 
@@ -2370,7 +2370,7 @@ public class TurtleOBDAParser extends Parser {
 		Term numericNegative44 =null;
 
 		try {
-			// TurtleOBDA.g:772:3: ( numericUnsigned | numericPositive | numericNegative )
+			// TurtleOBDA.g:774:3: ( numericUnsigned | numericPositive | numericNegative )
 			int alt21=3;
 			switch ( input.LA(1) ) {
 			case DECIMAL:
@@ -2401,9 +2401,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt21) {
 				case 1 :
-					// TurtleOBDA.g:772:5: numericUnsigned
+					// TurtleOBDA.g:774:5: numericUnsigned
 					{
-					pushFollow(FOLLOW_numericUnsigned_in_numericLiteral931);
+					pushFollow(FOLLOW_numericUnsigned_in_numericLiteral932);
 					numericUnsigned42=numericUnsigned();
 					state._fsp--;
 
@@ -2411,9 +2411,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:773:5: numericPositive
+					// TurtleOBDA.g:775:5: numericPositive
 					{
-					pushFollow(FOLLOW_numericPositive_in_numericLiteral939);
+					pushFollow(FOLLOW_numericPositive_in_numericLiteral940);
 					numericPositive43=numericPositive();
 					state._fsp--;
 
@@ -2421,9 +2421,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:774:5: numericNegative
+					// TurtleOBDA.g:776:5: numericNegative
 					{
-					pushFollow(FOLLOW_numericNegative_in_numericLiteral947);
+					pushFollow(FOLLOW_numericNegative_in_numericLiteral948);
 					numericNegative44=numericNegative();
 					state._fsp--;
 
@@ -2447,13 +2447,13 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "relativeURI"
-	// TurtleOBDA.g:777:1: relativeURI : STRING_URI ;
+	// TurtleOBDA.g:779:1: relativeURI : STRING_URI ;
 	public final void relativeURI() throws RecognitionException {
 		try {
-			// TurtleOBDA.g:778:3: ( STRING_URI )
-			// TurtleOBDA.g:778:5: STRING_URI
+			// TurtleOBDA.g:780:3: ( STRING_URI )
+			// TurtleOBDA.g:780:5: STRING_URI
 			{
-			match(input,STRING_URI,FOLLOW_STRING_URI_in_relativeURI963); 
+			match(input,STRING_URI,FOLLOW_STRING_URI_in_relativeURI964); 
 			}
 
 		}
@@ -2473,16 +2473,16 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "namespace"
-	// TurtleOBDA.g:781:1: namespace : NAMESPACE ;
+	// TurtleOBDA.g:783:1: namespace : NAMESPACE ;
 	public final TurtleOBDAParser.namespace_return namespace() throws RecognitionException {
 		TurtleOBDAParser.namespace_return retval = new TurtleOBDAParser.namespace_return();
 		retval.start = input.LT(1);
 
 		try {
-			// TurtleOBDA.g:782:3: ( NAMESPACE )
-			// TurtleOBDA.g:782:5: NAMESPACE
+			// TurtleOBDA.g:784:3: ( NAMESPACE )
+			// TurtleOBDA.g:784:5: NAMESPACE
 			{
-			match(input,NAMESPACE,FOLLOW_NAMESPACE_in_namespace976); 
+			match(input,NAMESPACE,FOLLOW_NAMESPACE_in_namespace977); 
 			}
 
 			retval.stop = input.LT(-1);
@@ -2505,16 +2505,16 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "defaultNamespace"
-	// TurtleOBDA.g:785:1: defaultNamespace : COLON ;
+	// TurtleOBDA.g:787:1: defaultNamespace : COLON ;
 	public final TurtleOBDAParser.defaultNamespace_return defaultNamespace() throws RecognitionException {
 		TurtleOBDAParser.defaultNamespace_return retval = new TurtleOBDAParser.defaultNamespace_return();
 		retval.start = input.LT(1);
 
 		try {
-			// TurtleOBDA.g:786:3: ( COLON )
-			// TurtleOBDA.g:786:5: COLON
+			// TurtleOBDA.g:788:3: ( COLON )
+			// TurtleOBDA.g:788:5: COLON
 			{
-			match(input,COLON,FOLLOW_COLON_in_defaultNamespace989); 
+			match(input,COLON,FOLLOW_COLON_in_defaultNamespace990); 
 			}
 
 			retval.stop = input.LT(-1);
@@ -2534,13 +2534,13 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "name"
-	// TurtleOBDA.g:789:1: name : VARNAME ;
+	// TurtleOBDA.g:791:1: name : VARNAME ;
 	public final void name() throws RecognitionException {
 		try {
-			// TurtleOBDA.g:790:3: ( VARNAME )
-			// TurtleOBDA.g:790:5: VARNAME
+			// TurtleOBDA.g:792:3: ( VARNAME )
+			// TurtleOBDA.g:792:5: VARNAME
 			{
-			match(input,VARNAME,FOLLOW_VARNAME_in_name1002); 
+			match(input,VARNAME,FOLLOW_VARNAME_in_name1003); 
 			}
 
 		}
@@ -2560,16 +2560,16 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "languageTag"
-	// TurtleOBDA.g:793:1: languageTag : VARNAME ;
+	// TurtleOBDA.g:795:1: languageTag : VARNAME ;
 	public final TurtleOBDAParser.languageTag_return languageTag() throws RecognitionException {
 		TurtleOBDAParser.languageTag_return retval = new TurtleOBDAParser.languageTag_return();
 		retval.start = input.LT(1);
 
 		try {
-			// TurtleOBDA.g:794:3: ( VARNAME )
-			// TurtleOBDA.g:794:5: VARNAME
+			// TurtleOBDA.g:796:3: ( VARNAME )
+			// TurtleOBDA.g:796:5: VARNAME
 			{
-			match(input,VARNAME,FOLLOW_VARNAME_in_languageTag1015); 
+			match(input,VARNAME,FOLLOW_VARNAME_in_languageTag1016); 
 			}
 
 			retval.stop = input.LT(-1);
@@ -2589,7 +2589,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "booleanLiteral"
-	// TurtleOBDA.g:797:1: booleanLiteral returns [Term value] : ( TRUE | FALSE );
+	// TurtleOBDA.g:799:1: booleanLiteral returns [Term value] : ( TRUE | FALSE );
 	public final Term booleanLiteral() throws RecognitionException {
 		Term value = null;
 
@@ -2598,7 +2598,7 @@ public class TurtleOBDAParser extends Parser {
 		Token FALSE46=null;
 
 		try {
-			// TurtleOBDA.g:798:3: ( TRUE | FALSE )
+			// TurtleOBDA.g:800:3: ( TRUE | FALSE )
 			int alt22=2;
 			int LA22_0 = input.LA(1);
 			if ( (LA22_0==TRUE) ) {
@@ -2616,18 +2616,18 @@ public class TurtleOBDAParser extends Parser {
 
 			switch (alt22) {
 				case 1 :
-					// TurtleOBDA.g:798:5: TRUE
+					// TurtleOBDA.g:800:5: TRUE
 					{
-					TRUE45=(Token)match(input,TRUE,FOLLOW_TRUE_in_booleanLiteral1032); 
+					TRUE45=(Token)match(input,TRUE,FOLLOW_TRUE_in_booleanLiteral1033); 
 
 					  ValueConstant trueConstant = dfac.getConstantLiteral((TRUE45!=null?TRUE45.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(trueConstant, COL_TYPE.BOOLEAN); 
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:801:5: FALSE
+					// TurtleOBDA.g:803:5: FALSE
 					{
-					FALSE46=(Token)match(input,FALSE,FOLLOW_FALSE_in_booleanLiteral1041); 
+					FALSE46=(Token)match(input,FALSE,FOLLOW_FALSE_in_booleanLiteral1042); 
 
 					  ValueConstant falseConstant = dfac.getConstantLiteral((FALSE46!=null?FALSE46.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(falseConstant, COL_TYPE.BOOLEAN);
@@ -2651,7 +2651,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "numericUnsigned"
-	// TurtleOBDA.g:807:1: numericUnsigned returns [Term value] : ( INTEGER | DOUBLE | DECIMAL );
+	// TurtleOBDA.g:809:1: numericUnsigned returns [Term value] : ( INTEGER | DOUBLE | DECIMAL );
 	public final Term numericUnsigned() throws RecognitionException {
 		Term value = null;
 
@@ -2661,7 +2661,7 @@ public class TurtleOBDAParser extends Parser {
 		Token DECIMAL49=null;
 
 		try {
-			// TurtleOBDA.g:808:3: ( INTEGER | DOUBLE | DECIMAL )
+			// TurtleOBDA.g:810:3: ( INTEGER | DOUBLE | DECIMAL )
 			int alt23=3;
 			switch ( input.LA(1) ) {
 			case INTEGER:
@@ -2686,9 +2686,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt23) {
 				case 1 :
-					// TurtleOBDA.g:808:5: INTEGER
+					// TurtleOBDA.g:810:5: INTEGER
 					{
-					INTEGER47=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_numericUnsigned1060); 
+					INTEGER47=(Token)match(input,INTEGER,FOLLOW_INTEGER_in_numericUnsigned1061); 
 
 					  ValueConstant integerConstant = dfac.getConstantLiteral((INTEGER47!=null?INTEGER47.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(integerConstant, COL_TYPE.INTEGER);
@@ -2696,9 +2696,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:812:5: DOUBLE
+					// TurtleOBDA.g:814:5: DOUBLE
 					{
-					DOUBLE48=(Token)match(input,DOUBLE,FOLLOW_DOUBLE_in_numericUnsigned1068); 
+					DOUBLE48=(Token)match(input,DOUBLE,FOLLOW_DOUBLE_in_numericUnsigned1069); 
 
 					  ValueConstant doubleConstant = dfac.getConstantLiteral((DOUBLE48!=null?DOUBLE48.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(doubleConstant, COL_TYPE.DOUBLE);
@@ -2706,9 +2706,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:816:5: DECIMAL
+					// TurtleOBDA.g:818:5: DECIMAL
 					{
-					DECIMAL49=(Token)match(input,DECIMAL,FOLLOW_DECIMAL_in_numericUnsigned1077); 
+					DECIMAL49=(Token)match(input,DECIMAL,FOLLOW_DECIMAL_in_numericUnsigned1078); 
 
 					  ValueConstant decimalConstant = dfac.getConstantLiteral((DECIMAL49!=null?DECIMAL49.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(decimalConstant, COL_TYPE.DECIMAL);
@@ -2732,7 +2732,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "numericPositive"
-	// TurtleOBDA.g:822:1: numericPositive returns [Term value] : ( INTEGER_POSITIVE | DOUBLE_POSITIVE | DECIMAL_POSITIVE );
+	// TurtleOBDA.g:824:1: numericPositive returns [Term value] : ( INTEGER_POSITIVE | DOUBLE_POSITIVE | DECIMAL_POSITIVE );
 	public final Term numericPositive() throws RecognitionException {
 		Term value = null;
 
@@ -2742,7 +2742,7 @@ public class TurtleOBDAParser extends Parser {
 		Token DECIMAL_POSITIVE52=null;
 
 		try {
-			// TurtleOBDA.g:823:3: ( INTEGER_POSITIVE | DOUBLE_POSITIVE | DECIMAL_POSITIVE )
+			// TurtleOBDA.g:825:3: ( INTEGER_POSITIVE | DOUBLE_POSITIVE | DECIMAL_POSITIVE )
 			int alt24=3;
 			switch ( input.LA(1) ) {
 			case INTEGER_POSITIVE:
@@ -2767,9 +2767,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt24) {
 				case 1 :
-					// TurtleOBDA.g:823:5: INTEGER_POSITIVE
+					// TurtleOBDA.g:825:5: INTEGER_POSITIVE
 					{
-					INTEGER_POSITIVE50=(Token)match(input,INTEGER_POSITIVE,FOLLOW_INTEGER_POSITIVE_in_numericPositive1096); 
+					INTEGER_POSITIVE50=(Token)match(input,INTEGER_POSITIVE,FOLLOW_INTEGER_POSITIVE_in_numericPositive1097); 
 
 					   ValueConstant integerConstant = dfac.getConstantLiteral((INTEGER_POSITIVE50!=null?INTEGER_POSITIVE50.getText():null), COL_TYPE.LITERAL);
 					   value = dfac.getTypedTerm(integerConstant, COL_TYPE.INTEGER);
@@ -2777,9 +2777,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:827:5: DOUBLE_POSITIVE
+					// TurtleOBDA.g:829:5: DOUBLE_POSITIVE
 					{
-					DOUBLE_POSITIVE51=(Token)match(input,DOUBLE_POSITIVE,FOLLOW_DOUBLE_POSITIVE_in_numericPositive1104); 
+					DOUBLE_POSITIVE51=(Token)match(input,DOUBLE_POSITIVE,FOLLOW_DOUBLE_POSITIVE_in_numericPositive1105); 
 
 					  ValueConstant doubleConstant = dfac.getConstantLiteral((DOUBLE_POSITIVE51!=null?DOUBLE_POSITIVE51.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(doubleConstant, COL_TYPE.DOUBLE);
@@ -2787,9 +2787,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:831:5: DECIMAL_POSITIVE
+					// TurtleOBDA.g:833:5: DECIMAL_POSITIVE
 					{
-					DECIMAL_POSITIVE52=(Token)match(input,DECIMAL_POSITIVE,FOLLOW_DECIMAL_POSITIVE_in_numericPositive1113); 
+					DECIMAL_POSITIVE52=(Token)match(input,DECIMAL_POSITIVE,FOLLOW_DECIMAL_POSITIVE_in_numericPositive1114); 
 
 					  ValueConstant decimalConstant = dfac.getConstantLiteral((DECIMAL_POSITIVE52!=null?DECIMAL_POSITIVE52.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(decimalConstant, COL_TYPE.DECIMAL);
@@ -2813,7 +2813,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "numericNegative"
-	// TurtleOBDA.g:837:1: numericNegative returns [Term value] : ( INTEGER_NEGATIVE | DOUBLE_NEGATIVE | DECIMAL_NEGATIVE );
+	// TurtleOBDA.g:839:1: numericNegative returns [Term value] : ( INTEGER_NEGATIVE | DOUBLE_NEGATIVE | DECIMAL_NEGATIVE );
 	public final Term numericNegative() throws RecognitionException {
 		Term value = null;
 
@@ -2823,7 +2823,7 @@ public class TurtleOBDAParser extends Parser {
 		Token DECIMAL_NEGATIVE55=null;
 
 		try {
-			// TurtleOBDA.g:838:3: ( INTEGER_NEGATIVE | DOUBLE_NEGATIVE | DECIMAL_NEGATIVE )
+			// TurtleOBDA.g:840:3: ( INTEGER_NEGATIVE | DOUBLE_NEGATIVE | DECIMAL_NEGATIVE )
 			int alt25=3;
 			switch ( input.LA(1) ) {
 			case INTEGER_NEGATIVE:
@@ -2848,9 +2848,9 @@ public class TurtleOBDAParser extends Parser {
 			}
 			switch (alt25) {
 				case 1 :
-					// TurtleOBDA.g:838:5: INTEGER_NEGATIVE
+					// TurtleOBDA.g:840:5: INTEGER_NEGATIVE
 					{
-					INTEGER_NEGATIVE53=(Token)match(input,INTEGER_NEGATIVE,FOLLOW_INTEGER_NEGATIVE_in_numericNegative1132); 
+					INTEGER_NEGATIVE53=(Token)match(input,INTEGER_NEGATIVE,FOLLOW_INTEGER_NEGATIVE_in_numericNegative1133); 
 
 					  ValueConstant integerConstant = dfac.getConstantLiteral((INTEGER_NEGATIVE53!=null?INTEGER_NEGATIVE53.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(integerConstant, COL_TYPE.INTEGER);
@@ -2858,9 +2858,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 2 :
-					// TurtleOBDA.g:842:5: DOUBLE_NEGATIVE
+					// TurtleOBDA.g:844:5: DOUBLE_NEGATIVE
 					{
-					DOUBLE_NEGATIVE54=(Token)match(input,DOUBLE_NEGATIVE,FOLLOW_DOUBLE_NEGATIVE_in_numericNegative1140); 
+					DOUBLE_NEGATIVE54=(Token)match(input,DOUBLE_NEGATIVE,FOLLOW_DOUBLE_NEGATIVE_in_numericNegative1141); 
 
 					   ValueConstant doubleConstant = dfac.getConstantLiteral((DOUBLE_NEGATIVE54!=null?DOUBLE_NEGATIVE54.getText():null), COL_TYPE.LITERAL);
 					   value = dfac.getTypedTerm(doubleConstant, COL_TYPE.DOUBLE);
@@ -2868,9 +2868,9 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:846:5: DECIMAL_NEGATIVE
+					// TurtleOBDA.g:848:5: DECIMAL_NEGATIVE
 					{
-					DECIMAL_NEGATIVE55=(Token)match(input,DECIMAL_NEGATIVE,FOLLOW_DECIMAL_NEGATIVE_in_numericNegative1149); 
+					DECIMAL_NEGATIVE55=(Token)match(input,DECIMAL_NEGATIVE,FOLLOW_DECIMAL_NEGATIVE_in_numericNegative1150); 
 
 					  ValueConstant decimalConstant = dfac.getConstantLiteral((DECIMAL_NEGATIVE55!=null?DECIMAL_NEGATIVE55.getText():null), COL_TYPE.LITERAL);
 					  value = dfac.getTypedTerm(decimalConstant, COL_TYPE.DECIMAL);
@@ -2895,104 +2895,104 @@ public class TurtleOBDAParser extends Parser {
 
 
 
-	public static final BitSet FOLLOW_directiveStatement_in_parse60 = new BitSet(new long[]{0x0080080000002480L,0x0000000000000030L});
-	public static final BitSet FOLLOW_triplesStatement_in_parse69 = new BitSet(new long[]{0x0080080000002080L,0x0000000000000030L});
-	public static final BitSet FOLLOW_triplesStatement_in_parse82 = new BitSet(new long[]{0x0080080000002080L,0x0000000000000030L});
-	public static final BitSet FOLLOW_EOF_in_parse89 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_directive_in_directiveStatement102 = new BitSet(new long[]{0x0010000000000000L});
-	public static final BitSet FOLLOW_PERIOD_in_directiveStatement104 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_triples_in_triplesStatement134 = new BitSet(new long[]{0x0010000000000000L,0x0000000000002000L});
-	public static final BitSet FOLLOW_WS_in_triplesStatement136 = new BitSet(new long[]{0x0010000000000000L,0x0000000000002000L});
-	public static final BitSet FOLLOW_PERIOD_in_triplesStatement139 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_base_in_directive154 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_prefixID_in_directive160 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AT_in_base173 = new BitSet(new long[]{0x0000000000001000L});
-	public static final BitSet FOLLOW_BASE_in_base175 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
-	public static final BitSet FOLLOW_uriref_in_base177 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_AT_in_prefixID195 = new BitSet(new long[]{0x0040000000000000L});
-	public static final BitSet FOLLOW_PREFIX_in_prefixID197 = new BitSet(new long[]{0x0000400000020000L});
-	public static final BitSet FOLLOW_namespace_in_prefixID200 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
-	public static final BitSet FOLLOW_defaultNamespace_in_prefixID206 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
-	public static final BitSet FOLLOW_uriref_in_prefixID211 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_subject_in_triples230 = new BitSet(new long[]{0x0080000000000000L,0x0000000000004010L});
-	public static final BitSet FOLLOW_predicateObjectList_in_triples232 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_blankNodePropertyList_in_triples243 = new BitSet(new long[]{0x0080000000000002L,0x0000000000004010L});
-	public static final BitSet FOLLOW_predicateObjectList_in_triples263 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_verb_in_predicateObjectList299 = new BitSet(new long[]{0x008008E087382080L,0x00000000000002B0L});
-	public static final BitSet FOLLOW_objectList_in_predicateObjectList305 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000002L});
-	public static final BitSet FOLLOW_SEMI_in_predicateObjectList313 = new BitSet(new long[]{0x0080000000000000L,0x0000000000004010L});
-	public static final BitSet FOLLOW_verb_in_predicateObjectList317 = new BitSet(new long[]{0x008008E087382080L,0x00000000000002B0L});
-	public static final BitSet FOLLOW_objectList_in_predicateObjectList321 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000002L});
-	public static final BitSet FOLLOW_LSQ_BRACKET_in_blankNodePropertyList344 = new BitSet(new long[]{0x0080000000000000L,0x0000000000004010L});
-	public static final BitSet FOLLOW_predicateObjectList_in_blankNodePropertyList353 = new BitSet(new long[]{0x4000000000000000L});
-	public static final BitSet FOLLOW_RSQ_BRACKET_in_blankNodePropertyList361 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_predicate_in_verb380 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_78_in_verb388 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_object_in_objectList414 = new BitSet(new long[]{0x0000000000040002L});
-	public static final BitSet FOLLOW_COMMA_in_objectList419 = new BitSet(new long[]{0x008008E087382080L,0x00000000000002B0L});
-	public static final BitSet FOLLOW_object_in_objectList423 = new BitSet(new long[]{0x0000000000040002L});
-	public static final BitSet FOLLOW_resource_in_subject444 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variable_in_subject452 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_blank_in_subject460 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_resource_in_predicate481 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_resource_in_object500 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_literal_in_object508 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_typedLiteral_in_object517 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variable_in_object525 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_blank_in_object533 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_blankNodePropertyList_in_object543 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_uriref_in_resource563 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_qname_in_resource572 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRING_WITH_BRACKET_in_uriref597 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_PREFIXED_NAME_in_qname616 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_BLANK_NODE_LABEL_in_blank635 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ANON_in_blank643 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRING_WITH_CURLY_BRACKET_in_variable662 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_resource_in_function681 = new BitSet(new long[]{0x0000040000000000L});
-	public static final BitSet FOLLOW_LPAREN_in_function683 = new BitSet(new long[]{0x008000E087380000L,0x00000000000002B0L});
-	public static final BitSet FOLLOW_terms_in_function685 = new BitSet(new long[]{0x2000000000000000L});
-	public static final BitSet FOLLOW_RPAREN_in_function687 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variable_in_typedLiteral706 = new BitSet(new long[]{0x0000000000000400L});
-	public static final BitSet FOLLOW_AT_in_typedLiteral708 = new BitSet(new long[]{0x0000000000000000L,0x0000000000001020L});
-	public static final BitSet FOLLOW_language_in_typedLiteral710 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variable_in_typedLiteral718 = new BitSet(new long[]{0x1000000000000000L});
-	public static final BitSet FOLLOW_REFERENCE_in_typedLiteral720 = new BitSet(new long[]{0x0080000000000000L,0x0000000000000010L});
-	public static final BitSet FOLLOW_resource_in_typedLiteral722 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_languageTag_in_language741 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variable_in_language749 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_term_in_terms775 = new BitSet(new long[]{0x0000000000040002L});
-	public static final BitSet FOLLOW_COMMA_in_terms780 = new BitSet(new long[]{0x008000E087380000L,0x00000000000002B0L});
-	public static final BitSet FOLLOW_term_in_terms784 = new BitSet(new long[]{0x0000000000040002L});
-	public static final BitSet FOLLOW_function_in_term805 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_variable_in_term813 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_literal_in_term821 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_stringLiteral_in_literal841 = new BitSet(new long[]{0x0000000000000402L});
-	public static final BitSet FOLLOW_AT_in_literal844 = new BitSet(new long[]{0x0000000000000000L,0x0000000000001020L});
-	public static final BitSet FOLLOW_language_in_literal846 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_dataTypeString_in_literal856 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_numericLiteral_in_literal864 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_booleanLiteral_in_literal872 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRING_WITH_QUOTE_DOUBLE_in_stringLiteral891 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_stringLiteral_in_dataTypeString911 = new BitSet(new long[]{0x1000000000000000L});
-	public static final BitSet FOLLOW_REFERENCE_in_dataTypeString913 = new BitSet(new long[]{0x0080000000000000L,0x0000000000000010L});
-	public static final BitSet FOLLOW_resource_in_dataTypeString915 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_numericUnsigned_in_numericLiteral931 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_numericPositive_in_numericLiteral939 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_numericNegative_in_numericLiteral947 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_STRING_URI_in_relativeURI963 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_NAMESPACE_in_namespace976 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_COLON_in_defaultNamespace989 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_VARNAME_in_name1002 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_VARNAME_in_languageTag1015 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_TRUE_in_booleanLiteral1032 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_FALSE_in_booleanLiteral1041 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INTEGER_in_numericUnsigned1060 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DOUBLE_in_numericUnsigned1068 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DECIMAL_in_numericUnsigned1077 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INTEGER_POSITIVE_in_numericPositive1096 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DOUBLE_POSITIVE_in_numericPositive1104 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DECIMAL_POSITIVE_in_numericPositive1113 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_INTEGER_NEGATIVE_in_numericNegative1132 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DOUBLE_NEGATIVE_in_numericNegative1140 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_DECIMAL_NEGATIVE_in_numericNegative1149 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_directiveStatement_in_parse61 = new BitSet(new long[]{0x0080080000002480L,0x0000000000000030L});
+	public static final BitSet FOLLOW_triplesStatement_in_parse70 = new BitSet(new long[]{0x0080080000002080L,0x0000000000000030L});
+	public static final BitSet FOLLOW_triplesStatement_in_parse83 = new BitSet(new long[]{0x0080080000002080L,0x0000000000000030L});
+	public static final BitSet FOLLOW_EOF_in_parse90 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_directive_in_directiveStatement103 = new BitSet(new long[]{0x0010000000000000L});
+	public static final BitSet FOLLOW_PERIOD_in_directiveStatement105 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_triples_in_triplesStatement135 = new BitSet(new long[]{0x0010000000000000L,0x0000000000002000L});
+	public static final BitSet FOLLOW_WS_in_triplesStatement137 = new BitSet(new long[]{0x0010000000000000L,0x0000000000002000L});
+	public static final BitSet FOLLOW_PERIOD_in_triplesStatement140 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_base_in_directive155 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_prefixID_in_directive161 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AT_in_base174 = new BitSet(new long[]{0x0000000000001000L});
+	public static final BitSet FOLLOW_BASE_in_base176 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+	public static final BitSet FOLLOW_uriref_in_base178 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_AT_in_prefixID196 = new BitSet(new long[]{0x0040000000000000L});
+	public static final BitSet FOLLOW_PREFIX_in_prefixID198 = new BitSet(new long[]{0x0000400000020000L});
+	public static final BitSet FOLLOW_namespace_in_prefixID201 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+	public static final BitSet FOLLOW_defaultNamespace_in_prefixID207 = new BitSet(new long[]{0x0000000000000000L,0x0000000000000010L});
+	public static final BitSet FOLLOW_uriref_in_prefixID212 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_subject_in_triples231 = new BitSet(new long[]{0x0080000000000000L,0x0000000000004010L});
+	public static final BitSet FOLLOW_predicateObjectList_in_triples233 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_blankNodePropertyList_in_triples244 = new BitSet(new long[]{0x0080000000000002L,0x0000000000004010L});
+	public static final BitSet FOLLOW_predicateObjectList_in_triples264 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_verb_in_predicateObjectList300 = new BitSet(new long[]{0x008008E087382080L,0x00000000000002B0L});
+	public static final BitSet FOLLOW_objectList_in_predicateObjectList306 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000002L});
+	public static final BitSet FOLLOW_SEMI_in_predicateObjectList314 = new BitSet(new long[]{0x0080000000000000L,0x0000000000004010L});
+	public static final BitSet FOLLOW_verb_in_predicateObjectList318 = new BitSet(new long[]{0x008008E087382080L,0x00000000000002B0L});
+	public static final BitSet FOLLOW_objectList_in_predicateObjectList322 = new BitSet(new long[]{0x0000000000000002L,0x0000000000000002L});
+	public static final BitSet FOLLOW_LSQ_BRACKET_in_blankNodePropertyList345 = new BitSet(new long[]{0x0080000000000000L,0x0000000000004010L});
+	public static final BitSet FOLLOW_predicateObjectList_in_blankNodePropertyList354 = new BitSet(new long[]{0x4000000000000000L});
+	public static final BitSet FOLLOW_RSQ_BRACKET_in_blankNodePropertyList362 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_predicate_in_verb381 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_78_in_verb389 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_object_in_objectList415 = new BitSet(new long[]{0x0000000000040002L});
+	public static final BitSet FOLLOW_COMMA_in_objectList420 = new BitSet(new long[]{0x008008E087382080L,0x00000000000002B0L});
+	public static final BitSet FOLLOW_object_in_objectList424 = new BitSet(new long[]{0x0000000000040002L});
+	public static final BitSet FOLLOW_resource_in_subject445 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variable_in_subject453 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_blank_in_subject461 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_resource_in_predicate482 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_resource_in_object501 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_literal_in_object509 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_typedLiteral_in_object518 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variable_in_object526 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_blank_in_object534 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_blankNodePropertyList_in_object544 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_uriref_in_resource564 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_qname_in_resource573 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRING_WITH_BRACKET_in_uriref598 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_PREFIXED_NAME_in_qname617 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_BLANK_NODE_LABEL_in_blank636 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ANON_in_blank644 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRING_WITH_CURLY_BRACKET_in_variable663 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_resource_in_function682 = new BitSet(new long[]{0x0000040000000000L});
+	public static final BitSet FOLLOW_LPAREN_in_function684 = new BitSet(new long[]{0x008000E087380000L,0x00000000000002B0L});
+	public static final BitSet FOLLOW_terms_in_function686 = new BitSet(new long[]{0x2000000000000000L});
+	public static final BitSet FOLLOW_RPAREN_in_function688 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variable_in_typedLiteral707 = new BitSet(new long[]{0x0000000000000400L});
+	public static final BitSet FOLLOW_AT_in_typedLiteral709 = new BitSet(new long[]{0x0000000000000000L,0x0000000000001020L});
+	public static final BitSet FOLLOW_language_in_typedLiteral711 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variable_in_typedLiteral719 = new BitSet(new long[]{0x1000000000000000L});
+	public static final BitSet FOLLOW_REFERENCE_in_typedLiteral721 = new BitSet(new long[]{0x0080000000000000L,0x0000000000000010L});
+	public static final BitSet FOLLOW_resource_in_typedLiteral723 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_languageTag_in_language742 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variable_in_language750 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_term_in_terms776 = new BitSet(new long[]{0x0000000000040002L});
+	public static final BitSet FOLLOW_COMMA_in_terms781 = new BitSet(new long[]{0x008000E087380000L,0x00000000000002B0L});
+	public static final BitSet FOLLOW_term_in_terms785 = new BitSet(new long[]{0x0000000000040002L});
+	public static final BitSet FOLLOW_function_in_term806 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_variable_in_term814 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_literal_in_term822 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_stringLiteral_in_literal842 = new BitSet(new long[]{0x0000000000000402L});
+	public static final BitSet FOLLOW_AT_in_literal845 = new BitSet(new long[]{0x0000000000000000L,0x0000000000001020L});
+	public static final BitSet FOLLOW_language_in_literal847 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_dataTypeString_in_literal857 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_numericLiteral_in_literal865 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_booleanLiteral_in_literal873 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRING_WITH_QUOTE_DOUBLE_in_stringLiteral892 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_stringLiteral_in_dataTypeString912 = new BitSet(new long[]{0x1000000000000000L});
+	public static final BitSet FOLLOW_REFERENCE_in_dataTypeString914 = new BitSet(new long[]{0x0080000000000000L,0x0000000000000010L});
+	public static final BitSet FOLLOW_resource_in_dataTypeString916 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_numericUnsigned_in_numericLiteral932 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_numericPositive_in_numericLiteral940 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_numericNegative_in_numericLiteral948 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_STRING_URI_in_relativeURI964 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_NAMESPACE_in_namespace977 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_COLON_in_defaultNamespace990 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_VARNAME_in_name1003 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_VARNAME_in_languageTag1016 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_TRUE_in_booleanLiteral1033 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_FALSE_in_booleanLiteral1042 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INTEGER_in_numericUnsigned1061 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DOUBLE_in_numericUnsigned1069 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DECIMAL_in_numericUnsigned1078 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INTEGER_POSITIVE_in_numericPositive1097 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DOUBLE_POSITIVE_in_numericPositive1105 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DECIMAL_POSITIVE_in_numericPositive1114 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_INTEGER_NEGATIVE_in_numericNegative1133 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DOUBLE_NEGATIVE_in_numericNegative1141 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_DECIMAL_NEGATIVE_in_numericNegative1150 = new BitSet(new long[]{0x0000000000000002L});
 }

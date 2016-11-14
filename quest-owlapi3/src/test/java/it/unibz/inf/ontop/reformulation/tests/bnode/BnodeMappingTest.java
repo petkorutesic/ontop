@@ -1,4 +1,4 @@
-package it.unibz.inf.ontop.parser;
+package it.unibz.inf.ontop.reformulation.tests.bnode;
 
 /*
  * #%L
@@ -71,8 +71,8 @@ public class BnodeMappingTest {
 	private OBDAModel obdaModel;
 	private OWLOntology ontology;
 
-	final String owlfile = "src/test/resources/simpleBNodeTestDatabase.owl";
-	final String obdafile = "src/test/resources/simpleBNodeTestDatabase.obda";
+	final String owlfile = "src/test/resources/bnode/simpleBNodeTestDatabase.owl";
+	final String obdafile = "src/test/resources/bnode/simpleBNodeTestDatabase.obda";
 //  This is a version of the mapping without blank nodes
 //	final String obdafile = "src/test/resources/emptiesDatabase.obda";
 
@@ -102,7 +102,7 @@ public class BnodeMappingTest {
 		connection = DriverManager.getConnection(url, username, password);
 		Statement st = connection.createStatement();
 
-		FileReader reader = new FileReader("src/test/resources/simpleBNodeTestDatabase-h2.sql");
+		FileReader reader = new FileReader("src/test/resources/bnode/simpleBNodeTestDatabase-h2.sql");
 		BufferedReader in = new BufferedReader(reader);
 		StringBuilder bf = new StringBuilder();
 		String line = in.readLine();
@@ -155,7 +155,7 @@ public class BnodeMappingTest {
 
 		Statement st = connection.createStatement();
 
-		FileReader reader = new FileReader("src/test/resources/simpleBNodeTestDatabase-drop-h2.sql");
+		FileReader reader = new FileReader("src/test/resources/bnode/simpleBNodeTestDatabase-drop-h2.sql");
 		BufferedReader in = new BufferedReader(reader);
 		StringBuilder bf = new StringBuilder();
 		String line = in.readLine();
@@ -205,11 +205,6 @@ public class BnodeMappingTest {
 		assertEquals(2, numberResults);
 	}
 
-	/**
-	 * The query returns correct answer in spite of the fact that :marketShare is not defined in the ontology
-	 *
-	 * @throws Exception
-	 */
 	@Test
 	public void testBNodesMappingNotDefinedProperty() throws Exception {
 		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE { ?x :marketShare ?y}";
@@ -237,14 +232,6 @@ public class BnodeMappingTest {
 		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a _:k.}";
 		int numberResults = runTests(query);
 		assertEquals(32, numberResults);
-	}
-
-
-	@Test
-	public void testBNodesMapping4() throws Exception {
-		String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT ?x WHERE {?x a :BusinessCenter. ?x :hasCommonNetworth ?y}";
-		int numberResults = runTests(query);
-		assertEquals(2, numberResults);
 	}
 
 }

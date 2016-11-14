@@ -13,14 +13,6 @@ mappingId	mappingAddress
 target		:address-{id} a :Address ; :inStreet {street} ; :hasNumber {number} ; :inCity {city} . 
 source		select id, street, number, city from address
 
-
-mappingId	mappingBusinessCenter
-target		_:business-center-{co.addressid} a :BusinessCenter ; :hasCommonNetworth  {adrNetworth} ; :hasNumberOfCompanies {numCompanies}  .
-source		select  co.addressid, sum(co.networth) adrNetworth, count (co.id) numCompanies
-            from company co
-            group by co.addressid
-            having count(co.id) >= 2
-
 mappingId	mappingCompanies
 target		_:company-{id} a :Company ; :companyName {name} .
 source		select id, name from company

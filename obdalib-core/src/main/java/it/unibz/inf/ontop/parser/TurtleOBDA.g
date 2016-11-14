@@ -172,6 +172,9 @@ private String removeBrackets(String text) {
    return text.substring(1, text.length()-1);
 }
 
+	/**
+	 *  Constructs URI template founctions from text
+	 */
 	private Term construct(String text) {
 	   Term toReturn = null;
 	   final String PLACEHOLDER = "{}";
@@ -209,26 +212,30 @@ private String removeBrackets(String text) {
 	   return toReturn;
 	}
 
-	/** A method which construct BNode templates according to the pattern given in the string text
+	/** A method which constructs BNode templates according to the pattern given in the string text
 	 *  It is very similar to construct function for URI templates
 	 */
-    private Term constructBNode(String text) {
-       Term toReturn = null;
+	 private Term constructBNode(String text) {
+	    Term toReturn = null;
        final String PLACEHOLDER = "{}";
        List<Term> terms = new LinkedList<Term>();
+
+       /*
+        * prefix for BNode
+        */
        if (text.startsWith("_:")){
-                   text = text.replaceFirst("_:","");
+           text = text.substring(2);
        }
        List<FormatString> tokens = parse(text);
        int size = tokens.size();
        if (size == 1) {
           FormatString token = tokens.get(0);
           if (token instanceof FixedString) {
-              ValueConstant uriTemplate = dfac.getConstantLiteral(token.toString()); // a single URI template
+              ValueConstant uriTemplate = dfac.getConstantLiteral(token.toString()); // a single BNode template
               toReturn = dfac.getBNodeTemplate(uriTemplate);
           }
           else if (token instanceof ColumnString) {
-             ValueConstant uriTemplate = dfac.getConstantLiteral(PLACEHOLDER); // a single URI template
+             ValueConstant uriTemplate = dfac.getConstantLiteral(PLACEHOLDER); // a single BNode template
              Variable column = dfac.getVariable(token.toString());
              terms.add(0, uriTemplate);
              terms.add(column);
@@ -238,7 +245,7 @@ private String removeBrackets(String text) {
        else {
           StringBuilder sb = new StringBuilder();
           for(FormatString token : tokens) {
-             if (token instanceof FixedString) { // if part of URI template
+             if (token instanceof FixedString) { // if part of BNode template
                 sb.append(token.toString());
              }
              else if (token instanceof ColumnString) {
@@ -253,6 +260,7 @@ private String removeBrackets(String text) {
        }
        return toReturn;
     }
+
 
 
 // Column placeholder pattern
@@ -448,7 +456,9 @@ private Function createBNode() {
     return f;
 }
 
-} /** end of @members */
+}
+
+/** end of @members */
 
 /*------------------------------------------------------------------
  * PARSER RULES

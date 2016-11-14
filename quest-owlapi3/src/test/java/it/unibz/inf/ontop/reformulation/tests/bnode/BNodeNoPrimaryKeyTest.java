@@ -1,4 +1,4 @@
-package it.unibz.inf.ontop.parser;
+package it.unibz.inf.ontop.reformulation.tests.bnode;
 
 /*
  * #%L
@@ -53,8 +53,8 @@ import java.sql.Statement;
 
    Query is just a simple SPARQL query.
  */
-public class QueriesOverBNodesTest extends TestCase {
-    final static Logger log = LoggerFactory.getLogger(QueriesOverBNodesTest.class);
+public class BNodeNoPrimaryKeyTest extends TestCase {
+    final static Logger log = LoggerFactory.getLogger(BNodeNoPrimaryKeyTest.class);
 
 
     private Connection conn;

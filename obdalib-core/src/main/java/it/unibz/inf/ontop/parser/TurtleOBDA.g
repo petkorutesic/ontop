@@ -32,46 +32,31 @@ grammar TurtleOBDA;
 @header {
 package it.unibz.inf.ontop.parser;
 
-import it.unibz.inf.ontop.model.CQIE;
+import com.google.common.collect.ImmutableList;
+
 import it.unibz.inf.ontop.model.Constant;
-import it.unibz.inf.ontop.model.Function;
-import it.unibz.inf.ontop.model.Term;
-import it.unibz.inf.ontop.model.OBDADataFactory;
 import it.unibz.inf.ontop.model.DatatypeFactory;
-import it.unibz.inf.ontop.model.OBDALibConstants;
+import it.unibz.inf.ontop.model.ExpressionOperation;
+import it.unibz.inf.ontop.model.Function;
+import it.unibz.inf.ontop.model.OBDADataFactory;
 import it.unibz.inf.ontop.model.Predicate;
-import it.unibz.inf.ontop.model.URIConstant;
+import it.unibz.inf.ontop.model.Predicate.COL_TYPE;
+import it.unibz.inf.ontop.model.Term;
+import it.unibz.inf.ontop.model.URITemplatePredicate;
 import it.unibz.inf.ontop.model.ValueConstant;
 import it.unibz.inf.ontop.model.Variable;
-import it.unibz.inf.ontop.model.Predicate.COL_TYPE;
+import it.unibz.inf.ontop.model.impl.NumberedBNodePredicateImpl;
 import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl;
 import it.unibz.inf.ontop.model.impl.OBDAVocabulary;
 import it.unibz.inf.ontop.utils.QueryUtils;
-import it.unibz.inf.ontop.model.URITemplatePredicate;
-import it.unibz.inf.ontop.model.ExpressionOperation;
 
-import java.net.URI;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.antlr.runtime.BitSet;
-import org.antlr.runtime.IntStream;
-import org.antlr.runtime.MismatchedTokenException;
-import org.antlr.runtime.NoViableAltException;
-import org.antlr.runtime.Parser;
-import org.antlr.runtime.ParserRuleReturnScope;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.RecognizerSharedState;
-import org.antlr.runtime.Token;
-import org.antlr.runtime.TokenStream;
-
 }
 
 @lexer::header {
@@ -124,6 +109,9 @@ private HashMap<String, String> directives = new HashMap<String, String>();
 /** Additional atoms generated as the consequence of the complex nesting of bnodes
 in the blankNodePropertyList rule*/
 private List<Function> additionalBNodeAtoms;
+
+/** counter for keeping track of occurrances of unlabeled BNodes */
+private int unlabeledBNodeCounter = 0;
 
 /** All variables */
 private Set<Term> variableSet = new HashSet<Term>();
@@ -445,16 +433,16 @@ private static boolean isRDFType(Term pred) {
 
 
 
-/**
- * This method creates unique Bnode
- *
- */
-private Function createBNode() {
-    Function f;
-    List<Term> emptyTermList = new LinkedList<Term>();
-    f = dfac.getBNodeTemplate(emptyTermList);
+	/**
+	 * This method constructs a fresh unlabeled BNode and increases the counter internally.
+	 *
+	 */
+private Function constructFreshUnlabeledBNode() {
+    final Function f = dfac.getFunction(new NumberedBNodePredicateImpl(unlabeledBNodeCounter), ImmutableList.of());
+    unlabeledBNodeCounter++;
     return f;
 }
+
 
 }
 
@@ -554,7 +542,7 @@ blankNodePropertyList returns [Term bnode, List<Function> nestedTriplePatternsIn
   : LSQ_BRACKET{
         //A new bNode is created as a subject for all triples created within predicateObjectList.
         //The newly created bNode is passed as an input parameter of the predicateObjectList
-        $bnode = createBNode();
+        $bnode = constructFreshUnlabeledBNode();
     }
     l=predicateObjectList[$bnode]{
         $nestedTriplePatternsInBNode = $l.value;
@@ -633,7 +621,7 @@ qname returns [String value]
 
 blank returns [Term value]
   : BLANK_NODE_LABEL { $value = constructBNode($BLANK_NODE_LABEL.text); }
-  | ANON { $value = createBNode(); }
+  | ANON { $value = constructFreshUnlabeledBNode(); }
   ;
 
 variable returns [Variable value]

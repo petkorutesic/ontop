@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 TurtleOBDA.g 2016-11-14 16:49:10
+// $ANTLR 3.5.2 TurtleOBDA.g 2016-11-17 14:14:28
 
 package it.unibz.inf.ontop.parser;
 
@@ -1206,17 +1206,17 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "subject"
-	// TurtleOBDA.g:570:1: subject returns [Term value] : ( resource | variable | blank );
+	// TurtleOBDA.g:570:1: subject returns [Term value] : ( resource | variable | blanknode );
 	public final Term subject() throws RecognitionException {
 		Term value = null;
 
 
 		Term resource8 =null;
 		Variable variable9 =null;
-		Term blank10 =null;
+		Term blanknode10 =null;
 
 		try {
-			// TurtleOBDA.g:571:3: ( resource | variable | blank )
+			// TurtleOBDA.g:571:3: ( resource | variable | blanknode )
 			int alt11=3;
 			switch ( input.LA(1) ) {
 			case PREFIXED_NAME:
@@ -1263,13 +1263,13 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 3 :
-					// TurtleOBDA.g:573:5: blank
+					// TurtleOBDA.g:573:5: blanknode
 					{
-					pushFollow(FOLLOW_blank_in_subject461);
-					blank10=blank();
+					pushFollow(FOLLOW_blanknode_in_subject461);
+					blanknode10=blanknode();
 					state._fsp--;
 
-					 value = blank10; 
+					 value = blanknode10; 
 					}
 					break;
 
@@ -1331,7 +1331,7 @@ public class TurtleOBDAParser extends Parser {
 
 
 	// $ANTLR start "object"
-	// TurtleOBDA.g:590:1: object returns [Term value] : ( resource | literal | typedLiteral | variable | blank |bl= blankNodePropertyList );
+	// TurtleOBDA.g:590:1: object returns [Term value] : ( resource | literal | typedLiteral | variable | blanknode |bl= blankNodePropertyList );
 	public final Term object() throws RecognitionException {
 		Term value = null;
 
@@ -1341,10 +1341,10 @@ public class TurtleOBDAParser extends Parser {
 		Term literal13 =null;
 		Function typedLiteral14 =null;
 		Variable variable15 =null;
-		Term blank16 =null;
+		Term blanknode16 =null;
 
 		try {
-			// TurtleOBDA.g:591:3: ( resource | literal | typedLiteral | variable | blank |bl= blankNodePropertyList )
+			// TurtleOBDA.g:591:3: ( resource | literal | typedLiteral | variable | blanknode |bl= blankNodePropertyList )
 			int alt12=6;
 			switch ( input.LA(1) ) {
 			case PREFIXED_NAME:
@@ -1451,13 +1451,13 @@ public class TurtleOBDAParser extends Parser {
 					}
 					break;
 				case 5 :
-					// TurtleOBDA.g:595:5: blank
+					// TurtleOBDA.g:595:5: blanknode
 					{
-					pushFollow(FOLLOW_blank_in_object534);
-					blank16=blank();
+					pushFollow(FOLLOW_blanknode_in_object534);
+					blanknode16=blanknode();
 					state._fsp--;
 
-					 value = blank16; 
+					 value = blanknode16; 
 					}
 					break;
 				case 6 :
@@ -1617,9 +1617,9 @@ public class TurtleOBDAParser extends Parser {
 
 
 
-	// $ANTLR start "blank"
-	// TurtleOBDA.g:622:1: blank returns [Term value] : ( BLANK_NODE_LABEL | ANON );
-	public final Term blank() throws RecognitionException {
+	// $ANTLR start "blanknode"
+	// TurtleOBDA.g:622:1: blanknode returns [Term value] : ( BLANK_NODE_LABEL | ANON );
+	public final Term blanknode() throws RecognitionException {
 		Term value = null;
 
 
@@ -1646,14 +1646,14 @@ public class TurtleOBDAParser extends Parser {
 				case 1 :
 					// TurtleOBDA.g:623:5: BLANK_NODE_LABEL
 					{
-					BLANK_NODE_LABEL21=(Token)match(input,BLANK_NODE_LABEL,FOLLOW_BLANK_NODE_LABEL_in_blank636); 
+					BLANK_NODE_LABEL21=(Token)match(input,BLANK_NODE_LABEL,FOLLOW_BLANK_NODE_LABEL_in_blanknode636); 
 					 value = constructBNode((BLANK_NODE_LABEL21!=null?BLANK_NODE_LABEL21.getText():null)); 
 					}
 					break;
 				case 2 :
 					// TurtleOBDA.g:624:5: ANON
 					{
-					match(input,ANON,FOLLOW_ANON_in_blank644); 
+					match(input,ANON,FOLLOW_ANON_in_blanknode644); 
 					 value = constructFreshUnlabeledBNode(); 
 					}
 					break;
@@ -1669,7 +1669,7 @@ public class TurtleOBDAParser extends Parser {
 		}
 		return value;
 	}
-	// $ANTLR end "blank"
+	// $ANTLR end "blanknode"
 
 
 
@@ -2921,20 +2921,20 @@ public class TurtleOBDAParser extends Parser {
 	public static final BitSet FOLLOW_object_in_objectList424 = new BitSet(new long[]{0x0000000000040002L});
 	public static final BitSet FOLLOW_resource_in_subject445 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_variable_in_subject453 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_blank_in_subject461 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_blanknode_in_subject461 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_resource_in_predicate482 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_resource_in_object501 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_literal_in_object509 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_typedLiteral_in_object518 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_variable_in_object526 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_blank_in_object534 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_blanknode_in_object534 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_blankNodePropertyList_in_object544 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_uriref_in_resource564 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_qname_in_resource573 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_STRING_WITH_BRACKET_in_uriref598 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_PREFIXED_NAME_in_qname617 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_BLANK_NODE_LABEL_in_blank636 = new BitSet(new long[]{0x0000000000000002L});
-	public static final BitSet FOLLOW_ANON_in_blank644 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_BLANK_NODE_LABEL_in_blanknode636 = new BitSet(new long[]{0x0000000000000002L});
+	public static final BitSet FOLLOW_ANON_in_blanknode644 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_STRING_WITH_CURLY_BRACKET_in_variable663 = new BitSet(new long[]{0x0000000000000002L});
 	public static final BitSet FOLLOW_resource_in_function682 = new BitSet(new long[]{0x0000040000000000L});
 	public static final BitSet FOLLOW_LPAREN_in_function684 = new BitSet(new long[]{0x008000E087380000L,0x00000000000002B0L});

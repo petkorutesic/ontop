@@ -48,13 +48,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 
-/* The testing database doesn't have primary key and in the mapping file
-   blank nodes are used for references different columns.
+/* The testing database has primary key and in the mapping file
+   blank nodes are used for referencing different columns.
 
    Query is just a simple SPARQL query.
  */
-public class BNodeNoPrimaryKeyTest extends TestCase {
-    final static Logger log = LoggerFactory.getLogger(BNodeNoPrimaryKeyTest.class);
+public class BNodeWithPrimaryKeyTest extends TestCase {
+    final static Logger log = LoggerFactory.getLogger(BNodeWithPrimaryKeyTest.class);
 
 
     private Connection conn;
@@ -62,14 +62,14 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
     private OWLOntology ontology;
     private OBDADataFactory fac;
 
-    final String owlfile = "src/test/resources/bnode/simple-db-noprimarykeys.owl";
-    final String obdafile = "src/test/resources/bnode/simple-db-noprimarykeys.obda";
-    private final String dbCreateFile = "src/test/resources/bnode/db-noprimarykeys-create-h2.sql";
-    private final String dbDropDatabase = "src/test/resources/bnode/db-noprimarykeys-drop-h2.sql";
+    final String owlfile = "src/test/resources/bnode/simple-db-with-primarykey.owl";
+    final String obdafile = "src/test/resources/bnode/simple-db-with_primarykey.obda";
+    private final String dbCreateFile = "src/test/resources/bnode/db-with-primarykey-create-h2.sql";
+    private final String dbDropDatabase = "src/test/resources/bnode/db-with-primarykey-drop-h2.sql";
 
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";
-    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb-noprimarykeys";
+    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb-with-primarykey";
     private final String jdbcDriverClass = "org.h2.Drive";
 
 
@@ -141,7 +141,6 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
     @Test
     public void testQuery() throws Exception {
 
-
         // Creating a new instance of the reasoner
         QuestOWLFactory factory = new QuestOWLFactory();
         QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).build();
@@ -158,19 +157,22 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
             QuestOWLResultSet rs = st.executeTuple(query);
             assertTrue(rs.nextRow());
             OWLObject ind1 = rs.getOWLObject("x");
+
+            log.debug(ToStringRenderer.getInstance().getRendering(ind1));
             assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
 
             assertTrue(rs.nextRow());
             ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
+            assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
 
             assertTrue(rs.nextRow());
             ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
+            assertEquals("_:b2", ToStringRenderer.getInstance().getRendering(ind1));
 
             assertTrue(rs.nextRow());
             ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
+            assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
+
 
         } catch (Exception e) {
             throw e;

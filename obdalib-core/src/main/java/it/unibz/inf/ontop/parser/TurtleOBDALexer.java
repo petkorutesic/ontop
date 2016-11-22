@@ -1,4 +1,4 @@
-// $ANTLR 3.5.2 TurtleOBDA.g 2016-11-14 16:49:11
+// $ANTLR 3.5.2 TurtleOBDA.g 2016-11-17 14:14:29
 
 package it.unibz.inf.ontop.parser;
 

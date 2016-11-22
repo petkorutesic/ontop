@@ -3,6 +3,7 @@ package it.unibz.inf.ontop.owlrefplatform.core;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import it.unibz.inf.ontop.model.*;
+import it.unibz.inf.ontop.model.impl.NumberedBNodePredicateImpl;
 import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl;
 import it.unibz.inf.ontop.model.impl.OBDAVocabulary;
 import it.unibz.inf.ontop.model.impl.TermUtils;
@@ -15,16 +16,21 @@ import it.unibz.inf.ontop.owlrefplatform.core.mappingprocessing.TMappingExclusio
 import it.unibz.inf.ontop.owlrefplatform.core.mappingprocessing.TMappingProcessor;
 import it.unibz.inf.ontop.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.inf.ontop.parser.PreprocessProjection;
+import it.unibz.inf.ontop.sql.*;
 import it.unibz.inf.ontop.utils.Mapping2DatalogConverter;
 import it.unibz.inf.ontop.utils.MappingSplitter;
 import it.unibz.inf.ontop.utils.MetaMappingExpander;
-import it.unibz.inf.ontop.sql.DBMetadata;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.select.FromItem;
+import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import net.sf.jsqlparser.schema.Table;
 
+import javax.smartcardio.TerminalFactorySpi;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -77,16 +83,15 @@ public class QuestUnfolder {
 		 */
 		mappings.addAll(MappingSameAs.addSameAsInverse(mappings));
 
+		/**
+		 * Substitutes unlabeled BNodes such as BNode[i] with proper templates
+		 */
+		preprocessUnlabeledBlankNodeTemplates(mappings, metadata);
+
 		/** 
 		 * Substitute select * with column names  (performs the operation `in place')
 		 */
 		preprocessProjection(mappings, metadata);
-
-        /**
-         * Substitute unlabel BNodes BNode[i] with proper templates
-         */
-        preprocessUnlabeledBlankNodeTemplates(mappings, metadata);
-
 
         /**
          * Split the mapping (creates a new set of mappings)
@@ -100,8 +105,7 @@ public class QuestUnfolder {
 		Collection<OBDAMappingAxiom> expandedMappings = metaMappingExpander.expand(splittedMappings);
 		
 		List<CQIE> unfoldingProgram = Mapping2DatalogConverter.constructDatalogProgram(expandedMappings, metadata);
-		
-		
+
 		log.debug("Original mapping size: {}", unfoldingProgram.size());
 		
 		 // Normalizing language tags and equalities
@@ -148,10 +152,7 @@ public class QuestUnfolder {
 		this.ufp = unfoldingProgram;
 	}
 
-    private void preprocessUnlabeledBlankNodeTemplates(Collection<OBDAMappingAxiom> mappings, DBMetadata metadata) {
-        // TODO: replace UnlabeledBlankNodeTemplates with proper ones
-        // you can use the metadata object to retrieve primary keys
-    }
+
 
 
     /**
@@ -216,7 +217,7 @@ public class QuestUnfolder {
 	/***
 	 * Adding data typing on the mapping axioms.
 	 * Adding NOT NULL conditions to the variables used in the head
-	 * of all mappings to preserve SQL-RDF semantics
+	 * of all mappings to preserve SQL-RDF semanticsimport it.unibz.inf.ontop.model.URITemplatePredicate;
 	 */
 	
 	private void extendTypesWithMetadataAndAddNOTNULL(List<CQIE> unfoldingProgram, TBoxReasoner tboxReasoner, VocabularyValidator qvv) throws OBDAException {
@@ -442,6 +443,71 @@ public class QuestUnfolder {
 		}
 	}
 
+	/**
+	 * Substitutes unlabeled BNodes such as BNode[i] with proper templates
+	 */
+	private void preprocessUnlabeledBlankNodeTemplates(Collection<OBDAMappingAxiom> mappings, DBMetadata metadata) {
+		// TODO: replace UnlabeledBlankNodeTemplates with proper ones
+		//  Metadata object is used to retrieve primary keys
+		for (OBDAMappingAxiom mapping : mappings){
+			try {
+
+				String sourceString = mapping.getSourceQuery().toString();
+				Select select = (Select) CCJSqlParserUtil.parse(sourceString);
+
+				List<Function> targetQuery = mapping.getTargetQuery();
+				OBDADataFactory dfac = OBDADataFactoryImpl.getInstance();
+
+				for (Function atom : targetQuery) {
+					// if it's unlabeled node change it with the node
+					// BNode(
+					Term term = atom.getTerm(0);
+
+					if (term  instanceof Function) {
+						Function function = (Function) term;
+						Predicate pred = function.getFunctionSymbol();
+						if (pred instanceof NumberedBNodePredicateImpl) {
+							// Find a name of the relation in from part of the sql statement
+							// under assumption that sqlquery is just simple query with only
+							// one relation in from part and with no WITH statement
+							SelectBody selectBody = select.getSelectBody();
+							if (selectBody instanceof PlainSelect) {
+								FromItem table = ((PlainSelect) selectBody).getFromItem();
+								QuotedIDFactory idfac = metadata.getQuotedIDFactory();
+								Table tableName = (Table) table;
+								RelationID tableId = idfac.createRelationID(tableName.getSchemaName(), tableName.getName());
+
+								// Checks if the table has primary key
+								UniqueConstraint primaryKey = metadata.getDatabaseRelation(tableId).getPrimaryKey();
+								if (primaryKey != null) {
+									StringBuilder bNodePattern = new StringBuilder();
+									bNodePattern = bNodePattern.append("_:unlabeled");
+									List<Term> terms = new LinkedList<Term>();
+									final String PLACEHOLDER = "{}";
+									//Create Blank node of the type (BNode_{}_{}, att1, att2)
+									for (Attribute attr : primaryKey.getAttributes()) {
+										bNodePattern = bNodePattern.append("_");
+										bNodePattern = bNodePattern.append(PLACEHOLDER);
+										Variable column = dfac.getVariable(attr.getID().getName());
+										terms.add(column);
+									}
+									ValueConstant bNodeTemplate = dfac.getConstantLiteral(bNodePattern.toString());
+									terms.add(0, bNodeTemplate);
+									Term newBnode = dfac.getBNodeTemplate(terms);
+									atom.setTerm(0, newBnode);
+
+								}
+							}
+						}
+					}
+				}
+			}
+			catch (JSQLParserException e) {
+				log.debug("SQL Query cannot be preprocessed by the parser");
+			}
+
+		}
+	}
 
     /**
      * Store information about owl:sameAs

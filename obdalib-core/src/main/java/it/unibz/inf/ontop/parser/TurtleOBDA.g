@@ -570,7 +570,7 @@ objectList returns [List<Term> value]
 subject returns [Term value]
   : resource { $value = $resource.value; }
   | variable { $value = $variable.value; }
-  | blank  { $value = $blank.value; }
+  | blanknode  { $value = $blanknode.value; }
   ;
 
 //predicate returns [String value]
@@ -592,7 +592,7 @@ object returns [Term value]
   | literal  { $value = $literal.value; }
   | typedLiteral { $value = $typedLiteral.value; }
   | variable { $value = $variable.value; }
-  | blank { $value = $blank.value; }
+  | blanknode { $value = $blanknode.value; }
   | bl=blankNodePropertyList {
         $value = $bl.bnode;
         //* Additional triples (atoms) created within blankNodePropertyList are added to a global list
@@ -619,7 +619,7 @@ qname returns [String value]
     }
   ;
 
-blank returns [Term value]
+blanknode returns [Term value]
   : BLANK_NODE_LABEL { $value = constructBNode($BLANK_NODE_LABEL.text); }
   | ANON { $value = constructFreshUnlabeledBNode(); }
   ;

@@ -170,7 +170,7 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
 
             assertTrue(rs.nextRow());
             ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
+            assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
 
         } catch (Exception e) {
             throw e;

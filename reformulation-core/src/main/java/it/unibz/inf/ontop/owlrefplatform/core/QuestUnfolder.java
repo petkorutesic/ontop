@@ -459,17 +459,16 @@ public class QuestUnfolder {
 				OBDADataFactory dfac = OBDADataFactoryImpl.getInstance();
 
 				for (Function atom : targetQuery) {
-					// if it's unlabeled node change it with the node
-					// BNode(
 					Term term = atom.getTerm(0);
-
 					if (term  instanceof Function) {
 						Function function = (Function) term;
 						Predicate pred = function.getFunctionSymbol();
+						// if it's unlabeled blank node change it with the node
+						// of the the type (BNode_{}_{}, att1, att2)
 						if (pred instanceof NumberedBNodePredicateImpl) {
-							// Find a name of the relation in from part of the sql statement
+							// Find a name of the relation in the FROM part of the sql statement
 							// under assumption that sqlquery is just simple query with only
-							// one relation in from part and with no WITH statement
+							// one relation in the FROM part and with no WITH statement
 							SelectBody selectBody = select.getSelectBody();
 							if (selectBody instanceof PlainSelect) {
 								FromItem table = ((PlainSelect) selectBody).getFromItem();

@@ -53,8 +53,8 @@ import java.sql.Statement;
 
    Query is just a simple SPARQL query.
  */
-public class BNodeWithPrimaryKeyTest extends TestCase {
-    final static Logger log = LoggerFactory.getLogger(BNodeWithPrimaryKeyTest.class);
+public class BNodeJoinTablesTest extends TestCase {
+    final static Logger log = LoggerFactory.getLogger(BNodeJoinTablesTest.class);
 
 
     private Connection conn;
@@ -62,14 +62,14 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
     private OWLOntology ontology;
     private OBDADataFactory fac;
 
-    final String owlfile = "src/test/resources/bnode/simple-db-with-primarykey.owl";
-    final String obdafile = "src/test/resources/bnode/simple-db-with_primarykey.obda";
-    private final String dbCreateFile = "src/test/resources/bnode/db-with-primarykey-create-h2.sql";
-    private final String dbDropDatabase = "src/test/resources/bnode/db-with-primarykey-drop-h2.sql";
+    final String owlfile = "src/test/resources/bnode/to-delete-TestDatabase.owl";
+    final String obdafile = "src/test/resources/bnode/to-delete-TestDatabase.obda";
+    private final String dbCreateFile = "src/test/resources/bnode/to-delete-TestDatabase-create-h2.sql";
+    private final String dbDropDatabase = "src/test/resources/bnode/to-delete-TestDatabase-drop-h2.sql";
 
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";
-    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb-with-primarykey";
+    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb";
     private final String jdbcDriverClass = "org.h2.Drive";
 
 
@@ -150,7 +150,7 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
         QuestOWLConnection conn = reasoner.getConnection();
         QuestOWLStatement st = conn.createStatement();
 
-        String query = "PREFIX : <http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :Message ; :text ?y }";
+        String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT * WHERE { ?x a :Student  }";
         try {
 
             QuestOWLResultSet rs = st.executeTuple(query);
@@ -161,9 +161,6 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
 
             assertTrue(rs.nextRow());
             OWLObject ind1 = rs.getOWLObject("x");
-
-            log.debug(ToStringRenderer.getInstance().getRendering(ind1));
-
             assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
 
             assertTrue(rs.nextRow());
@@ -178,6 +175,24 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
             ind1 = rs.getOWLObject("x");
             assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
 
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b4", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b5", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b6", ToStringRenderer.getInstance().getRendering(ind1));
+/*
+            There are 7 blank nodes altogether
+            3 from Student table and
+            4 from passed Exams
+ */
+
+            assertFalse(rs.nextRow());
 
 
         } catch (Exception e) {
@@ -194,6 +209,82 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
 
         }
 
+    }
+        @Test
+        public void testQueryExams() throws Exception {
+
+            // Creating a new instance of the reasoner
+            QuestOWLFactory factory = new QuestOWLFactory();
+            QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).build();
+            QuestOWL reasoner = factory.createReasoner(ontology, config);
+
+            // Now we are ready for querying
+            QuestOWLConnection conn = reasoner.getConnection();
+            QuestOWLStatement st = conn.createStatement();
+
+            String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT * WHERE { ?x a :Exam}";
+            try {
+
+                QuestOWLResultSet rs = st.executeTuple(query);
+
+                String sqlQuery = st.getUnfolding(query);
+                System.out.println("SQL: ");
+                System.out.println(sqlQuery);
+
+                assertTrue(rs.nextRow());
+                OWLObject ind1 = rs.getOWLObject("x");
+                System.out.print(ToStringRenderer.getInstance().getRendering(ind1));
+                assertEquals("<http://www.semanticweb.org/smallDatabase#exam1>",
+                        ToStringRenderer.getInstance().getRendering(ind1));
+
+                assertTrue(rs.nextRow());
+                ind1 = rs.getOWLObject("x");
+                assertEquals("<http://www.semanticweb.org/smallDatabase#exam1>",
+                        ToStringRenderer.getInstance().getRendering(ind1));
+
+                assertTrue(rs.nextRow());
+                ind1 = rs.getOWLObject("x");
+                assertEquals("<http://www.semanticweb.org/smallDatabase#exam2>",
+                        ToStringRenderer.getInstance().getRendering(ind1));
+
+                assertTrue(rs.nextRow());
+                ind1 = rs.getOWLObject("x");
+                assertEquals("<http://www.semanticweb.org/smallDatabase#exam3>",
+                        ToStringRenderer.getInstance().getRendering(ind1));
+
+                assertTrue(rs.nextRow());
+                ind1 = rs.getOWLObject("x");
+                assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
+
+                assertTrue(rs.nextRow());
+                ind1 = rs.getOWLObject("x");
+                assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
+
+                assertTrue(rs.nextRow());
+                ind1 = rs.getOWLObject("x");
+                assertEquals("_:b2", ToStringRenderer.getInstance().getRendering(ind1));
+/*
+            There are 7 blank nodes altogether
+            3 from Student table and
+            4 from passed Exams
+ */
+
+                assertFalse(rs.nextRow());
+
+
+            } catch (Exception e) {
+                throw e;
+            } finally {
+                try {
+                    st.close();
+                } catch (Exception e) {
+                    throw e;
+                } finally {
+                    conn.close();
+                    reasoner.dispose();
+                }
+
+            }
     }
 
 }

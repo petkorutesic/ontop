@@ -11,7 +11,7 @@ driverClass	org.h2.Driver
 
 [MappingDeclaration] @collection [[
 mappingId	mapping1
-target	[] a :Message .
-source	SELECT * FROM t_message
+target	[] a :Message ; :text {message_text}^^xsd:string.
+source	SELECT attr1, message_text FROM t_message
 ]]
 

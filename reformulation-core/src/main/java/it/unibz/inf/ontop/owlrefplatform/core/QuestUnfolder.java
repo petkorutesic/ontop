@@ -3,7 +3,6 @@ package it.unibz.inf.ontop.owlrefplatform.core;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import it.unibz.inf.ontop.model.*;
-import it.unibz.inf.ontop.model.impl.NumberedBNodePredicateImpl;
 import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl;
 import it.unibz.inf.ontop.model.impl.OBDAVocabulary;
 import it.unibz.inf.ontop.model.impl.TermUtils;
@@ -15,7 +14,7 @@ import it.unibz.inf.ontop.owlrefplatform.core.mappingprocessing.MappingSameAs;
 import it.unibz.inf.ontop.owlrefplatform.core.mappingprocessing.TMappingExclusionConfig;
 import it.unibz.inf.ontop.owlrefplatform.core.mappingprocessing.TMappingProcessor;
 import it.unibz.inf.ontop.owlrefplatform.core.unfolding.DatalogUnfolder;
-import it.unibz.inf.ontop.parser.PreprocessBNode;
+import it.unibz.inf.ontop.parser.BNodeTemplateGenerator;
 import it.unibz.inf.ontop.parser.PreprocessProjection;
 import it.unibz.inf.ontop.sql.*;
 import it.unibz.inf.ontop.utils.Mapping2DatalogConverter;
@@ -23,15 +22,10 @@ import it.unibz.inf.ontop.utils.MappingSplitter;
 import it.unibz.inf.ontop.utils.MetaMappingExpander;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.select.FromItem;
-import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectBody;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import net.sf.jsqlparser.schema.Table;
 
-import javax.smartcardio.TerminalFactorySpi;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
@@ -448,8 +442,7 @@ public class QuestUnfolder {
                 List<Function> targetQuery = mapping.getTargetQuery();
                 OBDADataFactory dfac = OBDADataFactoryImpl.getInstance();
 
-
-                PreprocessBNode bps = new PreprocessBNode(metadata, mapping);
+                BNodeTemplateGenerator bps = new BNodeTemplateGenerator(metadata, mapping);
                 bps.replaceUnlabeledBNodes(select, targetQuery, dfac);
 
             } catch (JSQLParserException e) {

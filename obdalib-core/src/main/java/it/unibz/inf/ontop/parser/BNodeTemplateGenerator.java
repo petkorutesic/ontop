@@ -19,16 +19,16 @@ import java.util.*;
  *
  *
  */
-public class PreprocessBNode {
+public class BNodeTemplateGenerator {
     private final DBMetadata metadata;
     private OBDAMappingAxiom mapping;
 
-    public PreprocessBNode(DBMetadata metadata, OBDAMappingAxiom mapping) {
+    public BNodeTemplateGenerator(DBMetadata metadata, OBDAMappingAxiom mapping) {
         this.metadata = metadata;
         this.mapping = mapping;
     }
 
-    public void replaceUnlabeledBNodes( Select select, List<Function> targetQuery, OBDADataFactory dfac){
+    public void replaceUnlabeledBNodes(Select select, List<Function> targetQuery, OBDADataFactory dfac){
         Map<Term, Term> map = getBNodeTemplateReplacementMap(select, targetQuery, dfac);
         for (Function atom : targetQuery) {
             for (int i = 0 ; i < atom.getTerms().size(); i++){
@@ -73,12 +73,13 @@ public class PreprocessBNode {
                                 UniqueConstraint primaryKey = metadata.getDatabaseRelation(tableId).getPrimaryKey();
 
                                 if (primaryKey != null) {
-
                                     for (Attribute attr : primaryKey.getAttributes()){
-                                        listOfAttributes.add(attr.getID().getName());
+                                        //listOfAttributes.add(attr.getID().getName());
+                                        listOfAttributes.add(attr.getQualifiedID().toString());
                                     }
                                 }
                             }
+
                             Term newBnode = constructNewBNode(dfac, listOfAttributes);
                             map.put(term, newBnode);
                         }

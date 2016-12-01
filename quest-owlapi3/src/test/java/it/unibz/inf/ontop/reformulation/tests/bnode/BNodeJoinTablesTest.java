@@ -150,7 +150,8 @@ public class BNodeJoinTablesTest extends TestCase {
         QuestOWLConnection conn = reasoner.getConnection();
         QuestOWLStatement st = conn.createStatement();
 
-        String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> SELECT * WHERE { ?x a :Student  }";
+        String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> " +
+                "SELECT * WHERE { ?x a :Student  }";
         try {
 
             QuestOWLResultSet rs = st.executeTuple(query);

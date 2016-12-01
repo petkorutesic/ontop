@@ -62,10 +62,10 @@ public class BNodeJoinTablesTest extends TestCase {
     private OWLOntology ontology;
     private OBDADataFactory fac;
 
-    final String owlfile = "src/test/resources/bnode/to-delete-TestDatabase.owl";
-    final String obdafile = "src/test/resources/bnode/to-delete-TestDatabase.obda";
-    private final String dbCreateFile = "src/test/resources/bnode/to-delete-TestDatabase-create-h2.sql";
-    private final String dbDropDatabase = "src/test/resources/bnode/to-delete-TestDatabase-drop-h2.sql";
+    final String owlfile = "src/test/resources/bnode/threeTablesTestDatabase.owl";
+    final String obdafile = "src/test/resources/bnode/threeTablesTestDatabase.obda";
+    private final String dbCreateFile = "src/test/resources/bnode/threeTablesTestDatabase-create-h2.sql";
+    private final String dbDropDatabase = "src/test/resources/bnode/threeTablesTestDatabase-drop-h2.sql";
 
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";

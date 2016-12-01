@@ -18,7 +18,7 @@ mappingId	mappingStudent
 target		[] a :Student ; :studentName  {name} .
 source		SELECT * FROM student
 
-; Passed exams with blank nodes
+; Passed exams are mapped using blank nodes
 mappingId	mappingStudentExam
 target		[] :passedExam :exam{exam_id} .
 source		SELECT student_id, exam_id

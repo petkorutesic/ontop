@@ -1,0 +1,21 @@
+[PrefixDeclaration]
+:		http://it.unibz.krdb/obda/test/simple#
+quest:		http://obda.org/quest#
+
+[SourceDeclaration]
+sourceUri	h2
+connectionUrl	jdbc:h2:mem:questjunitdb-with-primarykey
+username	sa
+password	
+driverClass	org.h2.Driver
+
+[MappingDeclaration] @collection [[
+mappingId	mapping1
+; target	[] a :Message ; :text {message_text}^^xsd:string.
+target	:message{tab1.attr1}_{tab2.attr2} a :Message ; :text {tab1.message_text}^^xsd:string.
+source	SELECT tab1.attr1, tab1.message_text,
+               tab2.attr1, tab2.message_text
+        FROM t_message AS tab1, t_message AS tab2
+        WHERE tab1.attr1 > tab2.attr1
+]]
+

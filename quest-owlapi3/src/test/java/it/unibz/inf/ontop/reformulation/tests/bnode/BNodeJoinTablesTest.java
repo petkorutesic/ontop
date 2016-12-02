@@ -63,7 +63,7 @@ public class BNodeJoinTablesTest extends TestCase {
     private OBDADataFactory fac;
 
     final String owlfile = "src/test/resources/bnode/threeTablesTestDatabase.owl";
-    final String obdafile = "src/test/resources/bnode/threeTablesTestDatabase.obda";
+    final String obdafile = "src/test/resources/bnode/threeTables-TestDatabase.obda";
     private final String dbCreateFile = "src/test/resources/bnode/threeTablesTestDatabase-create-h2.sql";
     private final String dbDropDatabase = "src/test/resources/bnode/threeTablesTestDatabase-drop-h2.sql";
 
@@ -151,7 +151,7 @@ public class BNodeJoinTablesTest extends TestCase {
         QuestOWLStatement st = conn.createStatement();
 
         String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> " +
-                "SELECT * WHERE { ?x a :Student  }";
+                "SELECT * WHERE { ?x a :Message  }";
         try {
 
             QuestOWLResultSet rs = st.executeTuple(query);
@@ -175,23 +175,6 @@ public class BNodeJoinTablesTest extends TestCase {
             assertTrue(rs.nextRow());
             ind1 = rs.getOWLObject("x");
             assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b4", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b5", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b6", ToStringRenderer.getInstance().getRendering(ind1));
-/*
-            There are 7 blank nodes altogether
-            3 from Student table and
-            4 from passed Exams
- */
 
             assertFalse(rs.nextRow());
 

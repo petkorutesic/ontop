@@ -62,10 +62,10 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
     private OWLOntology ontology;
     private OBDADataFactory fac;
 
-    final String owlfile = "src/test/resources/bnode/simple-db-noprimarykeys.owl";
-    final String obdafile = "src/test/resources/bnode/simple-db-noprimarykeys.obda";
-    private final String dbCreateFile = "src/test/resources/bnode/db-noprimarykeys-create-h2.sql";
-    private final String dbDropDatabase = "src/test/resources/bnode/db-noprimarykeys-drop-h2.sql";
+    final String owlfile = "src/test/resources/bnode/simpleDBNoPK.owl";
+    final String obdafile = "src/test/resources/bnode/simpleDBNoPK.obda";
+    private final String dbCreateFile = "src/test/resources/bnode/simpleDBNoPK-create-h2.sql";
+    private final String dbDropDatabase = "src/test/resources/bnode/simpleDBNoPK-drop-h2.sql";
 
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";

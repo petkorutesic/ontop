@@ -73,14 +73,7 @@ public class BnodeMappingTest {
 
 	final String owlfile = "src/test/resources/bnode/simpleBNodeTestDatabase.owl";
 	final String obdafile = "src/test/resources/bnode/simpleBNodeTestDatabase.obda";
-//  This is a version of the mapping without blank nodes
-//	final String obdafile = "src/test/resources/emptiesDatabase.obda";
 
-//	 final String owlfile =
-//	 "src/main/resources/testcases-scenarios/virtual-mode/stockexchange/simplecq/stockexchange.owl";
-//	 final String obdafile =
-//	 "src/main/resources/testcases-scenarios/virtual-mode/stockexchange/simplecq/stockexchange-mysql.obda";
-//
 	private List<String> emptyConcepts = new ArrayList<String>();
 	private List<String> emptyRoles = new ArrayList<String>();
 	private Set<ClassExpression> emptyBasicConcepts = new HashSet<ClassExpression>();

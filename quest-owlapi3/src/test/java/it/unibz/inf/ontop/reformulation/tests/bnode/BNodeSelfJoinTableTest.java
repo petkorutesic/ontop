@@ -53,8 +53,8 @@ import java.sql.Statement;
 
    Query is just a simple SPARQL query.
  */
-public class BNodeWithPrimaryKeyTest extends TestCase {
-    final static Logger log = LoggerFactory.getLogger(BNodeWithPrimaryKeyTest.class);
+public class BNodeSelfJoinTableTest extends TestCase {
+    final static Logger log = LoggerFactory.getLogger(BNodeSelfJoinTableTest.class);
 
 
     private Connection conn;
@@ -63,13 +63,13 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
     private OBDADataFactory fac;
 
     final String owlfile = "src/test/resources/bnode/simpleDBWiithPK.owl";
-    final String obdafile = "src/test/resources/bnode/simpleDBWithPK.obda";
+    final String obdafile = "src/test/resources/bnode/simpleDBWithPKSelfJoin.obda";
     private final String dbCreateFile = "src/test/resources/bnode/simpleDBWithPK-create-h2.sql";
     private final String dbDropDatabase = "src/test/resources/bnode/simpleDBWithPK-drop-h2.sql";
 
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";
-    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb-with-primarykey";
+    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb";
     private final String jdbcDriverClass = "org.h2.Drive";
 
 
@@ -150,7 +150,7 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
         QuestOWLConnection conn = reasoner.getConnection();
         QuestOWLStatement st = conn.createStatement();
 
-        String query = "PREFIX : <http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :Message ; :text ?y }";
+        String query = "PREFIX http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :Message  }";
         try {
 
             QuestOWLResultSet rs = st.executeTuple(query);
@@ -161,9 +161,6 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
 
             assertTrue(rs.nextRow());
             OWLObject ind1 = rs.getOWLObject("x");
-
-            log.debug(ToStringRenderer.getInstance().getRendering(ind1));
-
             assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
 
             assertTrue(rs.nextRow());
@@ -178,6 +175,7 @@ public class BNodeWithPrimaryKeyTest extends TestCase {
             ind1 = rs.getOWLObject("x");
             assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
 
+            assertFalse(rs.nextRow());
 
 
         } catch (Exception e) {

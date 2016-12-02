@@ -64,7 +64,7 @@ public class BNodeTemplateGenerator {
                             List<String> tableList = tablesNamesFinder.getTableList(select);
                             QuotedIDFactory idfac = metadata.getQuotedIDFactory();
                             //Table tableName = (Table) table;
-                            //TODO: Is this schema ok or is it that important
+                            //TODO: Is this schema ok and is it that important
                             String schemaName = "";
                             List<String> listOfAttributes = new ArrayList<>();
                             for (String tableName : tableList){

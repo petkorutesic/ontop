@@ -11,10 +11,10 @@ driverClass	org.h2.Driver
 
 [MappingDeclaration] @collection [[
 mappingId	mapping1
-; target	[] a :Message ; :text {message_text}^^xsd:string.
-target	:message{tab1.attr1}_{tab2.attr2} a :Message ; :text {tab1.message_text}^^xsd:string.
-source	SELECT tab1.attr1, tab1.message_text,
-               tab2.attr1, tab2.message_text
+; target	 :message{tab1.attr1}_{tab2.attr1} a :Message ; :text {message_text}^^xsd:string.
+target	[] a :Message ; :text {tab1.message_text}^^xsd:string.
+source	SELECT tab1.attr1, tab1.attr1 as c1, tab1.message_text ,
+               tab2.attr1
         FROM t_message AS tab1, t_message AS tab2
         WHERE tab1.attr1 > tab2.attr1
 ]]

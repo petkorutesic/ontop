@@ -16,7 +16,9 @@ import it.unibz.inf.ontop.owlrefplatform.core.mappingprocessing.TMappingProcesso
 import it.unibz.inf.ontop.owlrefplatform.core.unfolding.DatalogUnfolder;
 import it.unibz.inf.ontop.parser.BNodeTemplateGenerator;
 import it.unibz.inf.ontop.parser.PreprocessProjection;
+import it.unibz.inf.ontop.parser.SQLQueryShallowParser;
 import it.unibz.inf.ontop.sql.*;
+import it.unibz.inf.ontop.sql.api.ParsedSQLQuery;
 import it.unibz.inf.ontop.utils.Mapping2DatalogConverter;
 import it.unibz.inf.ontop.utils.MappingSplitter;
 import it.unibz.inf.ontop.utils.MetaMappingExpander;
@@ -437,13 +439,15 @@ public class QuestUnfolder {
             try {
 
                 String sourceString = mapping.getSourceQuery().toString();
-                Select select = (Select) CCJSqlParserUtil.parse(sourceString);
+                //Shallow parsing used in order to extract tablenames and relation names
+                // in a case when we have "relation_name AS table_name" in FROM clause
+                ParsedSQLQuery sqlQueryParsed = SQLQueryShallowParser.parse(metadata.getQuotedIDFactory(), sourceString);
 
                 List<Function> targetQuery = mapping.getTargetQuery();
                 OBDADataFactory dfac = OBDADataFactoryImpl.getInstance();
 
                 BNodeTemplateGenerator bps = new BNodeTemplateGenerator(metadata, mapping);
-                bps.replaceUnlabeledBNodes(select, targetQuery, dfac);
+                bps.replaceUnlabeledBNodes(sqlQueryParsed, targetQuery, dfac);
 
             } catch (JSQLParserException e) {
                 log.debug("SQL Query cannot be preprocessed by the parser");

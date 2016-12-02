@@ -69,7 +69,7 @@ public class BNodeSelfJoinTableTest extends TestCase {
 
     private final String jdbcPassword = "";
     private final String jdbcUserName = "sa";
-    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb";
+    private final String jdbcUrl = "jdbc:h2:mem:questjunitdb-with-primarykey";
     private final String jdbcDriverClass = "org.h2.Drive";
 
 
@@ -150,7 +150,7 @@ public class BNodeSelfJoinTableTest extends TestCase {
         QuestOWLConnection conn = reasoner.getConnection();
         QuestOWLStatement st = conn.createStatement();
 
-        String query = "PREFIX http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :Message  }";
+        String query = "PREFIX : <http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :Message  }";
         try {
 
             QuestOWLResultSet rs = st.executeTuple(query);
@@ -175,6 +175,13 @@ public class BNodeSelfJoinTableTest extends TestCase {
             ind1 = rs.getOWLObject("x");
             assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
 
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b4", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b5", ToStringRenderer.getInstance().getRendering(ind1));
             assertFalse(rs.nextRow());
 
 

@@ -11,7 +11,8 @@ driverClass	org.h2.Driver
 
 [MappingDeclaration] @collection [[
 mappingId	mapping1
-target	_:{message_time}_{message_text} a :Message .
-source	SELECT message_time, message_text FROM t_message
+; message_time, message_text
+target	[] a :Message ; :text {message_text}.
+source	SELECT * FROM t_message
 ]]
 

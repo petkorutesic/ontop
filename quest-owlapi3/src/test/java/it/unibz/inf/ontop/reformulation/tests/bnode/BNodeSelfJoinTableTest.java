@@ -1,3 +1,4 @@
+
 package it.unibz.inf.ontop.reformulation.tests.bnode;
 
 /*

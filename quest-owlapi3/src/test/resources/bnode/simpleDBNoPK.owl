@@ -51,6 +51,7 @@
 
     <owl:DatatypeProperty rdf:about="http://it.unibz.krdb/obda/test/simple#time"/>
 
+    <owl:DatatypeProperty rdf:about="http://it.unibz.krdb/obda/test/simple#text"/>
 
 
     <!-- 

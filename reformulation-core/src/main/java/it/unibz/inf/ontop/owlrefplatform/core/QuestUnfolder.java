@@ -435,20 +435,15 @@ public class QuestUnfolder {
     private void preprocessUnlabeledBlankNodeTemplates(Collection<OBDAMappingAxiom> mappings, DBMetadata metadata) {
         // TODO: replace UnlabeledBlankNodeTemplates with proper ones
         //  Metadata object is used to retrieve primary keys
-        for (OBDAMappingAxiom mapping : mappings) {
+        for (OBDAMappingAxiom axiom : mappings) {
             try {
-
-                String sourceString = mapping.getSourceQuery().toString();
+                String sourceString = axiom.getSourceQuery().toString();
                 //Shallow parsing used in order to extract tablenames and relation names
                 // in a case when we have "relation_name AS table_name" in FROM clause
                 ParsedSQLQuery sqlQueryParsed = SQLQueryShallowParser.parse(metadata.getQuotedIDFactory(), sourceString);
-
-                List<Function> targetQuery = mapping.getTargetQuery();
-                OBDADataFactory dfac = OBDADataFactoryImpl.getInstance();
-
-                BNodeTemplateGenerator bps = new BNodeTemplateGenerator(metadata, mapping);
-                bps.replaceUnlabeledBNodes(sqlQueryParsed, targetQuery, dfac);
-
+                BNodeTemplateGenerator bps = new BNodeTemplateGenerator(metadata, axiom);
+                String query = bps.replaceUnlabeledBNodes(sqlQueryParsed);
+                axiom.setSourceQuery(fac.getSQLQuery(query));
             } catch (JSQLParserException e) {
                 log.debug("SQL Query cannot be preprocessed by the parser");
             }

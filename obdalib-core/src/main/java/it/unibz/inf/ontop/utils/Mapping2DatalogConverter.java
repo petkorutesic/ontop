@@ -881,7 +881,6 @@ public class Mapping2DatalogConverter {
                 }
 
             }else {
-
                 throw new UnsupportedOperationException("Unsupported analytic expression " + expression);
             }
         }

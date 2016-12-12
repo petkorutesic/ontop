@@ -64,7 +64,7 @@ public class OntopBootstrapBNodesTest {
         conn = DriverManager.getConnection(jdbcUrl, jdbcUserName, jdbcPassword);
         Statement st = conn.createStatement();
 
-        FileReader reader = new FileReader("src/test/resources/test/simpleDBNoPK-create-h2.sql");
+        FileReader reader = new FileReader("src/test/resources/test/db-noprimarykeys-create-h2.sql");
         BufferedReader in = new BufferedReader(reader);
         StringBuilder bf = new StringBuilder();
         String line = in.readLine();
@@ -92,7 +92,7 @@ public class OntopBootstrapBNodesTest {
 
         Statement st = conn.createStatement();
 
-        FileReader reader = new FileReader("src/test/resources/test/simpleDBNoPK-drop-h2.sql");
+        FileReader reader = new FileReader("src/test/resources/test/db-noprimarykeys-drop-h2.sql");
         BufferedReader in = new BufferedReader(reader);
         StringBuilder bf = new StringBuilder();
         String line = in.readLine();

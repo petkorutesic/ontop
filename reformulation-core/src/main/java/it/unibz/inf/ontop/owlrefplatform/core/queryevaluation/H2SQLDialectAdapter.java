@@ -91,6 +91,13 @@ public class H2SQLDialectAdapter extends SQL99DialectAdapter {
     }
 
 	@Override
+	public String rowNumber(String[] strings) {
+
+		return "ROW_NUMBER() OVER()";
+	}
+
+
+	@Override
 	public String getDummyTable() {
 		return "SELECT 1";
 	}

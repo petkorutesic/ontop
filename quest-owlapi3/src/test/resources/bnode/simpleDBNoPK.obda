@@ -12,7 +12,7 @@ driverClass	org.h2.Driver
 [MappingDeclaration] @collection [[
 mappingId	mapping1
 ; message_time, message_text
-target	[] a :Message ; :text {message_text}.
-source	SELECT * FROM t_message
+target	[] a :Message ; :text {message_text3}.
+source	SELECT message_text1 || message_text2 AS message_text3 FROM t_message
 ]]
 

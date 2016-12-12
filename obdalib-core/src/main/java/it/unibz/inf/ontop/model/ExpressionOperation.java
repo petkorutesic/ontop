@@ -86,7 +86,10 @@ public enum ExpressionOperation implements OperationPredicate {
 	// ROMAN (23 Dec 2015) THIS COMES ONLY FROM MAPPINGS
 	SQL_LIKE("like", COL_TYPE.BOOLEAN, COL_TYPE.LITERAL, COL_TYPE.LITERAL),
 	
-	QUEST_CAST("cast", null, null, null);
+	QUEST_CAST("cast", null, null, null),
+
+	/*Analytic  functions */
+	ROW_NUMBER("row_number", null);
 
 
 

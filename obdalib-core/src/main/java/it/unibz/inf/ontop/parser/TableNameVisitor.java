@@ -450,7 +450,19 @@ public class TableNameVisitor {
 
 		@Override
 		public void visit(AnalyticExpression analytic) {
-			unsupported(analytic);
+			System.out.println("Analytic expression. TableNameVisitor should be checked and extended");
+			switch (analytic.getName().toLowerCase()) {
+				case "row_number":
+					if (analytic.getOrderByElements() != null) {
+						for (OrderByElement ex : analytic.getOrderByElements()) {
+							ex.accept(orderByVisitor);
+						}
+					}
+					break;
+				default:
+					unsupported(analytic);
+					break;
+			}
 		}
 
 		@Override
@@ -522,6 +534,14 @@ public class TableNameVisitor {
 		@Override
 		public void visit(SubSelect subSelect) {
 			visitSubSelect(subSelect);
+		}
+	};
+
+	private final OrderByVisitor orderByVisitor = new OrderByVisitor() {
+
+		@Override
+		public void visit(OrderByElement orderBy) {
+
 		}
 	};
 }

@@ -151,26 +151,32 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
         QuestOWLConnection conn = reasoner.getConnection();
         QuestOWLStatement st = conn.createStatement();
 
-        String query = "PREFIX : <http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x a :Message. }";
+        String query = "PREFIX : <http://it.unibz.krdb/obda/test/simple#> SELECT * WHERE { ?x  :text ?y }";
         try {
 
 
             QuestOWLResultSet rs = st.executeTuple(query);
+            String sqlQuery = st.getUnfolding(query);
+            System.out.println("SQL: ");
+            System.out.println(sqlQuery);
+
             assertTrue(rs.nextRow());
             OWLObject ind1 = rs.getOWLObject("x");
             assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
 
             assertTrue(rs.nextRow());
             ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
             assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b2", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertFalse(rs.nextRow());
 
         } catch (Exception e) {
             throw e;

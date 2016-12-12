@@ -225,6 +225,21 @@ public class SQL99DialectAdapter implements SQLDialectAdapter {
 
 
 	@Override
+	public String rowNumber(String[] strings) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("ROW_NUMBER() OVER(");
+		if (strings.length > 0){
+			sql.append(String.format("ORDER BY %s", strings[0]));
+			for (int i = 1; i < strings.length; i++) {
+				sql.append(String.format(", %s", strings[i]));
+			}
+		}
+		sql.append(")");
+		return sql.toString();
+	}
+
+
+	@Override
 	public String sqlQualifiedColumn(String tablename, String columnname) {
 		// TODO: This should depend on whether the column name was quoted in the original sql query
 		return String.format("%s.\"%s\"", tablename, columnname);

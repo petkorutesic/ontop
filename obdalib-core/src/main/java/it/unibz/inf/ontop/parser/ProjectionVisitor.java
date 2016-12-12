@@ -153,7 +153,7 @@ public class ProjectionVisitor implements SelectVisitor, SelectItemVisitor, Expr
 		projection = new ProjectionJSQL();
 		Distinct distinct = plainSelect.getDistinct();
 	
-		if (distinct != null) { // for SELECT DISTINCT [ON (...)]			
+		if (distinct != null) { // for SELECT DISTINCT [ON (...)]
 			
 			if (distinct.getOnSelectItems() != null) {
 				bdistinctOn = true;
@@ -444,7 +444,19 @@ public class ProjectionVisitor implements SelectVisitor, SelectItemVisitor, Expr
 
 	@Override
 	public void visit(AnalyticExpression aexpr) {
-		unsupported(aexpr);
+		System.out.println("Analytic expression. Visitor should be augmented with necessary things");
+		switch (aexpr.getName().toLowerCase()) {
+			case "row_number":
+				if (aexpr.getOrderByElements() != null) {
+					for (OrderByElement ex : aexpr.getOrderByElements()) {
+						ex.accept(orderByVisitor);
+					}
+				}
+				break;
+			default:
+				unsupported(aexpr);
+				break;
+		}
 	}
 
 	@Override
@@ -529,5 +541,12 @@ public class ProjectionVisitor implements SelectVisitor, SelectItemVisitor, Expr
 	public void visit(StringValue stringValue) {
 		// NO-OP
 	}
-	
+
+	private final OrderByVisitor orderByVisitor = new OrderByVisitor() {
+
+		@Override
+		public void visit(OrderByElement orderBy) {
+
+		}
+	};
 }

@@ -41,6 +41,7 @@ import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
 import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.OrderByElement;
 import net.sf.jsqlparser.statement.select.SubSelect;
 
 import java.util.ArrayList;
@@ -867,7 +868,22 @@ public class Mapping2DatalogConverter {
 
         @Override
         public void visit(AnalyticExpression expression) {
-            throw new UnsupportedOperationException();
+            if (expression.getName().toLowerCase().equals("row_number")) {
+                List<Term> orderByTerms = new ArrayList<>();
+                if (expression.getOrderByElements() != null) {
+                    for (OrderByElement ex : expression.getOrderByElements()) {
+                        Expression orderByExpression = ex.getExpression();
+                        orderByTerms.add(visitEx(orderByExpression));
+                    }
+                    result = fac.getFunction(ExpressionOperation.ROW_NUMBER, orderByTerms);
+                }else{
+                    result = fac.getFunction(ExpressionOperation.ROW_NUMBER, new ArrayList<Term>());
+                }
+
+            }else {
+
+                throw new UnsupportedOperationException("Unsupported analytic expression " + expression);
+            }
         }
 
         @Override

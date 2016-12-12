@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  *
  * Changes unlabeled blank nodes according to the corresponding
- * target mapping part and the type of a database
+ * mapping and the type of tables in a database
  *
  *
  */
@@ -72,24 +72,35 @@ public class BNodeTemplateGenerator {
                             /*TODO Do we have here more tables then necessary and how about aliases of
                             atribute names */
                             //Going throught the list of all tables in the FROM clause
-                            Iterator tableSourceIterator = sqlQueryParsed.getTables().entrySet().iterator();
+
                             List<String> listOfAttributes = new ArrayList<String>();
+                            List<Column> orderByAttributes = new ArrayList<>();
+                            Boolean requiredRownum = false;
+                            Iterator tableSourceIterator = sqlQueryParsed.getTables().entrySet().iterator();
                             while (tableSourceIterator.hasNext()){
                                 Map.Entry<RelationID,RelationID> table = (Map.Entry<RelationID, RelationID>)tableSourceIterator.next();
                                 UniqueConstraint primaryKey = metadata.getDatabaseRelation(table.getValue()).getPrimaryKey();
 
-                                // Checks if the table has primary key
+                                /* If table doesn't have a primary primary key then row_number() window
+                                 * function is used for identifying blank nodes, otherwise primary key
+                                 * attributes of all tables in
+                                 *
+                                 */
                                 if (primaryKey == null) {
-                                    //collect those variables in any atom of the targetQuery
+                                    //collects those variables in any atom of the targetQuery
                                     // which refer to columns of this table without primary key
-                                    List<Column> orderByAttributes = getUsedColumnsInTargetQuery(table);
-                                    String rowNumAttributeName = addRownumExpression(select , orderByAttributes);
-                                    listOfAttributes.add(rowNumAttributeName);
+                                    requiredRownum = true;
+                                    orderByAttributes.addAll(getUsedColumnsInTargetQuery(table));
                                 }else{
                                     listOfAttributes.addAll(primaryKey.getAttributes().stream()
                                             .map(attr -> table.getKey().getTableName() + "." + attr.getID().getName())
                                             .collect(Collectors.toList()));
                                 }
+                            }
+                            if (requiredRownum) {
+                                String rowNumAttributeName = addRownumExpression(select);
+                                listOfAttributes.add(rowNumAttributeName);
+                                updateOrderByExpressionForRownum(select, orderByAttributes);
                             }
                             Term newBnode = constructNewBNode(dfac,((NumberedBNodePredicateImpl) pred).getId() ,listOfAttributes);
                             map.put(term, newBnode);
@@ -127,17 +138,10 @@ public class BNodeTemplateGenerator {
      * @param selectQuery the source query
      * @return  the query with columns or functions in the projection part
      */
-    public String addRownumExpression(Select selectQuery, List<Column> listOfRownumAttributes) {
-        String rowNumAttributeName = "rownumber";
+    public String addRownumExpression(Select selectQuery) {
+        String rowNumAttributeName = mapping.getId()+"_row_id";
         AnalyticExpression rownumExpression = new AnalyticExpression();
-        rownumExpression.setName("rownum");
-        List<OrderByElement> listOfOrderByElements = new ArrayList<>();
-        for (Column newColumn : listOfRownumAttributes) {
-            OrderByElement orderByElement = new OrderByElement();
-            orderByElement.setExpression(newColumn);
-            listOfOrderByElements.add(orderByElement);
-        }
-        rownumExpression.setOrderByElements(listOfOrderByElements);
+        rownumExpression.setName("row_number");
 
         SelectExpressionItem selectItem = new SelectExpressionItem();
         selectItem.setExpression(rownumExpression);
@@ -147,32 +151,27 @@ public class BNodeTemplateGenerator {
         return rowNumAttributeName;
     }
 
-    private class AddRownumAnalyticFuncton  implements SelectVisitor {
-
-        private final List<String> ListOfOrderByAttributes;
-
-        private AddRownumAnalyticFuncton(List<String> listOfOrderByAttributes) {
-            ListOfOrderByAttributes = listOfOrderByAttributes;
+    public void updateOrderByExpressionForRownum(Select selectQuery, List<Column> listOfRownumAttributes) {
+        List<OrderByElement> listOfOrderByElements = new ArrayList<>();
+        for (Column newColumn : listOfRownumAttributes) {
+            OrderByElement orderByElement = new OrderByElement();
+            orderByElement.setExpression(newColumn);
+            listOfOrderByElements.add(orderByElement);
         }
-
-        @Override
-        public void visit(PlainSelect plainSelect) {
-
-        }
-
-        @Override
-        public void visit(SetOperationList setOpList) {
-
-        }
-
-        @Override
-        public void visit(WithItem withItem) {
-
-        }
+        // TODO Maybe this should be improved to avoid duplicates in order by clauses
+        if (((PlainSelect) (selectQuery.getSelectBody())).getOrderByElements() != null)
+            ((PlainSelect) (selectQuery.getSelectBody())).getOrderByElements().addAll(listOfOrderByElements);
+         else
+            ((PlainSelect) (selectQuery.getSelectBody())).setOrderByElements(listOfOrderByElements);
     }
+
     /**
      * implements the case-insensitive comparison
      * (to be replaced in the future)
+     * TODO Column names which are used for creating select items of the SELECT
+     * clause should be included here like the following example
+     * target	[] a :Message ; :text {message_text3}.
+     . source	SELECT message_text1 || message_text2 AS message_text3 FROM t_message
      */
     private static class TargetVariableSet {
 
@@ -198,16 +197,17 @@ public class BNodeTemplateGenerator {
     private List<Column> getUsedColumnsInTargetQuery(Map.Entry<RelationID,RelationID> table){
         List<Column> usedColumns = new ArrayList<>();
         Set<Variable> variables = new HashSet<>();
+        RelationID relationId = table.getValue();
+        RelationID aliasId = table.getKey();
         for (Function atom1 : targetQuery)
             TermUtils.addReferencedVariablesTo(variables, atom1);
         TargetVariableSet targetVariables = new TargetVariableSet(variables);
-
         Table tableName = new Table(table.getKey().getTableName());
 
-        List<Attribute> allAttributesOfTable = metadata.getDatabaseRelation(table.getValue()).getAttributes();
+        List<Attribute> allAttributesOfTable = metadata.getDatabaseRelation(relationId).getAttributes();
         for (Attribute attribute : allAttributesOfTable){
             //TODO alias columns should be processed also and we should look at SelectItems part
-            String attributeName = table.getKey().getTableName() + "." + attribute.getID().getName();
+            String attributeName = aliasId.getTableName() + "." + attribute.getID().getName();
             if (targetVariables.contains(attributeName, attribute.getID().getName())) {
                 Column column = new Column(tableName, attribute.getID().getSQLRendering());
                 usedColumns.add(column);

@@ -137,7 +137,12 @@ public class BNodeJoinTablesTest extends TestCase {
         conn.commit();
     }
 
-
+    /**
+     * Test case retrieves 7 blank nodes.
+     * Four of them are generated using the mapping mappingStudent
+     * and the other three from the mapping mappingStudentExam
+     *
+     */
     @Test
     public void testQuery() throws Exception {
 
@@ -151,7 +156,7 @@ public class BNodeJoinTablesTest extends TestCase {
         QuestOWLStatement st = conn.createStatement();
 
         String query = "PREFIX : <http://www.semanticweb.org/smallDatabase#> " +
-                "SELECT * WHERE { ?x a :Message  }";
+                "SELECT * WHERE { ?x a :Student  }";
         try {
 
             QuestOWLResultSet rs = st.executeTuple(query);
@@ -176,8 +181,19 @@ public class BNodeJoinTablesTest extends TestCase {
             ind1 = rs.getOWLObject("x");
             assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
 
-            assertFalse(rs.nextRow());
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b4", ToStringRenderer.getInstance().getRendering(ind1));
 
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b5", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b6", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertFalse(rs.nextRow());
 
         } catch (Exception e) {
             throw e;

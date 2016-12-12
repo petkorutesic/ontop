@@ -1450,6 +1450,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 				String after = getSQLString(function.getTerm(1), index, false);
 				return sqladapter.strAfter(string, after);
 			}
+			else if (functionSymbol ==  ExpressionOperation.ROW_NUMBER) {
+				List<String> orderbyList = new ArrayList<>();
+				for (Term orderByTerm : function.getTerms()){
+					orderbyList.add(getSQLString(orderByTerm , index, false));
+				}
+				return sqladapter.rowNumber(orderbyList.toArray(new String[orderbyList.size()]));
+			}
 		}
 
 		/*

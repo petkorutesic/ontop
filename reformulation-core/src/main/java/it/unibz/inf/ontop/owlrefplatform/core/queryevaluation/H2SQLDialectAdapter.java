@@ -21,6 +21,7 @@ package it.unibz.inf.ontop.owlrefplatform.core.queryevaluation;
  * #L%
  */
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class H2SQLDialectAdapter extends SQL99DialectAdapter {
@@ -154,6 +155,27 @@ public class H2SQLDialectAdapter extends SQL99DialectAdapter {
 		bf.append("'");
 		
 		return bf.toString();
+	}
+
+	/**
+	 * Order by clause for the purpose of the window function row_number()
+	 * sorting is always in the default order
+	 */
+
+	public String sqlRowNumOrderBy(List<String> orderByconditions) {
+		String sql = "";
+		if(!orderByconditions.isEmpty()) {
+			sql = "ORDER BY ";
+			boolean needComma = false;
+			for (String c : orderByconditions) {
+				if (needComma) {
+					sql += ", ";
+				}
+				sql += c;
+				needComma = true;
+			}
+		}
+		return sql;
 	}
 	
 }

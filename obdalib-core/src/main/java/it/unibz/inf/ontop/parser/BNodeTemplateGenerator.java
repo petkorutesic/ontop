@@ -74,7 +74,7 @@ public class BNodeTemplateGenerator {
                             //Going throught the list of all tables in the FROM clause
 
                             List<String> listOfAttributes = new ArrayList<String>();
-                            List<Column> orderByAttributes = new ArrayList<>();
+                            List<Column> rowNumberOrderByAttributes = new ArrayList<>();
                             Boolean requiredRownum = false;
                             Iterator tableSourceIterator = sqlQueryParsed.getTables().entrySet().iterator();
                             while (tableSourceIterator.hasNext()){
@@ -90,7 +90,7 @@ public class BNodeTemplateGenerator {
                                     //collects those variables in any atom of the targetQuery
                                     // which refer to columns of this table without primary key
                                     requiredRownum = true;
-                                    orderByAttributes.addAll(getUsedColumnsInTargetQuery(table));
+                                    rowNumberOrderByAttributes.addAll(getUsedColumnsInTargetQuery(table));
                                 }else{
                                     listOfAttributes.addAll(primaryKey.getAttributes().stream()
                                             .map(attr -> table.getKey().getTableName() + "." + attr.getID().getName())
@@ -98,9 +98,8 @@ public class BNodeTemplateGenerator {
                                 }
                             }
                             if (requiredRownum) {
-                                String rowNumAttributeName = addRownumExpression(select);
+                                String rowNumAttributeName = addRownumExpression(select, rowNumberOrderByAttributes);
                                 listOfAttributes.add(rowNumAttributeName);
-                                updateOrderByExpressionForRownum(select, orderByAttributes);
                             }
                             Term newBnode = constructNewBNode(dfac,((NumberedBNodePredicateImpl) pred).getId() ,listOfAttributes);
                             map.put(term, newBnode);
@@ -136,33 +135,29 @@ public class BNodeTemplateGenerator {
      * Method adds rownum analytic function with names of columns which are extracted from
      * a table without primary keys
      * @param selectQuery the source query
-     * @return  the query with columns or functions in the projection part
+     * @param listOfRownumAttributes a list of attributes to be inserted in order by clause
+     * @return the alias name of the row_number function
      */
-    public String addRownumExpression(Select selectQuery) {
-        String rowNumAttributeName = mapping.getId()+"_row_id";
+    public String addRownumExpression(Select selectQuery, List<Column> listOfRownumAttributes) {
         AnalyticExpression rownumExpression = new AnalyticExpression();
+        String rowNumAttributeName = mapping.getId()+"_row_id";
         rownumExpression.setName("row_number");
 
-        SelectExpressionItem selectItem = new SelectExpressionItem();
-        selectItem.setExpression(rownumExpression);
-        selectItem.setAlias(new Alias(rowNumAttributeName));
-
-        ((PlainSelect)(selectQuery.getSelectBody())).getSelectItems().add(selectItem);
-        return rowNumAttributeName;
-    }
-
-    public void updateOrderByExpressionForRownum(Select selectQuery, List<Column> listOfRownumAttributes) {
         List<OrderByElement> listOfOrderByElements = new ArrayList<>();
         for (Column newColumn : listOfRownumAttributes) {
             OrderByElement orderByElement = new OrderByElement();
             orderByElement.setExpression(newColumn);
             listOfOrderByElements.add(orderByElement);
         }
-        // TODO Maybe this should be improved to avoid duplicates in order by clauses
-        if (((PlainSelect) (selectQuery.getSelectBody())).getOrderByElements() != null)
-            ((PlainSelect) (selectQuery.getSelectBody())).getOrderByElements().addAll(listOfOrderByElements);
-         else
-            ((PlainSelect) (selectQuery.getSelectBody())).setOrderByElements(listOfOrderByElements);
+        rownumExpression.setOrderByElements(listOfOrderByElements);
+
+        SelectExpressionItem selectItem = new SelectExpressionItem();
+        selectItem.setExpression(rownumExpression);
+        selectItem.setAlias(new Alias(rowNumAttributeName));
+
+        ((PlainSelect)(selectQuery.getSelectBody())).getSelectItems().add(selectItem);
+
+        return rowNumAttributeName;
     }
 
     /**
@@ -190,8 +185,8 @@ public class BNodeTemplateGenerator {
 
     /**
      *
-     * collect all variables which belong to this table
-     * and appear in some atom of the targetQuery
+     * collects all variables which belong to the given table
+     * and appear in some of the atoms of the targetQuery
      *
      */
     private List<Column> getUsedColumnsInTargetQuery(Map.Entry<RelationID,RelationID> table){
@@ -215,5 +210,4 @@ public class BNodeTemplateGenerator {
         }
         return usedColumns;
     }
-
 }

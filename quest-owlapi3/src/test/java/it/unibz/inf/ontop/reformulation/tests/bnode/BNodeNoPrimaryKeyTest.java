@@ -176,6 +176,22 @@ public class BNodeNoPrimaryKeyTest extends TestCase {
             ind1 = rs.getOWLObject("x");
             assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
 
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b2", ToStringRenderer.getInstance().getRendering(ind1));
+
+            assertTrue(rs.nextRow());
+            ind1 = rs.getOWLObject("x");
+            assertEquals("_:b3", ToStringRenderer.getInstance().getRendering(ind1));
+
             assertFalse(rs.nextRow());
 
         } catch (Exception e) {

@@ -273,11 +273,13 @@ public class SQLGenerator implements SQLQueryGenerator {
 
             //adds order by conditions in the case of row_number in  H2 database
             String  ORDER_BY = "";
-
+            /*
             if (rowNumberModifiers != null && sqladapter instanceof H2SQLDialectAdapter){
                 ORDER_BY = "\n" + ((H2SQLDialectAdapter) sqladapter).sqlRowNumOrderBy(rowNumberModifiers);
                 rowNumberModifiers = null;
             }
+
+            */
 
 
             String querystr = SELECT + FROM + WHERE + ORDER_BY;

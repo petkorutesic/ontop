@@ -1,0 +1,18 @@
+[PrefixDeclaration]
+:		http://it.unibz.krdb/obda/test/simple#
+quest:		http://obda.org/quest#
+
+[SourceDeclaration]
+sourceUri	h2
+connectionUrl	jdbc:oracle:thin:@//localhost:1521/xe
+username   info
+password   sa
+driverClass	oracle.jdbc.driver.OracleDriver
+
+[MappingDeclaration] @collection [[
+mappingId	mapping1
+; message_time, message_text
+target	[] a :Message ; :text {message_text3}; :text {message_text2} .
+source	SELECT message_text1 || message_text2 AS message_text3 FROM t_message order by message_text1
+]]
+

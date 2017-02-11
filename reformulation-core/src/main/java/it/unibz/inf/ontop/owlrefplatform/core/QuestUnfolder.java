@@ -81,7 +81,7 @@ public class QuestUnfolder {
         mappings.addAll(MappingSameAs.addSameAsInverse(mappings));
 
         /**
-         * Substitutes unlabeled BNodes such as BNode[i] with proper templates
+         * Substitutes unlabeled blank nodes such as BNode[i] with proper templates
          */
         preprocessUnlabeledBlankNodeTemplates(mappings, metadata);
 

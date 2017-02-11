@@ -3,6 +3,7 @@ package it.unibz.inf.ontop.parser;
 import it.unibz.inf.ontop.model.*;
 import it.unibz.inf.ontop.model.impl.NumberedBNodePredicateImpl;
 import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl;
+import it.unibz.inf.ontop.model.impl.RDBMSourceParameterConstants;
 import it.unibz.inf.ontop.model.impl.TermUtils;
 import it.unibz.inf.ontop.sql.Attribute;
 import it.unibz.inf.ontop.sql.DBMetadata;
@@ -65,38 +66,44 @@ public class BNodeTemplateGenerator {
                     Predicate pred = function.getFunctionSymbol();
 
                     if (pred instanceof NumberedBNodePredicateImpl) {
-                        // Find a name of the relation in the FROM part of the sql statement
                         Select select = sqlQueryParsed.getStatement();
                         SelectBody selectBody = select.getSelectBody();
                         if (selectBody instanceof PlainSelect) {
-                            /*TODO Do we have here more tables then necessary and how about aliases of
-                            atribute names */
-                            //Going throught the list of all tables in the FROM clause
 
                             List<String> listOfAttributes = new ArrayList<String>();
                             List<Column> rowNumberOrderByAttributes = new ArrayList<>();
                             Boolean requiredRownum = false;
+                            //Going throught the list of all tables in the FROM clause
                             Iterator tableSourceIterator = sqlQueryParsed.getTables().entrySet().iterator();
                             while (tableSourceIterator.hasNext()){
                                 Map.Entry<RelationID,RelationID> table = (Map.Entry<RelationID, RelationID>)tableSourceIterator.next();
                                 UniqueConstraint primaryKey = metadata.getDatabaseRelation(table.getValue()).getPrimaryKey();
-
                                 /* If table doesn't have a primary primary key then row_number() window
-                                 * function is used for identifying blank nodes, otherwise primary key
-                                 * attributes of all tables in
-                                 *
+                                 * function is used for identifying blank nodes, or in a case of oracle dbms
+                                 * ROWID pseudo column is used in parameters.
+                                 * on the other hand, if primary key exists then attributes that comprise primary key
+                                 * are used for the identification of unlabeled blank nodes
                                  */
                                 if (primaryKey == null) {
-                                    //collects those variables in any atom of the targetQuery
-                                    // which refer to columns of this table without primary key
-                                    requiredRownum = true;
-                                    rowNumberOrderByAttributes.addAll(getUsedColumnsInTargetQuery(table));
+                                    //Not a perfect way to check if a corresponding DBMS is oracle
+                                    if (metadata.getDbmsProductName()=="Oracle") {
+                                        String rowidAttribute = addROWIDColumnExpression(select,table.getKey().getTableName());
+                                        listOfAttributes.add(rowidAttribute);
+                                    }else {
+                                        requiredRownum = true;
+                                        //collects those variables in any atom of the targetQuery
+                                        // which refer to columns of this table without primary key
+                                        rowNumberOrderByAttributes.addAll(getUsedColumnsInTargetQuery(table));
+                                    }
                                 }else{
                                     listOfAttributes.addAll(primaryKey.getAttributes().stream()
                                             .map(attr -> table.getKey().getTableName() + "." + attr.getID().getName())
                                             .collect(Collectors.toList()));
                                 }
                             }
+                            //Creation of rownum expression item has to be outside of the while loop above,
+                            // because we have to make rownum() over (attrib1, attrib2)
+                            // for all attributes of all tables that have no primary key
                             if (requiredRownum) {
                                 String rowNumAttributeName = addRownumExpression(select, rowNumberOrderByAttributes);
                                 listOfAttributes.add(rowNumAttributeName);
@@ -134,9 +141,10 @@ public class BNodeTemplateGenerator {
     /**
      * Method adds rownum analytic function with names of columns which are extracted from
      * a table without primary keys
+     * The rownum analytic function is added into the selectQuery
      * @param selectQuery the source query
-     * @param listOfRownumAttributes a list of attributes to be inserted in order by clause
-     * @return the alias name of the row_number function
+     * @param listOfRownumAttributes the list of attributes to be inserted in order by clause
+     * @return rowNumAttributeName the alias name of the row_number function
      */
     public String addRownumExpression(Select selectQuery, List<Column> listOfRownumAttributes) {
         AnalyticExpression rownumExpression = new AnalyticExpression();
@@ -160,14 +168,27 @@ public class BNodeTemplateGenerator {
         return rowNumAttributeName;
     }
 
-    /**
-     * implements the case-insensitive comparison
-     * (to be replaced in the future)
-     * TODO Column names which are used for creating select items of the SELECT
-     * clause should be included here like the following example
-     * target	[] a :Message ; :text {message_text3}.
-     . source	SELECT message_text1 || message_text2 AS message_text3 FROM t_message
+   /**
+     * Method adds rowid  pseudo column  of a given table in the selectQuery
+     * @param selectQuery the source query
+     * @return rowidAttributeName the alias name of the rowid pseudo column
      */
+    public String addROWIDColumnExpression(Select selectQuery, String tableName) {
+        Column  rowidItem = new Column();
+        String rowidAttributeName = mapping.getId()+"_"+tableName+"_row_id";
+        rowidItem.setColumnName(tableName+".ROWID");
+
+        SelectExpressionItem selectItem = new SelectExpressionItem();
+        selectItem.setExpression(rowidItem);
+        selectItem.setAlias(new Alias(rowidAttributeName));
+
+        ((PlainSelect)(selectQuery.getSelectBody())).getSelectItems().add(selectItem);
+
+        return rowidAttributeName;
+    }
+
+
+
     private static class TargetVariableSet {
 
         private Set<String> variableNames = new HashSet<>();
@@ -186,7 +207,7 @@ public class BNodeTemplateGenerator {
     /**
      *
      * collects all variables which belong to the given table
-     * and appear in some of the atoms of the targetQuery
+     * and occur in some of atoms of the targetQuery
      *
      */
     private List<Column> getUsedColumnsInTargetQuery(Map.Entry<RelationID,RelationID> table){

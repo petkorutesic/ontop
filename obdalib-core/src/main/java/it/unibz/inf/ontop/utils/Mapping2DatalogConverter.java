@@ -328,22 +328,7 @@ public class Mapping2DatalogConverter {
 
 				index++;
 			}
-            //adding Oracle ROWID pseudo column in lookupTable
-            if(dbMetadata.getDbmsProductName()=="Oracle"){
-                Term var = fac.getVariable("t" + index);
-                QuotedID rowidAttribute = idfac.createAttributeID("ROWID");
-                lookupTable.put(null, rowidAttribute , var);
 
-                // full qualified attribute name using table alias
-                RelationID tableAlias = entry.getKey();
-                if (tableAlias != relationId)
-                    lookupTable.put(tableAlias, rowidAttribute, var);
-                else {
-                    lookupTable.put(relationId.getSchemalessID(), rowidAttribute, var);
-                    lookupTable.put(relationId, rowidAttribute, var);
-                }
-
-            }
 		}
 
 	

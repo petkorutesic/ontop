@@ -1,0 +1,19 @@
+[PrefixDeclaration]
+:		http://it.unibz.krdb/obda/test/simple#
+quest:		http://obda.org/quest#
+
+[SourceDeclaration]
+sourceUri	 simpleNoPK
+connectionUrl	jdbc:oracle:thin:@//localhost:1521/xe
+username   info
+password   sa
+driverClass	oracle.jdbc.driver.OracleDriver
+
+[MappingDeclaration] @collection [[
+mappingId	mapping1
+target	[] a :Message ; :text  {unique1} ; :text {unique2} ; :text {two} ; :text {four} ; :text {ten} ; :text {twenty} ; :text {onepercent} ;  :text {tenpercent} ; :text {twentypercent} ; :text {fiftypercent} ; :text {unique3} ; :text {evenonepercent} ; :text {oddonepercent}; :text {stringu1}; :text {stringu2}; :text {string4} .
+source	SELECT  unique1,  unique2, two, four, ten, twenty, onepercent, tenpercent,
+         twentypercent, fiftypercent, unique3, evenonepercent,
+         oddonepercent, stringu1, stringu2, string4  FROM t
+]]
+

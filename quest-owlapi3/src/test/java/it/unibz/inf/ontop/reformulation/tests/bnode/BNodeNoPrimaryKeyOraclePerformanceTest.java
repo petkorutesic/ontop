@@ -49,8 +49,8 @@ import java.sql.Connection;
 
    Query is just a simple SPARQL query.
  */
-public class BNodeNoPrimaryKeyOracleTest extends TestCase {
-    final static Logger log = LoggerFactory.getLogger(BNodeNoPrimaryKeyOracleTest.class);
+public class BNodeNoPrimaryKeyOraclePerformanceTest extends TestCase {
+    final static Logger log = LoggerFactory.getLogger(BNodeNoPrimaryKeyOraclePerformanceTest.class);
 
 
     private Connection conn;
@@ -59,11 +59,14 @@ public class BNodeNoPrimaryKeyOracleTest extends TestCase {
     private OBDADataFactory fac;
 
     final String owlfile = "src/test/resources/bnode/simpleDBNoPK.owl";
-    final String obdafile = "src/test/resources/bnode/simpleDBNoPKOracle.obda";
+    final String obdafile = "src/test/resources/bnode/simpleDBNoPKPerformanceTestOracle.obda";
 
 
     @Before
     public void setUp() throws Exception {
+
+        ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
+        double startTime = mxBean.getCurrentThreadCpuTime();
 
         // Loading the OWL file
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -76,12 +79,16 @@ public class BNodeNoPrimaryKeyOracleTest extends TestCase {
         ModelIOManager ioManager = new ModelIOManager(obdaModel);
         ioManager.load(obdafile);
 
+        double endTime = mxBean.getCurrentThreadCpuTime();
+        System.out.println("Loading time "+ (endTime - startTime)/1000000 + "ms");
+
     }
 
 
     @Test
     public void testQuery() throws Exception {
-
+        ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
+        double startTime = mxBean.getCurrentThreadCpuTime();
         // Creating a new instance of the reasoner
         QuestOWLFactory factory = new QuestOWLFactory();
         QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).build();
@@ -100,32 +107,15 @@ public class BNodeNoPrimaryKeyOracleTest extends TestCase {
             System.out.println("SQL: ");
             System.out.println(sqlQuery);
 
-            assertTrue(rs.nextRow());
-            OWLObject ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b2", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b0", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b1", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertTrue(rs.nextRow());
-            ind1 = rs.getOWLObject("x");
-            assertEquals("_:b2", ToStringRenderer.getInstance().getRendering(ind1));
-
-            assertFalse(rs.nextRow());
-
+            long counter = 0;
+            while(rs.nextRow()) {
+                ++counter;
+                OWLObject ind1 = rs.getOWLObject("x");
+                //System.out.println(ToStringRenderer.getInstance().getRendering(ind1));
+            }
+            double endTime = mxBean.getCurrentThreadCpuTime();
+            System.out.println("Number of retreived blank nodes: " + counter);
+            System.out.println("Process took "+ (endTime - startTime)/1000000 + "ms");
 
         } catch (Exception e) {
             throw e;

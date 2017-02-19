@@ -450,7 +450,6 @@ public class TableNameVisitor {
 
 		@Override
 		public void visit(AnalyticExpression analytic) {
-			System.out.println("Analytic expression. TableNameVisitor should be checked and extended");
 			switch (analytic.getName().toLowerCase()) {
 				case "row_number":
 					if (analytic.getOrderByElements() != null) {

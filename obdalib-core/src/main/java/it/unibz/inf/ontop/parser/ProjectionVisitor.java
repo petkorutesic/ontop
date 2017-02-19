@@ -444,7 +444,6 @@ public class ProjectionVisitor implements SelectVisitor, SelectItemVisitor, Expr
 
 	@Override
 	public void visit(AnalyticExpression aexpr) {
-		System.out.println("Analytic expression. Visitor should be augmented with necessary things");
 		switch (aexpr.getName().toLowerCase()) {
 			case "row_number":
 				if (aexpr.getOrderByElements() != null) {

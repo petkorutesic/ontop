@@ -230,23 +230,35 @@ public class DBMetadataExtractor {
 			// catalog is ignored for now (rs.getString("TABLE_CAT"))
 			try (ResultSet rs = md.getColumns(null, seedId.getSchemaName(), seedId.getTableName(), null)) {
 				while (rs.next()) {
-					RelationID relationId = RelationID.createRelationIdFromDatabaseRecord(idfac, rs.getString("TABLE_SCHEM"), 
-										rs.getString("TABLE_NAME"));
+					RelationID relationId = RelationID.createRelationIdFromDatabaseRecord(idfac, rs.getString("TABLE_SCHEM"),
+							rs.getString("TABLE_NAME"));
 					QuotedID attributeId = QuotedID.createIdFromDatabaseRecord(idfac, rs.getString("COLUMN_NAME"));
 					if (printouts)
 						System.out.println("         " + relationId + "." + attributeId);
-					
+
 					if (currentRelation == null || !currentRelation.getID().equals(relationId)) {
 						// switch to the next database relation
 						currentRelation = metadata.createDatabaseRelation(relationId);
 						extractedRelations.add(currentRelation);
 					}
-					
+
 					// columnNoNulls, columnNullable, columnNullableUnknown 
 					boolean isNullable = rs.getInt("NULLABLE") != DatabaseMetaData.columnNoNulls;
 					String typeName = rs.getString("TYPE_NAME");
 					int dataType = dt.getCorrectedDatatype(rs.getInt("DATA_TYPE"), typeName);
-					
+
+					currentRelation.addAttribute(attributeId, dataType, typeName, isNullable);
+				}
+				if (productName.contains("Oracle")){
+					//Adding ROWID to database columns
+					QuotedID attributeId = QuotedID.createIdFromDatabaseRecord(idfac, "ROWID");
+
+					// columnNoNulls, columnNullable, columnNullableUnknown
+					boolean isNullable = false;
+					String typeName =  "VARCHAR2";
+					//I made this rs.getInt("DATA_TYPE") with fixed value 12
+					int dataType = dt.getCorrectedDatatype(12, typeName);
+
 					currentRelation.addAttribute(attributeId, dataType, typeName, isNullable);
 				}
 			}

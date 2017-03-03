@@ -4,7 +4,7 @@ quest:		http://obda.org/quest#
 
 [SourceDeclaration]
 sourceUri	 simpleNoPK
-connectionUrl	jdbc:postgresql://localhost:5432/postgres
+connectionUrl	jdbc:postgresql://localhost:5432/test
 username   postgres
 password   sa
 driverClass	org.postgresql.Driver

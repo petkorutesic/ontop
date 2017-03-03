@@ -66,6 +66,7 @@ public class BNodeNoPrimaryKeyPostgresPerformanceTest extends TestCase {
 
         ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
         double startTime = mxBean.getCurrentThreadCpuTime();
+        long start = System.nanoTime();
 
         // Loading the OWL file
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -80,7 +81,7 @@ public class BNodeNoPrimaryKeyPostgresPerformanceTest extends TestCase {
 
         double endTime = mxBean.getCurrentThreadCpuTime();
         System.out.println("Loading time "+ (endTime - startTime)/1000000 + "ms");
-
+        System.out.println("Loading real time " + ((double)System.nanoTime()-start)/1000000 + "ms");
     }
 
 
@@ -88,6 +89,7 @@ public class BNodeNoPrimaryKeyPostgresPerformanceTest extends TestCase {
     public void testQuery() throws Exception {
         ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
         double startTime = mxBean.getCurrentThreadCpuTime();
+        long start = System.nanoTime();
         // Creating a new instance of the reasoner
         QuestOWLFactory factory = new QuestOWLFactory();
         QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).build();
@@ -115,7 +117,7 @@ public class BNodeNoPrimaryKeyPostgresPerformanceTest extends TestCase {
             double endTime = mxBean.getCurrentThreadCpuTime();
             System.out.println("Number of retreived blank nodes: " + counter);
             System.out.println("Process took "+ (endTime - startTime)/1000000 + "ms");
-
+            System.out.println("Simple process time " + ((double)System.nanoTime()-start)/1000000 + "ms");
         } catch (Exception e) {
             throw e;
         } finally {

@@ -1057,14 +1057,14 @@ public class SQLGenerator implements SQLQueryGenerator {
 
                     if (isStringColType(currentTerm, index)) {
                         //empty place holders: the correct uri is in the column of DB no need to replace
-                        if (split.length == 0) {
+                        if (split.length == 0 || pred instanceof BNodePredicate) {
                             repl = getSQLString(currentTerm, index, false);
                         } else {
                             repl = replace1 + (getSQLString(currentTerm, index, false)) + replace2;
                         }
 
                     } else {
-                        if (split.length == 0) {
+                        if (split.length == 0 || pred instanceof BNodePredicate) {
                             repl = sqladapter.sqlCast(getSQLString(currentTerm, index, false), Types.VARCHAR);
                         } else {
                             repl = replace1 + sqladapter.sqlCast(getSQLString(currentTerm, index, false), Types.VARCHAR) + replace2;

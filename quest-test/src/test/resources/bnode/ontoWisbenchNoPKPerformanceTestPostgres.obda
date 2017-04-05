@@ -2,12 +2,17 @@
 :		http://it.unibz.krdb/obda/test/simple#
 quest:		http://obda.org/quest#
 
+; mapping to onto-wisbanch database without primary keys
+; for generation used
+; https://github.com/marianormuro/onto-wisbench/tree/master/wisonsin/data-generator/src/main/java
+
+
 [SourceDeclaration]
 sourceUri	 simpleNoPK
-connectionUrl	jdbc:oracle:thin:@//localhost:1521/xe
-username   info
+connectionUrl	jdbc:postgresql://localhost:5432/test
+username   postgres
 password   sa
-driverClass	oracle.jdbc.driver.OracleDriver
+driverClass	org.postgresql.Driver
 
 [MappingDeclaration] @collection [[
 mappingId	mapping1

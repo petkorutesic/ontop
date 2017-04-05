@@ -1,4 +1,4 @@
-package it.unibz.inf.ontop.reformulation.tests.bnode;
+package it.unibz.inf.ontop.bnode;
 
 /*
  * #%L
@@ -30,7 +30,6 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.io.ToStringRenderer;
 import org.semanticweb.owlapi.model.OWLObject;
 import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
@@ -43,12 +42,14 @@ import java.lang.management.ThreadMXBean;
 import java.sql.Connection;
 
 /***
- * Performance test with H2 database.
+ * Test ensures that the system can work with unlabeled blank nodes using PostgreSQL database
+ * The testing database doesn't have primary key and in the mapping file
+   blank nodes are used to refer to different columns.
 
    Query is just a simple SPARQL query.
  */
-public class BNodeNoPrimaryKeyH2PerformanceTest extends TestCase {
-    final static Logger log = LoggerFactory.getLogger(BNodeNoPrimaryKeyH2PerformanceTest.class);
+public class BNodeNoPrimaryKeyPostgresPerformanceTest extends TestCase {
+    final static Logger log = LoggerFactory.getLogger(BNodeNoPrimaryKeyPostgresPerformanceTest.class);
 
 
     private Connection conn;
@@ -57,7 +58,7 @@ public class BNodeNoPrimaryKeyH2PerformanceTest extends TestCase {
     private OBDADataFactory fac;
 
     final String owlfile = "src/test/resources/bnode/simpleDBNoPK.owl";
-    final String obdafile = "src/test/resources/bnode/simpleDBNoPKPerformanceTestH2.obda";
+    final String obdafile = "src/test/resources/bnode/ontoWisbenchNoPKPerformanceTestPostgres.obda";
 
 
     @Before
@@ -65,6 +66,7 @@ public class BNodeNoPrimaryKeyH2PerformanceTest extends TestCase {
 
         ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
         double startTime = mxBean.getCurrentThreadCpuTime();
+        long start = System.nanoTime();
 
         // Loading the OWL file
         OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
@@ -79,6 +81,7 @@ public class BNodeNoPrimaryKeyH2PerformanceTest extends TestCase {
 
         double endTime = mxBean.getCurrentThreadCpuTime();
         System.out.println("Loading time "+ (endTime - startTime)/1000000 + "ms");
+        System.out.println("Loading real time " + ((double)System.nanoTime()-start)/1000000 + "ms");
     }
 
 
@@ -86,6 +89,7 @@ public class BNodeNoPrimaryKeyH2PerformanceTest extends TestCase {
     public void testQuery() throws Exception {
         ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
         double startTime = mxBean.getCurrentThreadCpuTime();
+        long start = System.nanoTime();
         // Creating a new instance of the reasoner
         QuestOWLFactory factory = new QuestOWLFactory();
         QuestOWLConfiguration config = QuestOWLConfiguration.builder().obdaModel(obdaModel).build();
@@ -106,14 +110,14 @@ public class BNodeNoPrimaryKeyH2PerformanceTest extends TestCase {
 
             long counter = 0;
             while(rs.nextRow()) {
-                 ++counter;
+                ++counter;
                 OWLObject ind1 = rs.getOWLObject("x");
-            //    System.out.println(ToStringRenderer.getInstance().getRendering(ind1));
+                //System.out.println(ToStringRenderer.getInstance().getRendering(ind1));
             }
             double endTime = mxBean.getCurrentThreadCpuTime();
             System.out.println("Number of retreived blank nodes: " + counter);
             System.out.println("Process took "+ (endTime - startTime)/1000000 + "ms");
-
+            System.out.println("Simple process time " + ((double)System.nanoTime()-start)/1000000 + "ms");
         } catch (Exception e) {
             throw e;
         } finally {

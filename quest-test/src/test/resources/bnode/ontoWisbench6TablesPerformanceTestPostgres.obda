@@ -1,0 +1,63 @@
+[PrefixDeclaration]
+:		http://it.unibz.krdb/obda/test/simple#
+quest:		http://obda.org/quest#
+
+; mapping to onto-wisbanch database without primary keys
+; for generation used
+; https://github.com/marianormuro/onto-wisbench/tree/master/wisonsin/data-generator/src/main/java
+
+[SourceDeclaration]
+sourceUri	 simpleNoPK
+connectionUrl  jdbc:h2:~/Desktop/ontoptestdb
+username sa
+password   
+driverClass	org.h2.Driver
+
+
+[MappingDeclaration] @collection [[
+mappingId	mapping11
+target	[] a :A1 ; :Property1  :name/{unique2} .
+source   select unique2 FROM t1
+         where onepercent >= 0 AND onepercent < 20
+
+mappingId  mapping12
+target	[] a :A1 ; :Property1  :name/{unique2} .
+source   select unique2  FROM t2
+         where onepercent >= 10 AND onepercent < 30
+
+mappingId  mapping21
+target	[] a :A2 ; :Property2  :name/{unique2}/{stringu2} .
+source   select unique2, stringu2  FROM t3
+         where onepercent >= 0 AND onepercent < 40
+
+mappingId  mapping22
+target	[] a :A2 ; :Property3  :name/{unique2}/{stringu2}/{stringu1} .
+source   select unique2, stringu1, stringu2  FROM t4
+         where onepercent >= 30 AND onepercent < 70
+
+mappingId  mapping31
+target	[] a :A3 ; :Property3  :name/{unique2}/{stringu2}/{stringu1} .
+source   select unique2, stringu1, stringu2  FROM t5
+         where onepercent >= 0 AND onepercent < 50
+
+mappingId  mapping32
+target	[] a :A3 ; :Property3  :name/{unique2}/{stringu2}/{stringu1} .
+source   select unique2, stringu1, stringu2  FROM t6
+         where onepercent >= 30 AND onepercent < 80
+
+mappingId	mapping41
+target	[] a :A4 ; :Property4  :name/{t1.unique2}/{t2.stringu1} .
+source   select unique1,unique2, stringu1, stringu2  FROM t1, t2
+         where t1.unique1 = t2.unique2
+
+mappingId	mapping51
+target	_:{unique1} a :A5 ; :Property4  :name/{t1.unique2}/{t2.stringu1} .
+source   select unique1,unique2, stringu1, stringu2  FROM t1
+         where onepercent >= 0 AND onepercent < 40
+
+mappingId	mapping52
+target	_:{unique1} a :A5 ; :Property4  :name/{t1.unique2}/{t2.stringu1} .
+source   select unique1,unique2, stringu1, stringu2  FROM t2
+         where onepercent >= 30 AND onepercent < 70
+
+]]

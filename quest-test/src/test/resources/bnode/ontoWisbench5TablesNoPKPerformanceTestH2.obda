@@ -1,0 +1,43 @@
+[PrefixDeclaration]
+:		http://it.unibz.krdb/obda/test/simple#
+quest:		http://obda.org/quest#
+
+; mapping to onto-wisbanch database without primary keys
+; for generation used
+; https://github.com/marianormuro/onto-wisbench/tree/master/wisonsin/data-generator/src/main/java
+
+[SourceDeclaration]
+sourceUri	 simpleNoPK
+connectionUrl  jdbc:h2:~/Desktop/ontoptestdb
+username sa
+password    
+driverClass	org.h2.Driver
+
+[MappingDeclaration] @collection [[
+mappingId	mapping1
+target	[] a :A1 ; :Property1  :name/{unique2}.
+source   select unique2  FROM t1
+         where onepercent >= 0 AND onepercent < 20
+
+mappingId  mapping2
+target	[] a :A2 ; :Property2  :name/{unique2}.
+source   select unique2  FROM t2
+         where onepercent >= 20 AND onepercent < 40
+
+mappingId  mapping3
+target	[] a :A3 ; :Property3  :name/{unique2}.
+source   select unique2  FROM t3
+         where onepercent >= 40 AND onepercent < 60
+
+mappingId  mapping4
+target	[] a :A4 ; :Property4  :name/{unique1} .
+source   select unique1  FROM t4
+         where onepercent >= 60 AND onepercent < 80
+
+mappingId  mapping5
+target	[] a :A5 ; :Property5  :name/{unique1} .
+source   select unique1  FROM t5
+         where onepercent >= 80 AND onepercent <= 100
+
+]]
+

@@ -8,10 +8,10 @@ quest:		http://obda.org/quest#
 
 [SourceDeclaration]
 sourceUri	 simpleNoPK
-connectionUrl	jdbc:oracle:thin:@//localhost:1521/xe
-username   system
-password   oracle
-driverClass	oracle.jdbc.driver.OracleDriver
+connectionUrl  jdbc:h2:~/Desktop/ontoptestdb
+username sa
+password   
+driverClass	org.h2.Driver
 
 
 [MappingDeclaration] @collection [[

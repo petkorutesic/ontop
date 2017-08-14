@@ -26,7 +26,6 @@ import it.unibz.inf.ontop.model.OBDADataFactory;
 import it.unibz.inf.ontop.model.OBDAModel;
 import it.unibz.inf.ontop.model.impl.OBDADataFactoryImpl;
 import it.unibz.inf.ontop.owlrefplatform.owlapi.*;
-import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.semanticweb.owlapi.apibinding.OWLManager;
@@ -50,8 +49,8 @@ import java.sql.Connection;
  * To compare generation of unlabeled blank nodes over tables with and without primary keys.
  * all tests are executed over the same database just with added primary keys 
  */
-public class BNode7TablesOraclePerformanceTest {
-    final static Logger log = LoggerFactory.getLogger(BNode7TablesOraclePerformanceTest.class);
+public class BNode6TablesOraclePerformanceTest {
+    final static Logger log = LoggerFactory.getLogger(BNode6TablesOraclePerformanceTest.class);
 
 
     private Connection conn;
@@ -60,7 +59,7 @@ public class BNode7TablesOraclePerformanceTest {
     private OBDADataFactory fac;
 
     final String owlfile = "src/test/resources/bnode/performanceTestMoreTablesOntology.owl";
-    final String obdafile = "src/test/resources/bnode/ontoWisbench7TablesPerformanceTestOracle.obda";
+    final String obdafile = "src/test/resources/bnode/ontoWisbench6TablesPerformanceTestOracle.obda";
 
 
     @Before

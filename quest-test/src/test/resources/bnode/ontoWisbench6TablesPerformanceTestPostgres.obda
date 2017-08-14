@@ -8,10 +8,10 @@ quest:		http://obda.org/quest#
 
 [SourceDeclaration]
 sourceUri	 simpleNoPK
-connectionUrl  jdbc:h2:~/Desktop/ontoptestdb
-username sa
-password   
-driverClass	org.h2.Driver
+connectionUrl	jdbc:postgresql://localhost:7777/postgres
+username   postgres
+password   postgres2
+driverClass	org.postgresql.Driver
 
 
 [MappingDeclaration] @collection [[

@@ -1,7 +1,9 @@
 package it.unibz.inf.ontop.model.type.impl;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
 import it.unibz.inf.ontop.model.term.functionsymbol.BNodePredicate;
 import it.unibz.inf.ontop.model.term.functionsymbol.DatatypePredicate;
 import it.unibz.inf.ontop.model.term.functionsymbol.Predicate;
@@ -11,9 +13,12 @@ import it.unibz.inf.ontop.model.term.functionsymbol.URITemplatePredicate;
 import it.unibz.inf.ontop.model.term.*;
 import it.unibz.inf.ontop.model.type.TermType;
 import it.unibz.inf.ontop.exception.IncompatibleTermException;
+import it.unibz.inf.ontop.utils.TreeNode;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static it.unibz.inf.ontop.model.OntopModelSingletons.TYPE_FACTORY;
 import static it.unibz.inf.ontop.model.term.functionsymbol.Predicate.COL_TYPE.*;
@@ -50,8 +55,56 @@ public class TermTypeInferenceTools {
                 .put(UNSIGNED_INT, NON_NEGATIVE_INTEGER) // Subtype substitution
                 .build();
 
+        TreeNode<COL_TYPE> literalHierarchy = new TreeNode(LITERAL);
+        literalHierarchy.addChild(LITERAL_LANG);
+        literalHierarchy.addChild(STRING);
+        literalHierarchy.addChild(BOOLEAN);
+        literalHierarchy.addChild(DATE);
+        TreeNode<COL_TYPE> datetime = new TreeNode(DATETIME);
+        literalHierarchy.addChild(datetime);
+        datetime.addChild(DATETIME_STAMP);
+        literalHierarchy.addChild(TIME);
+        literalHierarchy.addChild(YEAR);
+        TreeNode<COL_TYPE> doubleType = new TreeNode(DOUBLE);
+        literalHierarchy.addChild(doubleType);
+        TreeNode<COL_TYPE> floatType = new TreeNode(FLOAT);
+        doubleType.addChild(floatType);
+        TreeNode<COL_TYPE> decimalType = new TreeNode(DECIMAL);
+        floatType.addChild(decimalType);
+        TreeNode<COL_TYPE> integerType = new TreeNode(INTEGER);
+        decimalType.addChild(integerType);
+        TreeNode<COL_TYPE> longType = new TreeNode(LONG);
+        integerType.addChild(longType);
+        longType.addChild(INT);
+        TreeNode<COL_TYPE> nonNegativeInteger = new TreeNode(NON_NEGATIVE_INTEGER);
+        integerType.addChild(nonNegativeInteger);
+        TreeNode<COL_TYPE> positiveIntegerType = new TreeNode(POSITIVE_INTEGER);
+        nonNegativeInteger.addChild(positiveIntegerType);
+        TreeNode<COL_TYPE> nonPositiveInteger = new TreeNode(NON_POSITIVE_INTEGER);
+        integerType.addChild(nonPositiveInteger);
+        TreeNode<COL_TYPE> negativeInteger = new TreeNode(NEGATIVE_INTEGER);
+        nonPositiveInteger.addChild(negativeInteger);
+        TreeNode<COL_TYPE> unsignedInt = new TreeNode(UNSIGNED_INT);
+        nonNegativeInteger.addChild(unsignedInt);
+
+        Table<COL_TYPE, COL_TYPE, COL_TYPE> literalHierarchySaturatedTable = HashBasedTable.create();
+        List<TreeNode<COL_TYPE>> literalHierarchyList = literalHierarchy.preOrderTraversal();
+        literalHierarchyList.stream().forEach(
+                treeNode1 -> literalHierarchyList.stream().forEach(
+                        treeNode2 -> {
+                            Optional<COL_TYPE> commonType = treeNode1.lowestCommonAncestor(treeNode2);
+                            if(commonType.isPresent()) {
+                                if(!literalHierarchySaturatedTable.contains(treeNode1.getChildren(),treeNode2.getChildren()))
+                                    literalHierarchySaturatedTable.put(treeNode1.getData(), treeNode2.getData(), commonType.get());
+                                if(! literalHierarchySaturatedTable.contains(treeNode2.getChildren(),treeNode1.getChildren()))
+                                    literalHierarchySaturatedTable.put(treeNode2.getData(), treeNode1.getData(), commonType.get());
+                            }
+                        }
+                )
+        );
 
         ImmutableTable.Builder<COL_TYPE, COL_TYPE, COL_TYPE> saturatedHierarchyBuilder = ImmutableTable.builder();
+
 
         datatypeHierarchy.forEach((child, parent) -> {
             saturatedHierarchyBuilder.put(child, child, child);
@@ -80,6 +133,7 @@ public class TermTypeInferenceTools {
         /**
          * Other literal type combinations
          */
+
         COL_TYPE.LITERAL_TYPES.stream().forEach(
                 type1 -> COL_TYPE.LITERAL_TYPES.stream().forEach(
                             type2 -> {
@@ -90,7 +144,55 @@ public class TermTypeInferenceTools {
                     )
         );
 
-        return tableBuilder.build();
+        ImmutableTable.Builder<COL_TYPE, COL_TYPE, COL_TYPE> newTableBuilder = ImmutableTable.<COL_TYPE, COL_TYPE, COL_TYPE>builder()
+                // Base COL_TYPES
+                //  .put(LITERAL, LITERAL, LITERAL)
+                .put(OBJECT, OBJECT, OBJECT)
+                .put(BNODE, BNODE, BNODE)
+                .put(NULL, NULL, NULL)
+                .put(UNSUPPORTED, UNSUPPORTED, UNSUPPORTED)
+                // .putAll(saturatedHierarchy);
+                .putAll(literalHierarchySaturatedTable);
+
+       ImmutableTable<COL_TYPE,COL_TYPE,COL_TYPE> newTable = newTableBuilder.build();
+       ImmutableTable<COL_TYPE,COL_TYPE,COL_TYPE> oldTable = tableBuilder.build();
+
+       AtomicReference<Integer> i = new AtomicReference<>(0);
+       System.out.println("In new table but not in old");
+       newTable.rowMap().forEach( (type1,map1)  -> {
+           map1.forEach( (type2, result) -> {
+              if (!oldTable.contains(type1,type2))
+                  System.out.println("Completely new " + type1.toString() + ", " + type2.toString() + " -> " + result.toString());
+              else if (oldTable.get(type1,type2)!= result) {
+                  i.set(i.get()+1);
+                  System.out.println("new " + type1.toString() + ", " + type2.toString() + " -> " + result.toString());
+                  System.out.println("old " + type1.toString() + ", " + type2.toString() + " -> " + oldTable.get(type1, type2).toString());
+              }
+           });
+
+       });
+
+       System.out.println("In total " + i);
+       System.out.println();
+
+       AtomicReference<Integer> j = new AtomicReference<>(0);
+       System.out.println("In old table but not in the new one");
+       oldTable.rowMap().forEach( (type1,map1)  -> {
+           map1.forEach( (type2, result) -> {
+              if (!newTable.contains(type1,type2))
+                  System.out.println("Completely old " + type1.toString() + ", " + type2.toString() + " -> " + result.toString());
+              else if (newTable.get(type1,type2)!= result) {
+                  j.set(j.get()+1);
+                  System.out.println("old " + type1.toString() + ", " + type2.toString() + " -> " + result.toString());
+                  System.out.println("new " + type1.toString() + ", " + type2.toString() + " -> " + newTable.get(type1, type2).toString());
+              }
+           });
+
+       });
+       System.out.println("In total " + j);
+       System.out.println();
+
+        return oldTable;
     }
 
     private static final Optional<TermType> OPTIONAL_OBJECT_TERM_TYPE = Optional.of(TYPE_FACTORY.getTermType(OBJECT));
